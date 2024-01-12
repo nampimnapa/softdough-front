@@ -12,19 +12,22 @@ const kanit = Kanit({
 
 
 function detailstaff() {
-    const categoriesData = {
-        ทั้งหมด: [
+
+    // Data JSON
+    const categoriesData = 
+     [
             {
-                id: 1,
-                name: 'น้องอายฟู',
-                username: 'eyefu',
-                pw: '1234',
-                tel: '099-9999999',
-                depart: 'ฝ่ายผลิต'
+                st_id: 1,
+                st_name: 'น้องอายฟู',
+                st_username: 'eyefu',
+                st_password: '1234',
+                st_tel: '099-9999999',
+                st_type: '1',
+                st_start: "2025-01-12"
             },
 
-        ],
-    };
+        ]
+
     const [categories, setCategories] = useState(categoriesData);
 
     const [workDate, setWorkDate] = useState({
@@ -32,23 +35,30 @@ function detailstaff() {
         endDate: null
     });
 
-    //Test value
+    // setWorkDate({
+    //     startDate: categories[0].st_start,
+    //     endDate: categories[0].st_start
+    // })
+
+    // console.log(workDate);
+
+
+    //leaveDate
     const [leaveDate, setLeaveDate] = useState({
         startDate: null,
         endDate: null
     });
 
 
-    const handleValueChange = (newValue) => {
-        console.log("newValue:", newValue);
-        setValue(newValue);
-    }
+
     // const [workDate, setWorkDate] = useState(null);
     const [leaveDateselect, setLeaveDateselect] = useState(null);
     const handleWorkDateChange = (newValue) => {
         console.log("workDate:", newValue);
         setWorkDate(newValue);
     };
+
+
     const handleLeaveDateChange = (newValue) => {
         console.log("leaveDate:", newValue);
         setLeaveDate(newValue);
@@ -86,7 +96,7 @@ function detailstaff() {
         <div className='h-screen'>
             <button className='my-3 mx-5 '>
                 <Link href="/staff/detailstaff" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
-                    <ChevronLeftIcon class="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
+                    <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
                     รายละเอียดพนักงาน
                 </Link>
             </button>
@@ -94,14 +104,14 @@ function detailstaff() {
 
             {Object.keys(categories).map((staff, idx) => (
                 <div className="mt-5 w-1/2 ">
-                    {categories[staff].map((staff) => (
+                    {categories.map((staff) => (
                         <div className="grid grid-cols-3 items-center ">
                             <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 ชื่อพนักงาน :</label>
                             <div className="mt-2 col-span-2 ">
                                 <input
-                                    key={staff.id}
-                                    value={staff.name}
+                                    key={staff.st_id}
+                                    value={staff.st_name}
                                     type="text"
                                     name="first-name"
                                     id="first-name"
@@ -113,13 +123,13 @@ function detailstaff() {
                             </div>
                         </div>
                     ))}
-                    {categories[staff].map((staff) => (
+                    {categories.map((staff) => (
                         <div className="grid grid-cols-3 items-center ">
                             <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 ชื่อผู้ใช้งาน :</label>
                             <div className="mt-2 col-span-2">
                                 <input
-                                    value={staff.username}
+                                    value={staff.st_username}
 
                                     type="text"
                                     name="last-name"
@@ -131,13 +141,13 @@ function detailstaff() {
                             </div>
                         </div>
                     ))}
-                    {categories[staff].map((staff) => (
+                    {categories.map((staff) => (
                         <div className="grid grid-cols-3 items-center ">
                             <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 รหัสผ่าน :</label>
                             <div className="mt-2 col-span-2">
                                 <input
-                                    value={staff.pw}
+                                    value={staff.st_password}
                                     type="text"
                                     name="last-name"
                                     id="last-name"
@@ -148,13 +158,13 @@ function detailstaff() {
                             </div>
                         </div>
                     ))}
-                    {categories[staff].map((staff) => (
+                    {categories.map((staff) => (
                         <div className="grid grid-cols-3 items-center ">
                             <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 เบอร์โทร :</label>
                             <div className="mt-2 col-span-2">
                                 <input
-                                    value={staff.tel}
+                                    value={staff.st_tel}
 
                                     type="text"
                                     name="last-name"
@@ -166,7 +176,7 @@ function detailstaff() {
                             </div>
                         </div>
                     ))}
-                    {categories[staff].map((staff) => (
+                    {categories.map((staff) => (
                         // selected
                         // <div className="grid grid-cols-3 items-center ">
                         //     <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
@@ -185,13 +195,13 @@ function detailstaff() {
                             <div className="mt-2 col-span-2 flex">
                                 <div className="form-control">
                                     <label className="label cursor-pointer ">
-                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182] " />
+                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182] " checked={staff.st_type === "1"}/>
                                         <span className="label-text text-[#73664B] px-3 ">พนักงานฝ่ายขาย</span>
                                     </label>
                                 </div>
                                 <div className="form-control ml-4">
                                     <label className="label cursor-pointer">
-                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182]" />
+                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182]" checked={staff.st_type === "2"}/>
                                         <span className="label-text text-[#73664B] px-3">พนักงานฝ่ายผลิต</span>
                                     </label>
                                 </div>
@@ -201,22 +211,21 @@ function detailstaff() {
                     ))
                     }
                     {
-                        categories[staff].map((staff) => (
+                        categories.map((staff) => (
                             <div className="grid grid-cols-3 items-center mt-3 ">
                                 <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                     วันที่เข้าทำงาน :</label>
                                 <Datepicker
-                                    className={`bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}
                                     useRange={false}
                                     asSingle={true}
-                                    value={workDate}
+                                    value={staff.st_start}
                                     onChange={handleWorkDateChange}
                                 />
 
                             </div>
                         ))
                     }
-                    {categories[staff].map((staff) => (
+                    {categories.map((staff) => (
                         // selected
                         // <div className="grid grid-cols-3 items-center ">
                         //     <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
@@ -257,7 +266,6 @@ function detailstaff() {
                             <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B] mt-3 text-right mr-5">
                                 วันที่ลาออก :</label>
                             <Datepicker
-                                className={`bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm sm:text-sm sm:leading-6 pl-2`}
                                 useRange={false}
                                 asSingle={true}
                                 value={leaveDate}

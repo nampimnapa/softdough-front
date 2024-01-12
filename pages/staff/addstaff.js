@@ -13,10 +13,10 @@ const kanit = Kanit({
 function addstaff() {
 
   const [nameEm, setNameEm] = useState('');
-  const [userName , setUserName] = useState('');
-  const [userTel , setUserTel] = useState('');
-  const [userPassw , setUserPassw] = useState('');
-  const [userDepart , setUserDepart] = useState('');
+  const [userName, setUserName] = useState('');
+  const [userTel, setUserTel] = useState('');
+  const [userPassw, setUserPassw] = useState('');
+  const [userDepart, setUserDepart] = useState('');
   const [value, setValue] = useState({
     startDate: null,
     endDate: null
@@ -37,7 +37,12 @@ function addstaff() {
   const openModal = () => {
     setIsOpen(true);
   };
-// ปุ่มยกเลิก
+
+  const InputSave =() =>{
+    console.log("Test")
+
+  }
+  // ปุ่มยกเลิก
   const [formData, setFormData] = useState({
     name: '',
     username: '',
@@ -56,7 +61,7 @@ function addstaff() {
   // };
 
   // FormData sand to API ถ้าส่งให้ อฟ ก็ส่งอันนี้ไปให้เลย Type JSON
-    const formDatasave = {
+  const formDatasave = {
     nameEm,
     userName,
     userPassw,
@@ -71,19 +76,20 @@ function addstaff() {
       username: '',
       tel: '',
       pw: '',
-      depart: ''});
+      depart: ''
+    });
 
-      console.log("Test data => ", formDatasave);
+    console.log("Test data => ", formDatasave);
 
-      setNameEm('');
-      setUserName('');
-      setUserDepart('');
-      setUserPassw('');
-      setUserTel('');
-      setValue({
-        startDate: null,
-        endDate: null
-      });
+    setNameEm('');
+    setUserName('');
+    setUserDepart('');
+    setUserPassw('');
+    setUserTel('');
+    setValue({
+      startDate: null,
+      endDate: null
+    });
   };
 
   // console.log("Name => ",nameEm);
@@ -93,9 +99,9 @@ function addstaff() {
   return (
     <div className='h-screen'>
       <p className='text-[#F2B461] font-medium m-4'>เพิ่มพนักงาน</p>
-      <div className="mt-5 w-1/2 ">
+      <form className="mt-5 w-1/2 ">
         <div className="grid grid-cols-3 items-center ">
-          <label  className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
             ชื่อพนักงาน :</label>
           <div className="mt-2 col-span-2">
             <input
@@ -110,7 +116,7 @@ function addstaff() {
           </div>
         </div>
         <div className="grid grid-cols-3 items-center ">
-          <label  className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
             ชื่อผู้ใช้งาน :</label>
           <div className="mt-2 col-span-2">
             <input
@@ -156,7 +162,7 @@ function addstaff() {
           </div>
         </div>
         <div className="grid grid-cols-3 items-center ">
-          <label  className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
             แผนก :</label>
           <div className="mt-2 col-span-2 flex">
             <div className="form-control">
@@ -189,7 +195,7 @@ function addstaff() {
             onChange={handleValueChange}
           />
         </div>
-      </div>
+      </form>
       <div className="grid grid-cols-3 items-center mt-3" >
         <button
           onClick={handleCancelClick}
@@ -250,7 +256,7 @@ function addstaff() {
                             <button
                               type="button"
                               className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                              onClick={closeModal}
+                              onClick={InputSave}
                             >
                               ยืนยัน
                             </button>

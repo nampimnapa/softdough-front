@@ -22,7 +22,7 @@ import { Icon } from '@iconify/react';
 
 // วัตถุดิบ
 const ingredientDropdown = [
-  { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/instore" },
+  { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/ingreincome" },
   { title: "วัตถุดิบทั้งหมด", href: "/ingredients/all" },
   { title: "วัตถุดิบที่ใช้", href: "/ingredients/using" },
   { title: "รออนุมัติ", href: "/ingredients/pending" },

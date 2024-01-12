@@ -38,12 +38,11 @@ function all() {
         ],
         ตามล็อต: [
             {
-                // id: 1,
-                // name: 'น้องอายฟู',
-                // username: 'eyefu',
-                // pw: '1234',
-                // tel: '099-9999999',
-                // depart: 'ฝ่ายผลิต'
+                lot:"LOT01",
+                lotname:"ไข่ไก้",
+                lotstock:6,
+                exp:"20/11/2555",
+
             },
 
         ]
@@ -173,7 +172,60 @@ function all() {
                                     </div>
                                 ) : (
                                     // เลย์เอาท์สำหรับ Tab ที่ 2
-                                    <div className="second-tab-layout">pppp</div>
+                                    <div className="second-tab-layout">
+                                        <div className="relative overflow-x-auto ">
+                                            <table className="w-full text-sm text-center text-gray-500">
+                                                <thead>
+                                                    <tr className="text-white  font-normal  bg-[#908362]  ">
+                                                        <td scope="col" className="px-6 py-3">
+                                                            ล็อตวัตถุดิบ
+                                                        </td>
+                                                        <td scope="col" className="px-12 py-3 ">
+                                                            รายการ
+                                                        </td>
+                                                        <td scope="col" className="px-6 py-3">
+                                                            สต็อก
+                                                        </td>
+                                                        <td scope="col" className="px-6 py-3">
+                                                            วันหมดอายุ
+                                                        </td>
+
+                                                        <td scope="col" className="px-6 py-3">
+                                                            รายละเอียด
+                                                        </td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {ingredients.map((ingredients) => (
+                                                        <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                            <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
+                                                                {ingredients.lot}
+                                                            </td>
+                                                            <td className="px-6 py-1 text-left">
+                                                                {ingredients.lotname}
+                                                            </td>
+                                                            <td className="px-6 py-1">
+                                                                {ingredients.lotstock}
+                                                            </td>
+                                                            
+                                                            <td className="px-6 py-1">
+                                                                {ingredients.exp}
+                                                            </td>
+                                                            
+                                                            <td className="px-6 py-4 flex items-center justify-center  ">
+                                                                <button type="submit" >
+                                                                    <Link href="/ingredients/detailall" className="w-full flex justify-center items-center">
+                                                                        <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
+                                                                    </Link>
+                                                                </button>
+
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 )}
                             </Tab.Panel>
                         ))}

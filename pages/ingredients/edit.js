@@ -8,8 +8,6 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-
-
 function edit() {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -20,6 +18,8 @@ function edit() {
     const openModal = () => {
         setIsOpen(true);
     };
+
+    // สมมุติ อฟ ส่งข้อมูลมา
     const ingredientsData =
     {
         id: 1,
@@ -31,14 +31,6 @@ function edit() {
         gramperunit: '650',
         unitgram: 'กรัม'
     }
-
-    const [nameIn, setnameIn] = useState('');
-    const [stockIn, setstockIn] = useState('');
-    const [unitIn, setunitIn] = useState('');
-    const [minIn, setminIn] = useState('');
-    const [statusIn, setstatusIn] = useState('');
-    const [gramperunitIn, setgramperunitIn] = useState('');
-    const [unitgramIn, setunitgramIn] = useState('');
 
     const [formIn, setformIn] = useState({
         name: '',
@@ -73,8 +65,6 @@ function edit() {
             depart: ''
         });
 
-        console.log("Test data => ", formInsave);
-
         setnameIn('');
         setstockIn('');
         setunitIn('');
@@ -84,10 +74,6 @@ function edit() {
         setunitgramIn('');
     };
 
-
-
-
-    // const [categories, setCategories] = useState(ingredients);
 
     const [ingredients, setIngredient] = useState(ingredientsData);
 
