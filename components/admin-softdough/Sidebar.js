@@ -282,9 +282,10 @@ const SoftDoughLogo = () => {
       <Image
         src={Logo}
         width={120}
-        height={120}
+        height="auto"
         className="object-cover"
         alt="logo"
+        priority={true}
       />
     </Link>
   );

@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
@@ -20,120 +20,179 @@ function edit() {
     const openModal = () => {
         setIsOpen(true);
     };
-    const ingredients =
-        [
-            {
-                id: 1,
-                name: 'ไข่ไก่',
-                stock: 5,
-                unit: 'แผง',
-                min: 5,
-                status: 'ปกติ',
-                gramperunit: '650',
-                unitgram: 'กรัม'
-            },
+    const ingredientsData =
+    {
+        id: 1,
+        name: 'ไข่ไก่',
+        stock: 5,
+        unit: 'แผง',
+        min: 5,
+        status: 'ปกติ',
+        gramperunit: '650',
+        unitgram: 'กรัม'
+    }
 
-        ]
-    const [categories, setCategories] = useState(ingredients);
+    const [nameIn, setnameIn] = useState('');
+    const [stockIn, setstockIn] = useState('');
+    const [unitIn, setunitIn] = useState('');
+    const [minIn, setminIn] = useState('');
+    const [statusIn, setstatusIn] = useState('');
+    const [gramperunitIn, setgramperunitIn] = useState('');
+    const [unitgramIn, setunitgramIn] = useState('');
+
+    const [formIn, setformIn] = useState({
+        name: '',
+        stock: '',
+        min: '',
+        pw: '',
+        depart: '',
+    });
+
+    const formInsave = {
+        nameIn,
+        stockIn,
+        unitIn,
+        minIn,
+        statusIn,
+        gramperunitIn,
+        unitgramIn
+    }
+
+
+
+    const handleCancelClick = (index) => {
+        const updatedIngredientsData = [...ingredientsData];
+        updatedIngredientsData[index] = { ...formIn };
+        console.log("Updated Ingredients Data =>", updatedIngredientsData);
+
+        setformIn({
+            name: '',
+            username: '',
+            tel: '',
+            pw: '',
+            depart: ''
+        });
+
+        console.log("Test data => ", formInsave);
+
+        setnameIn('');
+        setstockIn('');
+        setunitIn('');
+        setminIn('');
+        setstatusIn('');
+        setgramperunitIn('');
+        setunitgramIn('');
+    };
+
+
+
+
+    // const [categories, setCategories] = useState(ingredients);
+
+    const [ingredients, setIngredient] = useState(ingredientsData);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setIngredient((prevIngredient) => ({
-          ...prevIngredient,
-          [name]: value,
+        setIngredient((prevFormIn) => ({
+            ...prevFormIn,
+            [name]: value,
         }));
-      };
+    }
+
+    // console.log(ingredients);
 
     return (
-        <div className='h-screen'>
+        <div className='h-screen' >
             <button className='my-3 mx-5 '>
                 <Link href="/ingredients/detailall" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
-                    <ChevronLeftIcon class="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
+                    <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
                     รายละเอียดวัตถุดิบ
                 </Link>
             </button>
             <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>แก้ไขวัตถุดิบ</p>
-            {ingredients.map((ingredients) => (
-                <form className="mt-5 w-1/2 ">
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                            รายการ :</label>
-                        <div className="mt-2 col-span-2">
-                            <input
-                                onChange={handleInputChange}
+            <form className="mt-5 w-1/2 key={index} ">
+                <div className="grid grid-cols-3 items-center ">
+                    <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                        รายการ :</label>
+                    <div className="mt-2 col-span-2">
+                        <input
+                            onChange={handleInputChange}
+                            defaultValue={ingredients.name}
+                            type="text"
+                            name="name"
+                            id="name"
+                            autoComplete="off"
+                            // placeholder='ชื่อผู้ใช้งาน'
+                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
+                        />
+                    </div>
+                </div>
+                <div className="grid grid-cols-3 items-center ">
+                    <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                        จำนวนการซื้อขั้นต่ำ :</label>
+                    <div className="mt-2 col-span-2">
+                        <input
+                            onChange={handleInputChange}
+                            defaultValue={ingredients.min}
+                            type="number"
+                            name="min"
+                            id="min"
+                            autoComplete="family-name"
+                            // placeholder='ชื่อผู้ใช้งาน'
+                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
+                        />
+                    </div>
+                </div>
+                <div className="grid grid-cols-3 items-center ">
+                    <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                        หน่วยของวัตถุดิบ :</label>
+                    <div className="mt-2 col-span-2">
+                        <select id="countries"
+                            className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
+                            defaultValue={ingredients.unit}
+                            onChange={handleInputChange}
+                            name="unit">
+                            <option>ถุง</option>
+                            <option>แผง</option>
+                            <option>กล่อง</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="grid grid-cols-3 items-center ">
+                    <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                        ปริมาณต่อหน่วย :</label>
+                    <div className="mt-2 col-span-2">
+                        <input
+                            onChange={handleInputChange}
+                            defaultValue={ingredients.gramperunit}
+                            type="number"
+                            name="min"
+                            id="min"
+                            autoComplete="family-name"
+                            // placeholder='ชื่อผู้ใช้งาน'
+                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
+                        />
+                    </div>
+                </div>
+                <div className="grid grid-cols-3 items-center ">
+                    <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                        หน่วยปริมาณต่อหน่วย :</label>
+                    <div className="mt-2 col-span-2">
+                        <select id="countries"
+                            className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
+                            defaultValue={ingredients.unitgram}
+                            onChange={handleInputChange}
+                            name="unitgram"
+                        >
+                            <option>กรัม</option>
+                            <option>กิโลกรัม</option>
+                            <option>ลิตร</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
 
-                                value={ingredients.name}
-                                type="text"
-                                name="last-name"
-                                id="last-name"
-                                autoComplete="family-name"
-                                // placeholder='ชื่อผู้ใช้งาน'
-                                className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
-                            />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                            จำนวนการซื้อขั้นต่ำ :</label>
-                        <div className="mt-2 col-span-2">
-                            <input
-                                value={ingredients.min}
-                                type="number"
-                                name="min"
-                                id="min"
-                                autoComplete="family-name"
-                                // placeholder='ชื่อผู้ใช้งาน'
-                                className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
-                            />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                            หน่วยของวัตถุดิบ :</label>
-                        <div className="mt-2 col-span-2">
-                            <select id="countries"
-                                className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
-                                tValue={ingredients.unit}
-                            >
-                                <option>ถุง</option>
-                                <option>แผง</option>
-                                <option>กล่อง</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                            ปริมาณต่อหน่วย :</label>
-                        <div className="mt-2 col-span-2">
-                            <input
-                                value={ingredients.gramperunit}
-                                type="number"
-                                name="min"
-                                id="min"
-                                autoComplete="family-name"
-                                // placeholder='ชื่อผู้ใช้งาน'
-                                className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
-                            />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                            หน่วยปริมาณต่อหน่วย :</label>
-                        <div className="mt-2 col-span-2">
-                            <select id="countries"
-                                className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
-                                Value={ingredients.unitgram}
-                            >
-                                <option>กรัม</option>
-                                <option>กิโลกรัม</option>
-                                <option>ลิตร</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
-            ))}
-
-            <div className="flex justify-between  mt-5 " >
+            < div className="flex justify-between  mt-5 " >
                 <button>
                     <Link href="/ingredients/edit"
                         type="button"
@@ -157,7 +216,6 @@ function edit() {
 
                                 <div className="fixed inset-0 overflow-y-auto">
                                     <div className="flex min-h-full items-center justify-center p-4 text-center">
-
                                         <Transition.Child
                                             as={Fragment}
                                             enter="ease-out duration-300"
@@ -205,14 +263,13 @@ function edit() {
                                 </div>
                             </Dialog>
                         </Transition>
-
                     )
                     }
                 </>
                 <button onClick={openModal} type="button" className="mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
-            </div>
+            </div >
 
-        </div>
+        </div >
     )
 }
 
