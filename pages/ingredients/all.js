@@ -71,7 +71,7 @@ function all() {
                 <div className="mr-4 scale-90 flex items-center">
                     <Link href="/ingredients/add">
                         <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
-                            <PlusIcon class="h-5 w-5 text-white mr-2" />
+                            <PlusIcon className="h-5 w-5 text-white mr-2" />
                             เพิ่ม
                         </button></Link>
                 </div>

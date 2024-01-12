@@ -43,7 +43,7 @@ function detailall() {
         <div className='h-screen'>
             <button className='my-3 mx-5 '>
                 <Link href="/ingredients/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
-                    <ChevronLeftIcon class="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
+                    <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
                     วัตถุดิบทั้งหมด
                 </Link>
             </button>

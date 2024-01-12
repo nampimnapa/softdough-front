@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Datepicker from "react-tailwindcss-datepicker";
@@ -14,9 +14,7 @@ const kanit = Kanit({
 function detailstaff() {
 
     // Data JSON
-    const categoriesData = 
-     [
-            {
+    const categoriesData = {
                 st_id: 1,
                 st_name: 'น้องอายฟู',
                 st_username: 'eyefu',
@@ -24,24 +22,42 @@ function detailstaff() {
                 st_tel: '099-9999999',
                 st_type: '1',
                 st_start: "2025-01-12"
-            },
-
-        ]
+            }
 
     const [categories, setCategories] = useState(categoriesData);
+    const [leaveData , setLeaveData] = useState({
+        st_id:categories.st_id,
+        st_end:"",
+        st_status:2
+    });
 
+    useEffect(()=>{
+        setWorkDate({
+            startDate: categories.st_start,
+            endDate: categories.st_start
+        })
+    },[])
+
+    // Eyefuu
+    // send data json for edit employees
+    const handleEditWork = () =>{
+        setIsOpen(false);
+        console.log("handleEditWork",categories);
+
+    }
+
+    // Eyefuu
+    // send data json for leave employee
+    const handleLeaveWork = () =>{
+        setIsOpen(false);
+        console.log("handleLeaveWork",leaveData);
+    }
+
+    //workDate
     const [workDate, setWorkDate] = useState({
         startDate: null,
         endDate: null
     });
-
-    // setWorkDate({
-    //     startDate: categories[0].st_start,
-    //     endDate: categories[0].st_start
-    // })
-
-    // console.log(workDate);
-
 
     //leaveDate
     const [leaveDate, setLeaveDate] = useState({
@@ -49,19 +65,27 @@ function detailstaff() {
         endDate: null
     });
 
-
-
     // const [workDate, setWorkDate] = useState(null);
-    const [leaveDateselect, setLeaveDateselect] = useState(null);
-    const handleWorkDateChange = (newValue) => {
-        console.log("workDate:", newValue);
-        setWorkDate(newValue);
+
+    // State สำหรับเช็คว่าจะทำงาน หรือ ลาออก
+    const [leaveDateselect, setLeaveDateselect] = useState(false);
+
+    const handleWorkDateChange = (workDate: { startDate: any; endDate: any; }) => {
+        console.log("workDate:", workDate);
+        setWorkDate(workDate);
+        setCategories((prevFormIn) => ({
+            ...prevFormIn,
+            "st_start": workDate.startDate,
+        }));
     };
 
-
-    const handleLeaveDateChange = (newValue) => {
-        console.log("leaveDate:", newValue);
-        setLeaveDate(newValue);
+    const handleLeaveDateChange = (leaveDate: { startDate: any; endDate: any; }) => {
+        console.log("leaveDate:", leaveDate);
+        setLeaveDate(leaveDate);
+        setLeaveData((prevFormIn) => ({
+            ...prevFormIn,
+            "st_end": workDate.startDate,
+        }));
     };
 
     const [isOpen, setIsOpen] = useState(false);
@@ -73,24 +97,29 @@ function detailstaff() {
     const openModal = () => {
         setIsOpen(true);
     };
-    // const handleDateChange = (field, newValue) => {
-    //     console.log(`${field} Date:`, newValue);
-    //     setDates((prevDates) => ({
-    //         ...prevDates,
-    //         [field]: newValue,
-    //     }));
-    // };
-    // const [dates, setDates] = useState({
-    //     workDate: null,
-    //     leaveDate: null,
-    // });
-    // const handleDateChange = (type, newValue) => {
-    //     setDates((prevDates) => ({
-    //         ...prevDates,
-    //         [type]: newValue,
-    //     }));
-    // };
 
+    const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
+        const { name, value } = e.target;
+        setCategories((prevFormIn) => ({
+            ...prevFormIn,
+            [name]: value,
+        }));
+    }
+
+    const leaveSelect = (e: number) => {
+        console.log('leaveSelect', e)
+        if(e==1){
+           setLeaveDateselect(false) 
+        }else if(e==2){
+            setLeaveDateselect(true)
+            setLeaveDate({
+                startDate: new Date(),
+                endDate: new Date()
+            })
+        }
+    }
+
+    console.log("Data => ",categories)
 
     return (
         <div className='h-screen'>
@@ -102,19 +131,18 @@ function detailstaff() {
             </button>
             <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>แก้ไขพนักงาน</p>
 
-            {Object.keys(categories).map((staff, idx) => (
                 <div className="mt-5 w-1/2 ">
-                    {categories.map((staff) => (
                         <div className="grid grid-cols-3 items-center ">
-                            <label htmlFor="first-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                            <label htmlFor="st_name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 ชื่อพนักงาน :</label>
                             <div className="mt-2 col-span-2 ">
                                 <input
-                                    key={staff.st_id}
-                                    value={staff.st_name}
+                                    key={categories.st_id}
+                                    defaultValue={categories.st_name}
+                                    onChange={handleInputChange}
                                     type="text"
-                                    name="first-name"
-                                    id="first-name"
+                                    name="st_name"
+                                    id="st_name"
                                     autoComplete="given-name"
                                     placeholder='ชื่อพนักงาน'
                                     className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-3  sm:text-sm sm:leading-6 focus:outline-none"
@@ -122,122 +150,98 @@ function detailstaff() {
 
                             </div>
                         </div>
-                    ))}
-                    {categories.map((staff) => (
                         <div className="grid grid-cols-3 items-center ">
-                            <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                            <label htmlFor="st_username" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 ชื่อผู้ใช้งาน :</label>
                             <div className="mt-2 col-span-2">
                                 <input
-                                    value={staff.st_username}
-
+                                    defaultValue={categories.st_username}
+                                    onChange={handleInputChange}
                                     type="text"
-                                    name="last-name"
-                                    id="last-name"
+                                    name="st_username"
+                                    id="st_username"
                                     autoComplete="family-name"
                                     placeholder='ชื่อผู้ใช้งาน'
                                     className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-3  sm:text-sm sm:leading-6 focus:outline-none"
                                 />
                             </div>
                         </div>
-                    ))}
-                    {categories.map((staff) => (
+
+
                         <div className="grid grid-cols-3 items-center ">
-                            <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                            <label htmlFor="st_password" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 รหัสผ่าน :</label>
                             <div className="mt-2 col-span-2">
                                 <input
-                                    value={staff.st_password}
+                                    onChange={handleInputChange}
+                                    defaultValue={categories.st_password}
                                     type="text"
-                                    name="last-name"
-                                    id="last-name"
+                                    name="st_password"
+                                    id="st_password"
                                     autoComplete="family-name"
                                     placeholder='รหัสผ่าน'
                                     className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-3  sm:text-sm sm:leading-6 focus:outline-none"
                                 />
                             </div>
                         </div>
-                    ))}
-                    {categories.map((staff) => (
+
+
                         <div className="grid grid-cols-3 items-center ">
-                            <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                            <label htmlFor="st_tel" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 เบอร์โทร :</label>
                             <div className="mt-2 col-span-2">
                                 <input
-                                    value={staff.st_tel}
+                                    defaultValue={categories.st_tel}
+                                    onChange={handleInputChange}
 
                                     type="text"
-                                    name="last-name"
-                                    id="last-name"
+                                    name="st_tel"
+                                    id="st_tel"
                                     autoComplete="family-name"
                                     placeholder='เบอร์โทร'
                                     className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-3  sm:text-sm sm:leading-6 focus:outline-none"
                                 />
                             </div>
                         </div>
-                    ))}
-                    {categories.map((staff) => (
-                        // selected
-                        // <div className="grid grid-cols-3 items-center ">
-                        //     <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                        //         แผนก :</label>
-                        //     <div className="mt-2 col-span-2">
-                        //         <select id="countries"
-                        //             className="bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2">
-                        //             <option>พนักงานฝ่ายขาย</option>
-                        //             <option>พนักงานฝ่ายผลิต</option>
-                        //         </select>
-                        //     </div>
-                        // </div>
+
+
                         <div className="grid grid-cols-3 items-center ">
                             <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 แผนก :</label>
                             <div className="mt-2 col-span-2 flex">
                                 <div className="form-control">
                                     <label className="label cursor-pointer ">
-                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182] " checked={staff.st_type === "1"}/>
+                                        <input type="radio" name="st_type" className="radio checked:bg-[#C5B182] " defaultChecked={categories.st_type === "1"}
+                                    onChange={handleInputChange}
+                                    />
                                         <span className="label-text text-[#73664B] px-3 ">พนักงานฝ่ายขาย</span>
                                     </label>
                                 </div>
                                 <div className="form-control ml-4">
                                     <label className="label cursor-pointer">
-                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182]" checked={staff.st_type === "2"}/>
+                                        <input type="radio" name="st_type" className="radio checked:bg-[#C5B182]" defaultChecked={categories.st_type === "2"}
+                                    onChange={handleInputChange}
+                                    />
                                         <span className="label-text text-[#73664B] px-3">พนักงานฝ่ายผลิต</span>
                                     </label>
                                 </div>
                             </div>
                         </div>
 
-                    ))
-                    }
-                    {
-                        categories.map((staff) => (
+
                             <div className="grid grid-cols-3 items-center mt-3 ">
                                 <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                     วันที่เข้าทำงาน :</label>
                                 <Datepicker
                                     useRange={false}
                                     asSingle={true}
-                                    value={staff.st_start}
+                                    value={workDate}
                                     onChange={handleWorkDateChange}
                                 />
 
                             </div>
-                        ))
-                    }
-                    {categories.map((staff) => (
-                        // selected
-                        // <div className="grid grid-cols-3 items-center ">
-                        //     <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                        //         แผนก :</label>
-                        //     <div className="mt-2 col-span-2">
-                        //         <select id="countries"
-                        //             className="bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2">
-                        //             <option>พนักงานฝ่ายขาย</option>
-                        //             <option>พนักงานฝ่ายผลิต</option>
-                        //         </select>
-                        //     </div>
-                        // </div>
+
+
                         <div className="grid grid-cols-3 items-center ">
                             <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                                 สถานะ :</label>
@@ -245,22 +249,21 @@ function detailstaff() {
                                 <div className="form-control">
                                     <label className="label cursor-pointer ">
                                         <input type="radio" name="radio-1" className="radio checked:bg-[#C5B182] "
-                                            onChange={() => setLeaveDateselect(null)} />
+                                            onChange={() => leaveSelect(1)} />
                                         <span className="label-text text-[#73664B] px-3 ">ทำงาน</span>
                                     </label>
                                 </div>
                                 <div className="form-control ml-4">
                                     <label className="label cursor-pointer">
                                         <input type="radio" name="radio-1" className="radio checked:bg-[#C5B182]"
-                                            onChange={() => setLeaveDateselect(new Date())}
+                                            onChange={() => leaveSelect(2)}
                                         />
                                         <span className="label-text text-[#73664B] px-3">ลาออก</span>
                                     </label>
                                 </div>
                             </div>
                         </div>
-                    ))
-                    }
+
                     {leaveDateselect && (
                         <div className="grid grid-cols-3 items-center mt-3">
                             <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B] mt-3 text-right mr-5">
@@ -274,7 +277,7 @@ function detailstaff() {
                         </div>
                     )}
                 </div >
-            ))}
+
             <div className="flex justify-between items-center mt-3" >
                 <button>
                     
@@ -284,7 +287,7 @@ function detailstaff() {
                     ยกเลิก</Link></button>
                 <>
                     {isOpen && (
-                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                        <Transition appear show={isOpen} as={Fragment}>
                             <Dialog as="div" className="relative z-10" onClose={closeModal}>
                                 <Transition.Child
                                     as={Fragment}
@@ -297,10 +300,8 @@ function detailstaff() {
                                 >
                                     <div className="fixed inset-0 bg-black/25" />
                                 </Transition.Child>
-
                                 <div className="fixed inset-0 overflow-y-auto">
                                     <div className="flex min-h-full items-center justify-center p-4 text-center">
-
                                         <Transition.Child
                                             as={Fragment}
                                             enter="ease-out duration-300"
@@ -310,7 +311,7 @@ function detailstaff() {
                                             leaveFrom="opacity-100 scale-100"
                                             leaveTo="opacity-0 scale-95"
                                         >
-                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                            <Dialog.Panel className={`w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all ${kanit.className}`}>
                                                 <Dialog.Title
                                                     as="h3"
                                                     className="text-lg font-medium leading-6 text-[73664B]"
@@ -336,10 +337,9 @@ function detailstaff() {
                                                         <button
                                                             type="button"
                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={closeModal}
-                                                        ><Link href="/staff/allstaff">
-                                                            ยืนยัน
-                                                            </Link></button>
+                                                            onClick={leaveDateselect ? handleLeaveWork : handleEditWork}
+                                                        >
+                                                            ยืนยัน</button>
                                                     </div>
                                                 </div>
                                             </Dialog.Panel>
