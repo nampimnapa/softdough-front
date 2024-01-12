@@ -9,8 +9,8 @@ function classNames(...classes) {
 }
 
 function allstaff() {
-    const categoriesData = {
-        ทั้งหมด: [
+    const categoriesData =
+        [
             {
                 id: 1,
                 name: 'น้องอายฟู',
@@ -18,7 +18,7 @@ function allstaff() {
                 pw: '1234',
                 tel: '099-9999999',
                 depart: 'ฝ่ายผลิต'
-                ,status:'ลาออก'
+                , status: 'ลาออก'
             },
             {
                 id: 2,
@@ -27,7 +27,7 @@ function allstaff() {
                 pw: '1234',
                 tel: '099-9999999',
                 depart: 'ฝ่ายขาย'
-                ,status:'ทำงาน'
+                , status: 'ทำงาน'
             },
             {
                 id: 3,
@@ -36,35 +36,15 @@ function allstaff() {
                 pw: '1234',
                 tel: '099-9999999',
                 depart: 'ฝ่ายขาย'
-                ,status:'ทำงาน'
+                , status: 'ทำงาน'
             },
-        ],
-        ฝ่ายผลิต: [
-            {
-                id: 1,
-                name: 'น้องอายฟู',
-                username: 'eyefu',
-                pw: '1234',
-                tel: '099-9999999',
-                depart: 'ฝ่ายผลิต'
-            },
+        ]
 
-        ],
-        ขายหน้าร้าน: [
-            {
-                id: 2,
-                name: 'น้องน้าม',
-                username: 'nmps',
-                pw: '1234',
-                tel: '099-9999999',
-                depart: 'ฝ่ายขาย'
-            },
-
-        ],
-    };
     const [categories, setCategories] = useState(categoriesData);
 
-    
+    const departs = ["ทั้งหมด", ...new Set(categories.map((staff) => staff.depart))];
+
+
 
     return (
         <div className="h-screen  bg-white">
@@ -87,9 +67,9 @@ function allstaff() {
             <div className="">
                 <Tab.Group>
                     <Tab.List className="flex space-x-5  bg-white border-b border-b-1 border-b-[#E3D8BF] mx-5">
-                        {Object.keys(categories).map((category) => (
+                        {departs.map((depart) => (
                             <Tab
-                                key={category}
+                                key={depart}
                                 className={({ selected }) =>
                                     classNames(
                                         'w-sreen py-2.5 text-sm focus:outline-none',
@@ -99,12 +79,12 @@ function allstaff() {
                                     )
                                 }
                             >
-                                {category}
+                                {depart}
                             </Tab>
                         ))}
                     </Tab.List>
                     <Tab.Panels className="mt-2">
-                        {Object.values(categories).map((staff, idx) => (
+                        {departs.map((depart, idx) => (
                             <Tab.Panel
                                 key={idx}
                                 className={classNames(
@@ -134,35 +114,38 @@ function allstaff() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {staff.map((staff) => (
-                                                <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                    <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
-                                                        {staff.id}
-                                                    </td>
-                                                    <td className="px-6 py-1">
-                                                        {staff.depart}
-                                                    </td>
-                                                    <td className="px-6 py-1">
-                                                        {staff.name}
-                                                    </td>
-                                                    <td className={`px-6 py-1 
+                                            {Array.isArray(categories) &&
+                                                categories
+                                                    .filter((staff) => depart === "ทั้งหมด" || staff.depart === depart)
+                                                    .map((staff, idx) => (
+                                                        <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                            <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
+                                                                {staff.id}
+                                                            </td>
+                                                            <td className="px-6 py-1">
+                                                                {staff.depart}
+                                                            </td>
+                                                            <td className="px-6 py-1">
+                                                                {staff.name}
+                                                            </td>
+                                                            <td className={`px-6 py-1 
                                                     ${staff.status === 'ทำงาน' ? 'text-green-500'
-                                                            : staff.status === 'ลาออก' ? 'text-red-500'
-                                                                : ''}`}>
-                                                        {staff.status}
-                                                        
-                                                    </td>
-                                                    <td className="px-6 py-4 flex items-center justify-center  ">
-                                                        <button type="submit" >
-                                                            <Link href="/staff/detailstaff" className="w-full flex justify-center items-center">
-                                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
-                                                            </Link>
-                                                        </button>
+                                                                    : staff.status === 'ลาออก' ? 'text-red-500'
+                                                                        : ''}`}>
+                                                                {staff.status}
 
-                                                    </td>
-                                                </tr>
+                                                            </td>
+                                                            <td className="px-6 py-4 flex items-center justify-center  ">
+                                                                <button type="submit" >
+                                                                    <Link href="/staff/detailstaff" className="w-full flex justify-center items-center">
+                                                                        <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
+                                                                    </Link>
+                                                                </button>
 
-                                            ))}
+                                                            </td>
+                                                        </tr>
+
+                                                    ))}
                                         </tbody>
 
                                     </table>

@@ -10,7 +10,7 @@ const kanit = Kanit({
 
 
 
-function edit() {
+function add() {
     const [isOpen, setIsOpen] = useState(false);
 
     const closeModal = () => {
@@ -60,17 +60,13 @@ function edit() {
 
 
 
-    const handleCancelClick = (index) => {
-        const updatedIngredientsData = [...ingredientsData];
-        updatedIngredientsData[index] = { ...formIn };
-        console.log("Updated Ingredients Data =>", updatedIngredientsData);
-
+    const handleCancelClick = () => {
         setformIn({
             name: '',
-            username: '',
-            tel: '',
+            stock: '',
+            min: '',
             pw: '',
-            depart: ''
+            depart: '',
         });
 
         console.log("Test data => ", formInsave);
@@ -89,41 +85,40 @@ function edit() {
 
     // const [categories, setCategories] = useState(ingredients);
 
-    const [ingredients, setIngredient] = useState(ingredientsData);
+    // const [ingredients, setIngredient] = useState(ingredientsData);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setIngredient((prevFormIn) => ({
-            ...prevFormIn,
-            [name]: value,
-        }));
-    }
+    // const handleInputChange = (e) => {
+    //     const { name, value } = e.target;
+    //     setIngredient((prevFormIn) => ({
+    //         ...prevFormIn,
+    //         [name]: value,
+    //     }));
+    // }
 
     // console.log(ingredients);
 
     return (
         <div className='h-screen' >
             <button className='my-3 mx-5 '>
-                <Link href="/ingredients/detailall" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
+                <Link href="/ingredients/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
-                    รายละเอียดวัตถุดิบ
+                    วัตถุดิบทั้งหมด
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>แก้ไขวัตถุดิบ</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>เพิ่มวัตถุดิบ</p>
             <form className="mt-5 w-1/2 key={index} ">
                 <div className="grid grid-cols-3 items-center ">
                     <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                         รายการ :</label>
                     <div className="mt-2 col-span-2">
                         <input
-                            onChange={handleInputChange}
-                            defaultValue={ingredients.name}
+                            placeholder="ชื่อวัตถุดิบ"
                             type="text"
                             name="name"
                             id="name"
                             autoComplete="off"
                             // placeholder='ชื่อผู้ใช้งาน'
-                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
+                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6 focus:outline-none"
                         />
                     </div>
                 </div>
@@ -132,14 +127,15 @@ function edit() {
                         จำนวนการซื้อขั้นต่ำ :</label>
                     <div className="mt-2 col-span-2">
                         <input
-                            onChange={handleInputChange}
-                            defaultValue={ingredients.min}
+                            placeholder="จำนวน"
+                            min="0"
+                            onChange={handleCancelClick}
                             type="number"
                             name="min"
                             id="min"
                             autoComplete="family-name"
                             // placeholder='ชื่อผู้ใช้งาน'
-                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
+                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                         />
                     </div>
                 </div>
@@ -148,10 +144,12 @@ function edit() {
                         หน่วยของวัตถุดิบ :</label>
                     <div className="mt-2 col-span-2">
                         <select id="countries"
+
                             className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
-                            defaultValue={ingredients.unit}
-                            onChange={handleInputChange}
                             name="unit">
+                            <option disabled selected value="">
+                                เลือกหน่วยวัตถุดิบ
+                            </option>
                             <option>ถุง</option>
                             <option>แผง</option>
                             <option>กล่อง</option>
@@ -163,14 +161,13 @@ function edit() {
                         ปริมาณต่อหน่วย :</label>
                     <div className="mt-2 col-span-2">
                         <input
-                            onChange={handleInputChange}
-                            defaultValue={ingredients.gramperunit}
+                            placeholder="ปริมาณต่อหน่วย"
+                            min="0"
                             type="number"
                             name="min"
                             id="min"
                             autoComplete="family-name"
-                            // placeholder='ชื่อผู้ใช้งาน'
-                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-1  sm:text-sm sm:leading-6 focus:outline-none"
+                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]    sm:text-sm sm:leading-6 focus:outline-none"
                         />
                     </div>
                 </div>
@@ -180,10 +177,11 @@ function edit() {
                     <div className="mt-2 col-span-2">
                         <select id="countries"
                             className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
-                            defaultValue={ingredients.unitgram}
-                            onChange={handleInputChange}
                             name="unitgram"
                         >
+                            <option disabled selected value="">
+                                เลือกหน่วยปริมาณต่อวัตถุดิบ
+                            </option>
                             <option>กรัม</option>
                             <option>กิโลกรัม</option>
                             <option>ลิตร</option>
@@ -192,12 +190,12 @@ function edit() {
                 </div>
             </form>
 
-            < div className="flex justify-between  mt-5 " >
+            < div className="flex justify-between  mt-8 " >
                 <button>
-                    <Link href="/ingredients/edit"
+                    <Link href="/ingredients/all"
                         type="button"
                         className="mx-auto text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
-                        ยกเลิก</Link></button>
+                        ย้อนกลับ</Link></button>
                 <>
                     {isOpen && (
                         <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
@@ -230,11 +228,11 @@ function edit() {
                                                     as="h3"
                                                     className="text-lg font-medium leading-6 text-[73664B]"
                                                 >
-                                                    ยืนยันการแก้ไขวัตถุดิบ
+                                                    ยืนยันการเพิ่มวัตถุดิบ
                                                 </Dialog.Title>
                                                 <div className="mt-2">
                                                     <p className="text-sm text-[#73664B]">
-                                                        คุณต้องการแก้ไขวัตถุดิบหรือไม่
+                                                        คุณต้องการเพิ่มวัตถุดิบหรือไม่
                                                     </p>
                                                 </div>
                                                 {/*  choose */}
@@ -251,8 +249,8 @@ function edit() {
                                                         <button
                                                             type="button"
                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={closeModal}
-                                                        ><Link href="/ingredients/detailall">
+                                                        // onClick={closeModal}
+                                                        ><Link href="/ingredients/all">
                                                                 ยืนยัน
                                                             </Link></button>
                                                     </div>
@@ -273,4 +271,4 @@ function edit() {
     )
 }
 
-export default edit
+export default add

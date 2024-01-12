@@ -38,12 +38,12 @@ function all() {
         ],
         ตามล็อต: [
             {
-                id: 1,
-                name: 'น้องอายฟู',
-                username: 'eyefu',
-                pw: '1234',
-                tel: '099-9999999',
-                depart: 'ฝ่ายผลิต'
+                // id: 1,
+                // name: 'น้องอายฟู',
+                // username: 'eyefu',
+                // pw: '1234',
+                // tel: '099-9999999',
+                // depart: 'ฝ่ายผลิต'
             },
 
         ]
@@ -70,10 +70,11 @@ function all() {
                     </button>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
-                    <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
-                        <PlusIcon class="h-5 w-5 text-white mr-2" />
-                        เพิ่ม
-                    </button>
+                    <Link href="/ingredients/add">
+                        <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
+                            <PlusIcon class="h-5 w-5 text-white mr-2" />
+                            เพิ่ม
+                        </button></Link>
                 </div>
             </div>
             <div className="">
@@ -104,81 +105,83 @@ function all() {
 
                                 )}
                             >
-                                <div className="relative overflow-x-auto ">
-                                    <table className="w-full text-sm text-center text-gray-500">
-                                        <thead >
-                                            <tr className="text-white  font-normal  bg-[#908362]  ">
-                                                <td scope="col" className="px-3 py-3">
-                                                    ลำดับ
-                                                </td>
-                                                <td scope="col" className="px-12 py-3 ">
-                                                    รายการ
-                                                </td>
-                                                <td scope="col" className="px-6 py-3">
-                                                    สต็อก
-                                                </td>
-                                                <td scope="col" className="px-6 py-3">
-                                                    หน่วยที่ซื้อ
-                                                </td>
-                                                <td scope="col" className="px-6 py-3">
-                                                    ขั้นต่ำ
-                                                </td>
-                                                <td scope="col" className="px-6 py-3">
-                                                    สถานะ
-                                                </td>
-                                                <td scope="col" className="px-6 py-3">
-                                                    รายละเอียด
-                                                </td>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {ingredients.map((ingredients) => (
-                                                <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                    <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
-                                                        {ingredients.id}
+                                {idx === 0 ? (
+                                    <div className="relative overflow-x-auto ">
+                                        <table className="w-full text-sm text-center text-gray-500">
+                                            <thead >
+                                                <tr className="text-white  font-normal  bg-[#908362]  ">
+                                                    <td scope="col" className="px-3 py-3">
+                                                        ลำดับ
                                                     </td>
-                                                    <td className="px-6 py-1 text-left">
-                                                        {ingredients.name}
+                                                    <td scope="col" className="px-12 py-3 ">
+                                                        รายการ
                                                     </td>
-                                                    <td className="px-6 py-1">
-                                                        {ingredients.stock}
+                                                    <td scope="col" className="px-6 py-3">
+                                                        สต็อก
                                                     </td>
-                                                    <td className="px-6 py-1">
-                                                        {ingredients.unit}
+                                                    <td scope="col" className="px-6 py-3">
+                                                        หน่วยที่ซื้อ
                                                     </td>
-                                                    <td className="px-6 py-1">
-                                                        {ingredients.min}
+                                                    <td scope="col" className="px-6 py-3">
+                                                        ขั้นต่ำ
                                                     </td>
-                                                    <td className={`px-6 py-1 
-                                                    ${ingredients.status === 'ปกติ' ? 'text-green-500'
-                                                            : ingredients.status === 'ซื้อเพิ่ม' ? 'text-red-500'
-                                                                : ingredients.status === 'ไม่มี' ? 'text-red-500' : ''}`}>
-                                                        {ingredients.status}
-
+                                                    <td scope="col" className="px-6 py-3">
+                                                        สถานะ
                                                     </td>
-                                                    <td className="px-6 py-4 flex items-center justify-center  ">
-                                                        <button type="submit" >
-                                                            <Link href="/ingredients/detailall" className="w-full flex justify-center items-center">
-                                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
-                                                            </Link>
-                                                        </button>
-
+                                                    <td scope="col" className="px-6 py-3">
+                                                        รายละเอียด
                                                     </td>
                                                 </tr>
+                                            </thead>
+                                            <tbody>
+                                                {ingredients.map((ingredients) => (
+                                                    <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                        <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
+                                                            {ingredients.id}
+                                                        </td>
+                                                        <td className="px-6 py-1 text-left">
+                                                            {ingredients.name}
+                                                        </td>
+                                                        <td className="px-6 py-1">
+                                                            {ingredients.stock}
+                                                        </td>
+                                                        <td className="px-6 py-1">
+                                                            {ingredients.unit}
+                                                        </td>
+                                                        <td className="px-6 py-1">
+                                                            {ingredients.min}
+                                                        </td>
+                                                        <td className={`px-6 py-1 
+                                                    ${ingredients.status === 'ปกติ' ? 'text-green-500'
+                                                                : ingredients.status === 'ซื้อเพิ่ม' ? 'text-red-500'
+                                                                    : ingredients.status === 'ไม่มี' ? 'text-red-500' : ''}`}>
+                                                            {ingredients.status}
 
-                                            ))}
-                                        </tbody>
+                                                        </td>
+                                                        <td className="px-6 py-4 flex items-center justify-center  ">
+                                                            <button type="submit" >
+                                                                <Link href="/ingredients/detailall" className="w-full flex justify-center items-center">
+                                                                    <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
+                                                                </Link>
+                                                            </button>
 
-                                    </table>
-                                </div>
-
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                ) : (
+                                    // เลย์เอาท์สำหรับ Tab ที่ 2
+                                    <div className="second-tab-layout">pppp</div>
+                                )}
                             </Tab.Panel>
                         ))}
                     </Tab.Panels>
                 </Tab.Group>
             </div>
         </div>
-    )
+    );
 }
 
 export default all
