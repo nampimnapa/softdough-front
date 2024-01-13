@@ -1,15 +1,38 @@
 {
   "compilerOptions": {
-    "paths": {
-      "@/*": ["./*"],
-      "@components/*": ["./components/*"],
-      "@contexts/*": ["./contexts/*"],
-      "@hooks/*": ["./hooks/*"],
-      "@layouts/*": ["./layouts/*"],
-      "@public/*": ["./public/*"],
-      "@services/*": ["./services/*"],
-      "@themes/*": ["./themes/*"],
-      "@utils/*": ["./utils/*"],
-    }
+    "target": "es2015",
+    "downlevelIteration": true
+  },
+  "include": [
+    "src/**/*.js"
+  ],
+  "paths": {
+    "@/*": [
+      "./*"
+    ],
+    "@components/*": [
+      "./components/*"
+    ],
+    "@contexts/*": [
+      "./contexts/*"
+    ],
+    "@hooks/*": [
+      "./hooks/*"
+    ],
+    "@layouts/*": [
+      "./layouts/*"
+    ],
+    "@public/*": [
+      "./public/*"
+    ],
+    "@services/*": [
+      "./services/*"
+    ],
+    "@themes/*": [
+      "./themes/*"
+    ],
+    "@utils/*": [
+      "./utils/*"
+    ],
   }
 }

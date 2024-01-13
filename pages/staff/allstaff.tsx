@@ -42,7 +42,7 @@ function allstaff() {
 
     const [categories, setCategories] = useState(categoriesData);
 
-    const departs = ["ทั้งหมด", ...new Set(categories.map((staff) => staff.depart))];
+    const departs: string[] = ["ทั้งหมด", ...Array.from(new Set(categories.map((staff) => staff.depart)))];
 
 
 

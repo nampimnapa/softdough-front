@@ -14,8 +14,8 @@ const kanit = Kanit({
 function detailstaff() {
 
     // Data JSON
-    const categoriesData = 
-     [
+    const categoriesData =
+        [
             {
                 st_id: 1,
                 st_name: 'น้องอายฟู',
@@ -195,13 +195,13 @@ function detailstaff() {
                             <div className="mt-2 col-span-2 flex">
                                 <div className="form-control">
                                     <label className="label cursor-pointer ">
-                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182] " checked={staff.st_type === "1"}/>
+                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182] " checked={staff.st_type === "1"} />
                                         <span className="label-text text-[#73664B] px-3 ">พนักงานฝ่ายขาย</span>
                                     </label>
                                 </div>
                                 <div className="form-control ml-4">
                                     <label className="label cursor-pointer">
-                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182]" checked={staff.st_type === "2"}/>
+                                        <input type="radio" name="radio-10" className="radio checked:bg-[#C5B182]" checked={staff.st_type === "2"} />
                                         <span className="label-text text-[#73664B] px-3">พนักงานฝ่ายผลิต</span>
                                     </label>
                                 </div>
@@ -277,11 +277,11 @@ function detailstaff() {
             ))}
             <div className="flex justify-between items-center mt-3" >
                 <button>
-                    
+
                     <Link href="/staff/detailstaff"
-                    type="button"
-                    className=" mx-auto  text-white bg-[#C5B182] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ml-6">
-                    ยกเลิก</Link></button>
+                        type="button"
+                        className=" mx-auto  text-white bg-[#C5B182] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ml-6">
+                        ยกเลิก</Link></button>
                 <>
                     {isOpen && (
                         <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
@@ -338,7 +338,7 @@ function detailstaff() {
                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                             onClick={closeModal}
                                                         ><Link href="/staff/allstaff">
-                                                            ยืนยัน
+                                                                ยืนยัน
                                                             </Link></button>
                                                     </div>
                                                 </div>
