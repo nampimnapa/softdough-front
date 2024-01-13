@@ -12,7 +12,7 @@ const kanit = Kanit({
 
 
 function detailstaff() {
-    // Data JSON
+    // Data JSON ที่รับมาจากหลังบ้าน เอามาแสดงในช่องอินพูต
     const categoriesData = {
                 st_id: 1,
                 st_name: 'น้องอายฟู',
@@ -30,6 +30,7 @@ function detailstaff() {
         st_status: 2
     });
 
+    // เอาไว้สำหรับกำหนดวันใส่ช่องอินพุต ทำงานเมื่อมีการรีโหลดหน้าครั้งแรก
     useEffect(() => {
         setWorkDate({
             startDate: categories.st_start,
@@ -37,7 +38,8 @@ function detailstaff() {
         })
     }, [])
 
-    // Eyefuu
+
+    // Eyefuu ของ อฟ มันจะเลือกทำอันได อันหนึ่ง ดูจากการเลือกว่าทำงานหรือลาออก ดูบรรทัด 343
     // send data json for edit employees
     const handleEditWork = () => {
         setIsOpen(false);
@@ -45,7 +47,7 @@ function detailstaff() {
 
     }
 
-    // Eyefuu
+    // Eyefuu ของ อฟ
     // send data json for leave employee
     const handleLeaveWork = () => {
         setIsOpen(false);
