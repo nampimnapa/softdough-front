@@ -38,7 +38,7 @@ function addstaff() {
     setIsOpen(true);
   };
 
-  const InputSave =() =>{
+  const InputSave = () => {
     console.log("Test")
 
   }
@@ -94,7 +94,50 @@ function addstaff() {
 
   // console.log("Name => ",nameEm);
   // console.log("UserName => ",userDepart);
+  const [formErrors, setFormErrors] = useState<{
+    st_name: string;
+    st_username: string;
+    st_password: string;
+    st_tel: string;
+  }>({
+    st_name: '',
+    st_username: '',
+    st_password: '',
+    st_tel: '',
+  });
 
+  const validateForm = () => {
+    const errors: typeof formErrors = {
+      st_name: '',
+      st_username: '',
+      st_password: '',
+      st_tel: '',
+    };
+
+    console.log('categories:', formDatasave);
+
+    if (!formDatasave.nameEm || !formDatasave.nameEm.trim()) {
+      errors.st_name = 'กรุณากรอกชื่อพนักงาน';
+    }
+
+    if (!formDatasave.userName || !formDatasave.userName.trim()) {
+      errors.st_username = 'กรุณากรอกชื่อผู้ใช้งาน';
+    }
+
+    if (!formDatasave.userPassw || !formDatasave.userPassw.trim()) {
+      errors.st_password = 'กรุณากรอกรหัสผ่าน';
+    }
+
+    if (!formDatasave.userTel || !formDatasave.userTel.trim()) {
+      errors.st_tel = 'กรุณากรอกเบอร์โทร';
+    }
+
+    console.log('formErrors:', errors);
+
+    setFormErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
 
   return (
     <div className='h-screen'>
@@ -113,6 +156,9 @@ function addstaff() {
               placeholder='ชื่อพนักงาน'
               className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
             />
+            {formErrors.st_name && (
+              <p className="text-red-500 text-xs mt-1">{formErrors.st_name}</p>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-3 items-center ">
@@ -128,6 +174,9 @@ function addstaff() {
               onChange={(e) => setUserName(e.target.value)}
               className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
             />
+            {formErrors.st_username && (
+              <p className="text-red-500 text-xs mt-1">{formErrors.st_username}</p>
+            )}
           </div>
 
         </div>
@@ -144,6 +193,9 @@ function addstaff() {
               onChange={(e) => setUserPassw(e.target.value)}
               className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
             />
+            {formErrors.st_password && (
+              <p className="text-red-500 text-xs mt-1">{formErrors.st_password}</p>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-3 items-center ">
@@ -151,7 +203,7 @@ function addstaff() {
             เบอร์โทร :</label>
           <div className="mt-2 col-span-2">
             <input
-              type="number"
+              type="text"
               name="tel"
               id="tel"
               placeholder='เบอร์โทร'
@@ -159,6 +211,9 @@ function addstaff() {
               onChange={(e) => setUserTel(e.target.value)}
               className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
             />
+            {formErrors.st_tel && (
+              <p className="text-red-500 text-xs mt-1">{formErrors.st_tel}</p>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-3 items-center ">
@@ -272,7 +327,19 @@ function addstaff() {
           )
           }
         </>
-        <button onClick={openModal} type="button" className="mx-auto w-1/3 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
+        <button onClick={() => {
+          const isValid = validateForm();
+          if (isValid) {
+            // ทำงานเมื่อ validateForm ผ่าน
+            console.log('Form is valid. Open the modal.');
+
+            // ทำการเรียก openModal ที่นี่
+            openModal();
+          } else {
+            // ทำงานเมื่อ validateForm ไม่ผ่าน
+            console.log('Form is not valid. Please check the errors.');
+          }
+        }} type="button" className="mx-auto w-1/3 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
       </div>
 
     </div>
