@@ -3,7 +3,6 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Tab } from '@headlessui/react';
 import Link from "next/link";
 
-
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }

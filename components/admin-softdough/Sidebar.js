@@ -29,7 +29,7 @@ const ingredientDropdown = [
 ];
 // สินค้า
 const productDropdown = [
-  { title: "ประเภทสินค้า/สำหรับขาย", href: "/product/forsell" },
+  { title: "ประเภทสินค้า/สำหรับขาย", href: "/product/all" },
   { title: "สูตรอาหาร", href: "/product/recipes" },
   { title: "เมนูสำหรับขาย", href: "/product/menusell" },
 ];
