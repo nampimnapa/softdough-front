@@ -5,6 +5,8 @@ import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from
 import { Dialog, Transition } from '@headlessui/react';
 import { Tab } from '@headlessui/react';
 import { Kanit } from "next/font/google";
+import { HiOutlineTrash } from "react-icons/hi";
+import { FiSave } from "react-icons/fi";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -48,13 +50,48 @@ function all() {
     const [isOpen, setIsOpen] = useState(false);
 
     const openDialog = (ingredientToEdit, position) => {
-    setSelectedIngredient(ingredientToEdit);
-    // setDialogPosition(position);
-    setIsOpen(true);
-};
+        setSelectedIngredient(ingredientToEdit);
+        // setDialogPosition(position);
+        setIsOpen(true);
+    };
     const [selectedIngredient, setSelectedIngredient] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
 
+    const [openInput, setOpenInput] = useState(0);
+    const changeInput = (id: any) => {
+        setOpenInput(id);
+        console.log("change input", openInput)
+        setIsEditing(true);
+    }
 
+    useEffect(() => {
+        console.log("change input", openInput);
+    }, [openInput]);
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
+        // คัดลอก Object พี่จะไม่ทำการแก้ไขข้อมูลใน categories
+        const updatedCategories = { ...categories };
+        const updatedIngredients = [...updatedCategories.สินค้า];
+
+        // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
+        const index = updatedIngredients.findIndex((ingredient) => ingredient.id === id);
+
+        if (index !== -1) {
+            updatedIngredients[index].name = event.target.value;
+        // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
+            setCategories({ ...categories, สินค้า: updatedIngredients });
+        }
+    };
+
+    // อันนี้เช็คเผื่อเปลี่ยนไอคอนเมื่อมีการกดแก้ไข
+    const handleSaveChanges = () => {
+        setIsEditing(false);
+    };
+
+    const handleCancelEdit = () => {
+        setOpenInput(0);
+        setIsEditing(false);
+    };
 
 
     return (
@@ -129,10 +166,10 @@ function all() {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {ingredients.map((ingredients) => (
-                                                    <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                {ingredients.map((ingredient) => (
+                                                    <tr key={ingredient.id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                         <td scope="row" className="px-6 py-1  text-[#73664B] whitespace-nowrap dark:text-white">
-                                                            {ingredients.id}
+                                                            {ingredient.id}
                                                         </td>
                                                         <td className="px-6 py-1 text-left text-[#73664B]">
                                                             {/* <Transition.Root show={isOpen} as={Fragment}>
@@ -148,15 +185,35 @@ function all() {
                                                                     </div>
                                                                 </Dialog>
                                                             </Transition.Root> */}
-                                                            {ingredients.name}
+
+                                                            {openInput === ingredient.id ? (
+                                                                <input
+                                                                    type="text"
+                                                                    defaultValue={ingredient.name}
+                                                                    onChange={(event) => handleInputChange(event, ingredient.id)}
+                                                                />
+                                                            ) : (
+                                                                ingredient.name
+                                                            )}
 
                                                         </td>
                                                         <td className="px-6 py-4 flex items-center justify-end ">
-                                                            <button type="submit" onClick={(e) => e.stopPropagation()}>
-                                                                <Link href="" className="w-full flex justify-center items-center">
-                                                                    <PencilSquareIcon className="h-4 w-4 text-[#73664B] " />
-                                                                </Link>
-                                                            </button>
+                                                            {isEditing && openInput === ingredient.id ? (
+                                                                <>
+                                                                    <button type="button" onClick={handleSaveChanges}>
+                                                                        <FiSave className="h-4 w-4 text-[#73664B]" />
+                                                                    </button>
+                                                                    <button type="button" onClick={handleCancelEdit}>
+                                                                        <HiOutlineTrash className="h-4 w-4 text-[#73664B]" />
+                                                                    </button>
+                                                                </>
+                                                            ) : (
+                                                                <button type="button" onClick={() => changeInput(ingredient.id)}>
+                                                                    <a href="#" className="w-full flex justify-center items-center">
+                                                                        <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                                                    </a>
+                                                                </button>
+                                                            )}
 
                                                         </td>
                                                     </tr>
