@@ -171,32 +171,20 @@ function all() {
                                                         <td scope="row" className="px-6 py-1  text-[#73664B] whitespace-nowrap dark:text-white">
                                                             {ingredient.id}
                                                         </td>
-                                                        <td className="px-6 py-1 text-left text-[#73664B]">
-                                                            {/* <Transition.Root show={isOpen} as={Fragment}>
-                                                                <Dialog
-                                                                    as="div"
-                                                                    className="fixed inset-0 z-40 overflow-y-auto"
-                                                                    onClose={closeDialog}
-                                                                >
-                                                                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                                                        <input type="text"
-                                                                            placeholder="แก้ไข">
-                                                                        </input>
-                                                                    </div>
-                                                                </Dialog>
-                                                            </Transition.Root> */}
-
+                                                        
                                                             {openInput === ingredient.id ? (
+                                                                <td className="px-3 py-1 text-left text-[#73664B]">
                                                                 <input
                                                                     type="text"
                                                                     defaultValue={ingredient.name}
                                                                     onChange={(event) => handleInputChange(event, ingredient.id)}
                                                                 />
+                                                                </td>
                                                             ) : (
-                                                                ingredient.name
+                                                                <td className="px-6 py-1 text-left text-[#73664B]">
+                                                                {ingredient.name}
+                                                                </td>
                                                             )}
-
-                                                        </td>
                                                         <td className="px-6 py-4 flex items-center justify-end ">
                                                             {isEditing && openInput === ingredient.id ? (
                                                                 <>
