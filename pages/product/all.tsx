@@ -39,7 +39,9 @@ function all() {
 
     };
     const [categories, setCategories] = useState(ingredients);
+
     const [toggle, setToggle] = useState(false);
+
     const EditCategory = () => {
         setToggle(true);
     }
@@ -58,6 +60,7 @@ function all() {
     const [isEditing, setIsEditing] = useState(false);
 
     const [openInput, setOpenInput] = useState(0);
+
     const changeInput = (id: any) => {
         setOpenInput(id);
         console.log("change input", openInput)
@@ -72,10 +75,8 @@ function all() {
         // คัดลอก Object พี่จะไม่ทำการแก้ไขข้อมูลใน categories
         const updatedCategories = { ...categories };
         const updatedIngredients = [...updatedCategories.สินค้า];
-
         // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
         const index = updatedIngredients.findIndex((ingredient) => ingredient.id === id);
-
         if (index !== -1) {
             updatedIngredients[index].name = event.target.value;
             // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
@@ -83,35 +84,38 @@ function all() {
         }
     };
 
-
-
     // อันนี้เช็คเผื่อเปลี่ยนไอคอนเมื่อมีการกดแก้ไข
     const handleSaveChanges = () => {
         setOpenInput(0);
         setIsEditing(false);
     };
+    const [originalData, setOriginalData] = useState(null);
+
+    const [editingIngredient, setEditingIngredient] = useState(null);
     const handleCancelEdit = () => {
-        if (openInput && isEditing && selectedIngredient) {
-            // คัดลอก Object ทั้ง categories เพื่อไม่ทำให้เปลี่ยนแปลงข้อมูลต้นฉบับ
-            const updatedCategories = { ...categories };
-            const categoryToEdit = updatedCategories[selectedIngredient.category];
+        if (openInput && isEditing && editingIngredient) {
+            // คืนค่าเดิม
+            setCategories((prevCategories) => {
+                const updatedCategories = { ...prevCategories };
+                const categoryToEdit = updatedCategories[editingIngredient.category];
     
-            if (categoryToEdit) {
-                // ค้นหาข้อมูลตาม id และกำหนดค่าเดิมกลับ
-                const index = categoryToEdit.findIndex((ingredient) => ingredient.id === selectedIngredient.id);
-                if (index !== -1) {
-                    categoryToEdit[index].name = selectedIngredient.name;
+                if (categoryToEdit) {
+                    const index = categoryToEdit.findIndex((ingredient) => ingredient.id === editingIngredient.id);
+                    if (index !== -1) {
+                        categoryToEdit[index].name = editingIngredient.name;
+                    }
                 }
     
-                // กำหนดค่าใหม่ให้กับ state
-                setCategories({ ...updatedCategories });
-            }
+                return { ...updatedCategories };
+            });
         }
-        // ยกเลิกการแก้ไข
+    
         setOpenInput(0);
         setIsEditing(false);
-        setSelectedIngredient(null); // เคลียร์ข้อมูลที่ถูกเลือกไว้
+        setEditingIngredient(null);
     };
+
+
 
 
     return (
