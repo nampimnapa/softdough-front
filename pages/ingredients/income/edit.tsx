@@ -17,13 +17,11 @@ const kanit = Kanit({
 });
 function edit() {
     const ingreunit = {
-        "แป้ง": "ถุง",
-        "น้ำตาล": "ถุง",
-        "นม": "แกลลอน",
-        "เนย": "ชิ้น"
+        "แป้ง": 1,
+        "น้ำตาล": 2,
+        "นม":  3,
+        "เนย": 4
     };
-
-
 
     const [ingrelot, setIngrelot] = useState([
         {
@@ -31,44 +29,36 @@ function edit() {
             date: '10/10/2555',
             ingre: [
                 {
-                    name: 'แป้ง',
-                    count: "2",
-                    unit: "ถุง",
+                    ind_id: 1,
+                    count:2,
                     exp: "10/10/2556",
-                    price: '500'
-                },
-                {
-                    name: 'น้ำตาล',
-                    count: "2",
-                    unit: "ถุง",
-                    exp: "10/10/2556",
-                    price: '100'
+                    price: 500
                 }
+               
             ],
         },
     ]);
     const handleEditWork = () => {
         setIsOpen(false);
         console.log("handleEditWork", ingrelot);
-
     };
 
     const handleAddIngredient = (newIngredient) => {
         setIngrelot((prevIngrelot) => {
-            const updatedIngrelot = [...prevIngrelot];
-
+            // const updatedIngrelot = [...prevIngrelot];
             // ตรวจสอบว่า lotIndex มีค่าหรือไม่
-            const lotIndex = updatedIngrelot.findIndex((lot) => lot.lotno === newIngredient.lotno);
+            const lotIndex = prevIngrelot.findIndex((lot) => lot.lotno === newIngredient.lotno);
             if (lotIndex !== -1) {
                 // ตรวจสอบว่า property ingre มีค่าหรือไม่
-                if (updatedIngrelot[lotIndex].ingre) {
-                    updatedIngrelot[lotIndex].ingre.push(newIngredient.ingre[0]);
+                if (prevIngrelot[lotIndex].ingre) {
+                    prevIngrelot[lotIndex].ingre.push(newIngredient.ingre[0]);
                 } else {
-                    updatedIngrelot[lotIndex].ingre = [newIngredient.ingre[0]];
+                    prevIngrelot[lotIndex].ingre = [newIngredient.ingre[0]];
                 }
             }
-
-            return updatedIngrelot;
+            console.log(prevIngrelot);
+            return prevIngrelot;
+            
         });
     };
 
@@ -96,16 +86,13 @@ function edit() {
         console.log("newValue:", newValue);
         setValue(newValue);
     }
-    const [addedIngredients, setAddedIngredients] = useState([]);
 
     const handleSubmit = (e, lotIndex) => {
         e.preventDefault();
-
         const priceValue = e.target.price ? e.target.price.value : null;
         const ingredientData = {
             name: e.target.ingredients.value,
             count: e.target.count.value,
-            // unit: "your_unit_value",  // ค่าจริงที่คุณได้รับจากฟอร์มหรือที่ต้องการ
             exp: value.startDate,
             price: priceValue,
         };
@@ -129,11 +116,11 @@ function edit() {
                 </Link>
             </button>
             <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>แก้ไขวัตถุดิบเข้าร้าน</p>
-            {ingrelot.map((lot, idx) => (
-                <div key={idx}>
+            {ingrelot.map((lot, index) => (
+                <div key={index}>
                     <p className="text-sm px-6 py-2 text-[#73664B]">เลขล็อตวัตถุดิบ : {lot.lotno}</p>
                     <p className="text-sm px-6 py-2 text-[#73664B]">วันที่ : {lot.date}</p>
-                    <form onSubmit={(e) => handleSubmit(e, idx)}>
+                    <form onSubmit={(e) => handleSubmit(e, index)}>
                         <div className="grid grid-cols-6">
                             <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:
                                 <select id="ingredients"
@@ -153,10 +140,7 @@ function edit() {
                                     className="px-3 bg-[#FFFFDD] w-1/2 block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                                 />
                                 {/* ใส่หน่วยวัตถุดิบตรง span */}
-                                <span>{ingreunit[lot.ingre[0].name] || ''}</span> 
                             </p>
-
-
                             <div className="text-sm px-6 py-2 text-[#73664B] flex  col-span-2 justify-center items-center">
                                 <p>วันหมดอายุ: </p>
                                 <Datepicker
@@ -182,15 +166,14 @@ function edit() {
                     {lot.ingre.map((ingredient, Idx) => (
                         <Fragment key={Idx}>
                             <div className="grid grid-cols-8">
-                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">วัตถุดิบ : {ingredient.name}</p>
-                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">จำนวน : {ingredient.count} {ingreunit[ingredient.name] || ''}</p>
+                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">วัตถุดิบ : {ingredient.ind_id}</p>
+                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">จำนวน : {ingredient.count} {ingreunit[ingredient.ind_id] || ''}</p>
                                 <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">วันหมดอายุ : {ingredient.exp}</p>
                                 <p className="text-sm px-6 py-2 text-[#73664B]">ราคา : {ingredient.price}</p>
                                 <p className="px-6 py-2">
-                                    <button onClick={() => handleDeleteIngredient(idx, Idx)}>
+                                    <button onClick={() => handleDeleteIngredient(index, Idx)}>
                                         <TrashIcon className="h-5 w-5 text-red-500" /></button>
                                 </p></div>
-
                         </Fragment>
                     ))}
                 </div>

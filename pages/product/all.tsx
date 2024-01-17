@@ -108,6 +108,9 @@ function all() {
         setIsEditing(false);
         setSelectedIngredient(null); // เคลียร์ข้อมูลที่ถูกเลือกไว้
     };
+
+    const [newIngredientName, setNewIngredientName] = useState('');
+
     
 
 
