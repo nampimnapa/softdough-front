@@ -39,6 +39,7 @@ function addstaff() {
   };
 
   const InputSave = () => {
+    setIsOpen(false);
     console.log("Test")
 
   }
@@ -134,9 +135,15 @@ function addstaff() {
 
     console.log('formErrors:', errors);
 
-    setFormErrors(errors);
+    const checkError = Object.values(errors).filter(value => value)
 
-    return Object.keys(errors).length === 0;
+    // console.log(checkError.length);
+    
+    if (checkError.length) {
+      setFormErrors(errors);
+    } else {
+      return true;
+    }
   };
 
   return (
@@ -332,7 +339,6 @@ function addstaff() {
           if (isValid) {
             // ทำงานเมื่อ validateForm ผ่าน
             console.log('Form is valid. Open the modal.');
-
             // ทำการเรียก openModal ที่นี่
             openModal();
           } else {
