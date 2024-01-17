@@ -78,7 +78,7 @@ function all() {
 
         if (index !== -1) {
             updatedIngredients[index].name = event.target.value;
-        // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
+            // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
             setCategories({ ...categories, สินค้า: updatedIngredients });
         }
     };
@@ -150,16 +150,16 @@ function all() {
                             >
                                 {idx === 0 ? (
                                     <div className="relative overflow-x-auto ">
-                                        <table className="w-full text-sm text-center text-gray-500">
+                                        <table className="w-full text-sm text-center ">
                                             <thead >
                                                 <tr className="text-white  font-normal  bg-[#908362]  ">
                                                     <td scope="col" className="px-3 py-3">
                                                         ลำดับ
                                                     </td>
-                                                    <td scope="col" className="px-12 py-3 ">
+                                                    <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
                                                         ชื่อประเภทสินค้า
                                                     </td>
-                                                    <td scope="col" className="px-12 py-3 ">
+                                                    <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">
 
                                                     </td>
 
@@ -168,43 +168,29 @@ function all() {
                                             <tbody>
                                                 {ingredients.map((ingredient) => (
                                                     <tr key={ingredient.id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                        <td scope="row" className="px-6 py-1  text-[#73664B] whitespace-nowrap dark:text-white">
+                                                        <td scope="row" className="px-3 py-1  text-[#73664B] whitespace-nowrap dark:text-white">
                                                             {ingredient.id}
                                                         </td>
-                                                        <td className="px-6 py-1 text-left text-[#73664B]">
-                                                            {/* <Transition.Root show={isOpen} as={Fragment}>
-                                                                <Dialog
-                                                                    as="div"
-                                                                    className="fixed inset-0 z-40 overflow-y-auto"
-                                                                    onClose={closeDialog}
-                                                                >
-                                                                    <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                                                        <input type="text"
-                                                                            placeholder="แก้ไข">
-                                                                        </input>
-                                                                    </div>
-                                                                </Dialog>
-                                                            </Transition.Root> */}
-
-                                                            {openInput === ingredient.id ? (
-                                                                <input
-                                                                    type="text"
-                                                                    defaultValue={ingredient.name}
-                                                                    onChange={(event) => handleInputChange(event, ingredient.id)}
-                                                                />
-                                                            ) : (
-                                                                ingredient.name
-                                                            )}
-
+                                                        <td className="px-12 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                                {openInput === ingredient.id ? (
+                                                                    <input
+                                                                        className="w-full h-10 focus:outline-none border  py-1"
+                                                                        type="text"
+                                                                        defaultValue={ingredient.name}
+                                                                        onChange={(event) => handleInputChange(event, ingredient.id)}
+                                                                    />
+                                                                ) : (
+                                                                    ingredient.name
+                                                                )}
                                                         </td>
-                                                        <td className="px-6 py-4 flex items-center justify-end ">
+                                                        <td className="px-12 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
                                                             {isEditing && openInput === ingredient.id ? (
                                                                 <>
                                                                     <button type="button" onClick={handleSaveChanges}>
                                                                         <FiSave className="h-4 w-4 text-[#73664B]" />
                                                                     </button>
-                                                                    <button type="button" onClick={handleCancelEdit}>
-                                                                        <HiOutlineTrash className="h-4 w-4 text-[#73664B]" />
+                                                                    <button type="button" onClick={handleCancelEdit}>ยกเลิก
+                                                                        {/* <HiOutlineTrash className="h-4 w-4 text-[#73664B]" /> */}
                                                                     </button>
                                                                 </>
                                                             ) : (
@@ -214,7 +200,6 @@ function all() {
                                                                     </a>
                                                                 </button>
                                                             )}
-
                                                         </td>
                                                     </tr>
                                                 ))}
