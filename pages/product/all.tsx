@@ -171,36 +171,43 @@ function all() {
                                                         <td scope="row" className="px-3 py-1  text-[#73664B] whitespace-nowrap dark:text-white">
                                                             {ingredient.id}
                                                         </td>
-                                                        <td className="px-12 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
                                                                 {openInput === ingredient.id ? (
+                                                                    <td className="ms-12 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
                                                                     <input
-                                                                        className="w-full h-10 focus:outline-none border  py-1"
+                                                                        className="w-full h-9 focus:outline-none border"
                                                                         type="text"
                                                                         defaultValue={ingredient.name}
                                                                         onChange={(event) => handleInputChange(event, ingredient.id)}
                                                                     />
+                                                                    </td>
                                                                 ) : (
-                                                                    ingredient.name
+                                                                    <td className="ms-12 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                                    {ingredient.name}
+                                                                    </td>
                                                                 )}
-                                                        </td>
-                                                        <td className="px-12 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
+                                                        
+                                                       
                                                             {isEditing && openInput === ingredient.id ? (
                                                                 <>
+                                                                 <td className="me-7 my-3 pt-[0.12rem] pb-[0.12rem] flex items-center justify-end whitespace-nowrap overflow-hidden">
                                                                     <button type="button" onClick={handleSaveChanges}>
                                                                         <FiSave className="h-4 w-4 text-[#73664B]" />
                                                                     </button>
                                                                     <button type="button" onClick={handleCancelEdit}>ยกเลิก
                                                                         {/* <HiOutlineTrash className="h-4 w-4 text-[#73664B]" /> */}
                                                                     </button>
+                                                                    </td>
                                                                 </>
                                                             ) : (
+                                                                <td className="me-7 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
                                                                 <button type="button" onClick={() => changeInput(ingredient.id)}>
                                                                     <a href="#" className="w-full flex justify-center items-center">
                                                                         <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
                                                                     </a>
                                                                 </button>
+                                                                </td>
                                                             )}
-                                                        </td>
+                                                        
                                                     </tr>
                                                 ))}
 
