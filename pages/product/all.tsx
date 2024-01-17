@@ -83,14 +83,34 @@ function all() {
         }
     };
 
+
+
     // อันนี้เช็คเผื่อเปลี่ยนไอคอนเมื่อมีการกดแก้ไข
     const handleSaveChanges = () => {
-        setIsEditing(false);
-    };
-
-    const handleCancelEdit = () => {
         setOpenInput(0);
         setIsEditing(false);
+    };
+    const handleCancelEdit = () => {
+        if (openInput && isEditing && selectedIngredient) {
+            // คัดลอก Object ทั้ง categories เพื่อไม่ทำให้เปลี่ยนแปลงข้อมูลต้นฉบับ
+            const updatedCategories = { ...categories };
+            const categoryToEdit = updatedCategories[selectedIngredient.category];
+    
+            if (categoryToEdit) {
+                // ค้นหาข้อมูลตาม id และกำหนดค่าเดิมกลับ
+                const index = categoryToEdit.findIndex((ingredient) => ingredient.id === selectedIngredient.id);
+                if (index !== -1) {
+                    categoryToEdit[index].name = selectedIngredient.name;
+                }
+    
+                // กำหนดค่าใหม่ให้กับ state
+                setCategories({ ...updatedCategories });
+            }
+        }
+        // ยกเลิกการแก้ไข
+        setOpenInput(0);
+        setIsEditing(false);
+        setSelectedIngredient(null); // เคลียร์ข้อมูลที่ถูกเลือกไว้
     };
 
 
@@ -171,43 +191,39 @@ function all() {
                                                         <td scope="row" className="px-3 py-1  text-[#73664B] whitespace-nowrap dark:text-white">
                                                             {ingredient.id}
                                                         </td>
-                                                                {openInput === ingredient.id ? (
-                                                                    <td className="ms-12 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                                    <input
-                                                                        className="w-full h-9 focus:outline-none border"
-                                                                        type="text"
-                                                                        defaultValue={ingredient.name}
-                                                                        onChange={(event) => handleInputChange(event, ingredient.id)}
-                                                                    />
-                                                                    </td>
-                                                                ) : (
-                                                                    <td className="ms-12 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                                    {ingredient.name}
-                                                                    </td>
-                                                                )}
-                                                        
-                                                       
-                                                            {isEditing && openInput === ingredient.id ? (
-                                                                <>
-                                                                 <td className="me-7 my-3 pt-[0.12rem] pb-[0.12rem] flex items-center justify-end whitespace-nowrap overflow-hidden">
-                                                                    <button type="button" onClick={handleSaveChanges}>
-                                                                        <FiSave className="h-4 w-4 text-[#73664B]" />
+                                                        {openInput === ingredient.id ? (
+                                                            <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                                <input
+                                                                    className="w-full h-9 focus:outline-none border"
+                                                                    type="text"
+                                                                    value={ingredient.name}
+                                                                    onChange={(event) => handleInputChange(event, ingredient.id)}
+                                                                />
+                                                            </td>
+                                                        ) : (
+                                                            <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                                {ingredient.name}
+                                                            </td>
+                                                        )}
+                                                        {isEditing && openInput === ingredient.id ? (
+                                                            <>
+                                                                <td className="me-2 my-2 pt-[0.12rem] pb-[0.12rem] flex items-center justify-end whitespace-nowrap overflow-hidden">
+                                                                    <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก
                                                                     </button>
-                                                                    <button type="button" onClick={handleCancelEdit}>ยกเลิก
-                                                                        {/* <HiOutlineTrash className="h-4 w-4 text-[#73664B]" /> */}
+                                                                    <button type="button" onClick={handleSaveChanges} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก
                                                                     </button>
-                                                                    </td>
-                                                                </>
-                                                            ) : (
-                                                                <td className="me-7 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
+                                                                </td>
+                                                            </>
+                                                        ) : (
+                                                            <td className="me-2 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
                                                                 <button type="button" onClick={() => changeInput(ingredient.id)}>
                                                                     <a href="#" className="w-full flex justify-center items-center">
                                                                         <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
                                                                     </a>
                                                                 </button>
-                                                                </td>
-                                                            )}
-                                                        
+                                                            </td>
+                                                        )}
+
                                                     </tr>
                                                 ))}
 
