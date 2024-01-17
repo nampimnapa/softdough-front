@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import React from "react";
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
+import {NextUIProvider} from "@nextui-org/react";
 // import { pages } from "next/dist/build/templates/app-page";
 
 const kanit = Kanit({
@@ -29,6 +30,7 @@ export default function App({ Component, pageProps }) {
   const { pathname } = useRouter();
   return (
     <React.Fragment>
+      <NextUIProvider>
       {pathname.includes("Login") ?
         <Component {...pageProps} />
         :
@@ -36,6 +38,7 @@ export default function App({ Component, pageProps }) {
           <Component {...pageProps} />
         </Sidebar>
       }
+      </NextUIProvider>
 
     </React.Fragment>
   );
