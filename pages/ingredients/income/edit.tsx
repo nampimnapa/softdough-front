@@ -30,6 +30,7 @@ function edit() {
             ingre: [
                 {
                     ind_id: 1,
+                    name:"แป้ง",
                     count:2,
                     exp: "10/10/2556",
                     price: 500
@@ -45,7 +46,6 @@ function edit() {
 
     const handleAddIngredient = (newIngredient) => {
         setIngrelot((prevIngrelot) => {
-            // const updatedIngrelot = [...prevIngrelot];
             // ตรวจสอบว่า lotIndex มีค่าหรือไม่
             const lotIndex = prevIngrelot.findIndex((lot) => lot.lotno === newIngredient.lotno);
             if (lotIndex !== -1) {
@@ -121,6 +121,7 @@ function edit() {
                     <p className="text-sm px-6 py-2 text-[#73664B]">เลขล็อตวัตถุดิบ : {lot.lotno}</p>
                     <p className="text-sm px-6 py-2 text-[#73664B]">วันที่ : {lot.date}</p>
                     <form onSubmit={(e) => handleSubmit(e, index)}>
+
                         <div className="grid grid-cols-6">
                             <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:
                                 <select id="ingredients"
