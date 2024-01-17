@@ -12,7 +12,11 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
+let dataSet = null;
+
 function all() {
+
+    // ตัวแปรแก็บข้อมูลจาก API
     const ingredients = {
         สินค้า: [
             {
@@ -38,45 +42,34 @@ function all() {
         ]
 
     };
+
+    // เอาจากตัวแปรที่ได้จาก API มาทำเป็น State
     const [categories, setCategories] = useState(ingredients);
-
-    const [toggle, setToggle] = useState(false);
-
-    const EditCategory = () => {
-        setToggle(true);
-    }
-    // บันทึก
-    const SaveEditCategory = () => {
-
-    }
-    const [isOpen, setIsOpen] = useState(false);
-
-    const openDialog = (ingredientToEdit, position) => {
-        setSelectedIngredient(ingredientToEdit);
-        // setDialogPosition(position);
-        setIsOpen(true);
-    };
     const [selectedIngredient, setSelectedIngredient] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
-
     const [openInput, setOpenInput] = useState(0);
-
     const changeInput = (id: any) => {
+        dataSet = ingredients;
         setOpenInput(id);
-        console.log("change input", openInput)
         setIsEditing(true);
+
+        const selected = categories.สินค้า.find((ingredient) => ingredient.id === id);
+        setSelectedIngredient(selected);
     }
 
     useEffect(() => {
-        console.log("change input", openInput);
+        // console.log("change input", openInput);
     }, [openInput]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
         // คัดลอก Object พี่จะไม่ทำการแก้ไขข้อมูลใน categories
         const updatedCategories = { ...categories };
         const updatedIngredients = [...updatedCategories.สินค้า];
+
+
         // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
         const index = updatedIngredients.findIndex((ingredient) => ingredient.id === id);
+
         if (index !== -1) {
             updatedIngredients[index].name = event.target.value;
             // อันนี้พี่จะค้นหาข้อมูลตามที่กดมาว่ามันอยู่แถวไหน ก็จะทำการเปลี่ยน State ในช่องนั้น ๆ
@@ -89,33 +82,33 @@ function all() {
         setOpenInput(0);
         setIsEditing(false);
     };
-    const [originalData, setOriginalData] = useState(null);
-
-    const [editingIngredient, setEditingIngredient] = useState(null);
     const handleCancelEdit = () => {
-        if (openInput && isEditing && editingIngredient) {
-            // คืนค่าเดิม
-            setCategories((prevCategories) => {
-                const updatedCategories = { ...prevCategories };
-                const categoryToEdit = updatedCategories[editingIngredient.category];
+        if (openInput !== 0 && isEditing && selectedIngredient) {
+            // คัดลอก state เพื่อไม่ทำให้เปลี่ยนแปลงข้อมูลต้นฉบับ
+            const updatedCategories = { ...categories };
+            const categoryToEdit = updatedCategories.สินค้า;
+
+            console.log(categoryToEdit)
     
-                if (categoryToEdit) {
-                    const index = categoryToEdit.findIndex((ingredient) => ingredient.id === editingIngredient.id);
-                    if (index !== -1) {
-                        categoryToEdit[index].name = editingIngredient.name;
-                    }
+            if (categoryToEdit) {
+                // ค้นหาข้อมูลตาม id และกำหนดค่าเดิมกลับ
+                const index = categoryToEdit.findIndex((ingredient) => ingredient.id === selectedIngredient.id);
+                if (index !== -1) {
+                    categoryToEdit[index].name = selectedIngredient.name;
                 }
     
-                return { ...updatedCategories };
-            });
+                // อัปเดต state
+                setCategories(ingredients)
+            }
+            
         }
     
+        // ยกเลิกการแก้ไข
         setOpenInput(0);
         setIsEditing(false);
-        setEditingIngredient(null);
+        setSelectedIngredient(null); // เคลียร์ข้อมูลที่ถูกเลือกไว้
     };
-
-
+    
 
 
     return (
@@ -174,10 +167,10 @@ function all() {
                             >
                                 {idx === 0 ? (
                                     <div className="relative overflow-x-auto ">
-                                        <table className="w-full text-sm text-center ">
+                                        <table className="w-full text-sm text-center table-fixed">
                                             <thead >
                                                 <tr className="text-white  font-normal  bg-[#908362]  ">
-                                                    <td scope="col" className="px-3 py-3">
+                                                    <td scope="col" className="px-3 py-3 w-64">
                                                         ลำดับ
                                                     </td>
                                                     <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
@@ -192,11 +185,11 @@ function all() {
                                             <tbody>
                                                 {ingredients.map((ingredient) => (
                                                     <tr key={ingredient.id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                        <td scope="row" className="px-3 py-1  text-[#73664B] whitespace-nowrap dark:text-white">
+                                                        <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
                                                             {ingredient.id}
                                                         </td>
                                                         {openInput === ingredient.id ? (
-                                                            <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                            <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
                                                                 <input
                                                                     className="w-full h-9 focus:outline-none border"
                                                                     type="text"
@@ -211,7 +204,7 @@ function all() {
                                                         )}
                                                         {isEditing && openInput === ingredient.id ? (
                                                             <>
-                                                                <td className="me-2 my-2 pt-[0.12rem] pb-[0.12rem] flex items-center justify-end whitespace-nowrap overflow-hidden">
+                                                                <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem]  flex items-center justify-end">
                                                                     <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก
                                                                     </button>
                                                                     <button type="button" onClick={handleSaveChanges} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก
