@@ -49,27 +49,51 @@ function all() {
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
         const newValue = event.target.value;
-
         // ใช้ setDataProduct เพื่ออัปเดต State
         setDataProduct(prevProducts => {
-          return prevProducts.map(product => {
-            if (product.id === id) {
-              // อัปเดตข้อมูลเฉพาะของสินค้าที่ต้องการ
-              return { ...product, name: newValue };
-            }
-            return product;
-          });
+            return prevProducts.map(product => {
+                if (product.id === id) {
+                    // อัปเดตข้อมูลเฉพาะของสินค้าที่ต้องการ
+                    return { ...product, name: newValue };
+                }
+                return product;
+            });
         });
+        console.log("แก้ไขประเภทวัตถุดิบ : ",newValue); 
+
     };
 
-
     const handleCancelEdit = () => {
-
         setDataProduct(productsAPI)
         // ยกเลิกการแก้ไข
         setOpenInput(0);
+        setAdding(false);
         setIsEditing(false);
     };
+
+    // stateข้อมูล ที่ add
+    const [newProductName, setNewProductName] = useState('');
+    const [isAdding, setAdding] = useState(false);
+
+    // กดปุ่มเพิ่ม
+    const handleAddProduct = () => {
+        setAdding(true); // ตั้งค่า isAdding เป็น true เมื่อคลิกปุ่ม "เพิ่ม"
+        // ต่อไปคุณสามารถทำอย่างที่คุณทำกับ handleAddChanges ต่อไป
+    };
+    const handleAddChanges = () => {
+        if (newProductName.trim() !== '') {
+            setDataProduct((prevDataProduct) => [
+                ...prevDataProduct,
+                { id: prevDataProduct.length + 1, name: newProductName },
+            ]);
+            setNewProductName('');
+            setOpenInput(0);
+            setAdding(false); // ตั้งค่า isAdding เป็น false เมื่อเพิ่มข้อมูลเสร็จสิ้น
+        }
+        console.log("เพิ่มประเภทวัตถุดิบ : ",newProductName); //ข้อมูลที่เพิ่ม
+    };
+
+
 
 
 
@@ -92,15 +116,14 @@ function all() {
                     </button>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
-
-                    <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
+                    <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex
+                     " onClick={handleAddProduct}>
                         <PlusIcon className="h-5 w-5 text-white mr-2" />
                         เพิ่ม
                     </button>
                 </div>
             </div>
             <div className="w-full">
-
                 <div className="flex w-full flex-col">
                     <Tabs
                         aria-label="Options"
@@ -113,9 +136,7 @@ function all() {
                             tabContent: "group-data-[selected=true]:text-[#73664B]"
                         }}
                     >
-
                         {/* Tab Product */}
-
                         <Tab
                             key="product"
                             title={
@@ -124,8 +145,6 @@ function all() {
                                 </div>
                             }
                         >
-
-
                             <div className="relative overflow-x-auto mx-4">
                                 <table className="w-full text-sm text-center table-fixed">
                                     <thead >
@@ -137,9 +156,7 @@ function all() {
                                                 ชื่อประเภทสินค้า
                                             </td>
                                             <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">
-
                                             </td>
-
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -184,6 +201,33 @@ function all() {
 
                                             </tr>
                                         ))}
+                                        {isAdding && (
+                                                <>
+
+                                            <tr key="new" className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+                                                <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                    {dataProduct.length + 1}
+                                                </td>
+                                                <td className="py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                    <input
+                                                        className="w-full h-9 focus:outline-none border"
+                                                        type="text"
+                                                        value={newProductName}
+                                                        onChange={(event) => setNewProductName(event.target.value)}
+                                                    />
+                                                </td>
+                                                <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem] flex items-center justify-end">
+                                                    <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">
+                                                        ยกเลิก
+                                                    </button>
+                                                    <button type="button" onClick={handleAddChanges} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">
+                                                        บันทึก
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            </>
+
+                                        )}
 
                                     </tbody>
                                 </table>
@@ -191,23 +235,21 @@ function all() {
 
 
                         </Tab>
-
                         {/* Tab Menu */}
                         <Tab
-                            key="music"
+                            key="menusell"
                             title={
                                 <div className="flex items-center space-x-2">
                                     <span>เมนูสำหรับขาย</span>
                                 </div>
                             }
                         >
-
                             <div className="second-tab-layout mx-4">
                                 <div className="relative overflow-x-auto ">
                                     <table className="w-full text-sm text-center text-gray-500">
-                                        <thead>
+                                        <thead className="">
                                             <tr className="text-white  font-normal  bg-[#908362]  ">
-                                                <td scope="col" className="px-6 py-3">
+                                                <td scope="col" className="px-6 py-3 ">
                                                     ล็อตวัตถุดิบ
                                                 </td>
                                                 <td scope="col" className="px-12 py-3 ">
@@ -228,21 +270,20 @@ function all() {
                                         <tbody>
                                             {dataMenu.map((ingredients) => (
                                                 <tr key={ingredients.lot} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                    <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
+                                                    <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
                                                         {ingredients.lot}
                                                     </td>
-                                                    <td className="px-6 py-1 text-left">
+                                                    <td className="px-6 py-1 text-left text-[#73664B]">
                                                         {ingredients.lotname}
                                                     </td>
-                                                    <td className="px-6 py-1">
+                                                    <td className="px-6 py-1 text-[#73664B]">
                                                         {ingredients.lotstock}
                                                     </td>
 
-                                                    <td className="px-6 py-1">
+                                                    <td className="px-6 py-1 text-[#73664B]">
                                                         {ingredients.exp}
                                                     </td>
-
-                                                    <td className="px-6 py-4 flex items-center justify-center  ">
+                                                    <td className="px-6 py-4 flex items-center justify-center  text-[#73664B]">
                                                         <button type="submit" >
                                                             <Link href="/ingredients/detailall" className="w-full flex justify-center items-center">
                                                                 <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
