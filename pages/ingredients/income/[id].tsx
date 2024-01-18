@@ -15,7 +15,9 @@ const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
-function edit() {
+function Index() {
+    const router = useRouter();
+    const { id } = router.query;
     const ingreunit = {
         "แป้ง": 1,
         "น้ำตาล": 2,
@@ -23,22 +25,30 @@ function edit() {
         "เนย": 4
     };
 
-    const [ingrelot, setIngrelot] = useState([
+    const ingrelotData = [
         {
             lotno: "LOT01",
             date: '10/10/2555',
             ingre: [
                 {
                     ind_id: 1,
-                    name:"แป้ง",
                     count:2,
                     exp: "10/10/2556",
                     price: 500
-                }
+                },
+                {
+                    ind_id: 2,
+                    count:2,
+                    exp: "10/10/2556",
+                    price: 500
+                },
                
             ],
-        },
-    ]);
+        }
+    ]
+
+    const [ingrelot, setIngrelot] = useState(ingrelotData);
+
     const handleEditWork = () => {
         setIsOpen(false);
         console.log("handleEditWork", ingrelot);
@@ -71,6 +81,7 @@ function edit() {
     const openModal = () => {
         setIsOpen(true);
     };
+    
     const ingredients = {
         name: [
             "แป้ง",
@@ -259,4 +270,4 @@ function edit() {
     )
 }
 
-export default edit
+export default Index

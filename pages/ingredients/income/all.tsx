@@ -120,7 +120,7 @@ function ingreincome() {
                                 </td>
                                 <td className="px-1 py-3  items-center justify-center  ">
                                     <button type="submit" >
-                                        <Link href="/ingredients/income/edit" className="w-full flex justify-center items-center">
+                                        <Link href={`/ingredients/income/edit/${lot.lotno}`} className="w-full flex justify-center items-center">
                                             <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
 
                                         </Link>
