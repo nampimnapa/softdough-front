@@ -47,7 +47,7 @@ function detailall() {
                     วัตถุดิบทั้งหมด
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>รายละเอียดวัตถุดิบ</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>รายละเอียดวัตถุดิบ</p>
             {ingredients.map((ingredients) => (<div>
                 <p className="text-sm px-6 py-2 text-[#73664B]">รายการ : {ingredients.name}</p>
                 <p className="text-sm px-6 py-2 text-[#73664B]">จำนวนการซื้อขั้นต่ำ : {ingredients.min}</p>
@@ -57,16 +57,13 @@ function detailall() {
             </div>
             ))}
 
-            <div className="flex justify-between  mt-3 " >
+            <div className="flex justify-start mt-3 " >
                 <button>
                     <Link href="/ingredients/edit"
                         type="button"
-                        className="mx-auto text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
+                        className="text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
                         แก้ไขวัตถุดิบ</Link></button>
-
-
-
-                <button type="button" className="mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
+                <button type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
                     <Link href="/ingredients/all">
                     เสร็จสิ้น</Link></button>
             </div>

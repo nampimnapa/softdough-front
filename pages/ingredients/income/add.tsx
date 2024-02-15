@@ -18,7 +18,7 @@ const kanit = Kanit({
 
 
 function add() {
-    
+
     const [isOpen, setIsOpen] = useState(false);
 
     const closeModal = () => {
@@ -77,7 +77,7 @@ function add() {
                     วัตถุดิบเข้าร้าน
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>เพิ่มวัตถุดิบเข้าร้าน</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>เพิ่มวัตถุดิบเข้าร้าน</p>
             <p className="text-m px-6 py-2 text-[#73664B]">รายละเอียดวัตถุดิบที่เพิ่ม</p>
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-6">
@@ -117,10 +117,11 @@ function add() {
                         id="price"
                         className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                     /></p>
-                    <input
-                        type="submit"
-                        value="เพิ่มวัตถุดิบ"
-                        className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 scale-75 w-1/2" />
+                    <div className="scale-75 w-full my-2">
+                        <button
+                            type="submit"
+                            value="เพิ่มวัตถุดิบ"
+                            className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 py-2 px-2">เพิ่มวัตถุดิบ</button></div>
                 </div >
             </form>
 

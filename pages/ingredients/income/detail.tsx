@@ -40,7 +40,7 @@ function detail() {
                     วัตถุดิบเข้าร้าน
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>รายละเอียดวัตถุดิบเข้าร้าน</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>รายละเอียดวัตถุดิบเข้าร้าน</p>
             {ingrelot.map((lot, idx) => (
                 <div key={idx}>
                     <p className="text-sm px-6 py-2 text-[#73664B]">เลขล็อตวัตถุดิบ : {lot.lotno}</p>

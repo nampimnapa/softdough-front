@@ -138,7 +138,7 @@ function addstaff() {
     const checkError = Object.values(errors).filter(value => value)
 
     // console.log(checkError.length);
-    
+
     if (checkError.length) {
       setFormErrors(errors);
     } else {
@@ -149,207 +149,210 @@ function addstaff() {
   return (
     <div className='h-screen'>
       <p className='text-[#F2B461] font-medium m-4'>เพิ่มพนักงาน</p>
-      <form className="mt-5 w-1/2 ">
-        <div className="grid grid-cols-3 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-            ชื่อพนักงาน :</label>
-          <div className="mt-2 col-span-2">
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={nameEm}
-              onChange={(e) => setNameEm(e.target.value)}
-              placeholder='ชื่อพนักงาน'
-              className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
-            />
-            {formErrors.st_name && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.st_name}</p>
-            )}
+      <div className="flex justify-center">
+        <form className="mt-5 w-1/2 ">
+          <div className="grid grid-cols-4 items-center ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+              ชื่อพนักงาน :</label>
+            <div className="mt-2 col-span-3">
+              <input
+                type="text"
+                name="name"
+                id="name"
+                value={nameEm}
+                onChange={(e) => setNameEm(e.target.value)}
+                placeholder='ชื่อพนักงาน'
+                className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
+              />
+              {formErrors.st_name && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.st_name}</p>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-3 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-            ชื่อผู้ใช้งาน :</label>
-          <div className="mt-2 col-span-2">
-            <input
-              type="text"
-              name="username"
-              id="username"
-              placeholder='ชื่อผู้ใช้งาน'
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
-            />
-            {formErrors.st_username && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.st_username}</p>
-            )}
-          </div>
+          <div className="grid grid-cols-4 items-center ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+              ชื่อผู้ใช้งาน :</label>
+            <div className="mt-2 col-span-3">
+              <input
+                type="text"
+                name="username"
+                id="username"
+                placeholder='ชื่อผู้ใช้งาน'
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+                className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
+              />
+              {formErrors.st_username && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.st_username}</p>
+              )}
+            </div>
 
-        </div>
-        <div className="grid grid-cols-3 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-            รหัสผ่าน :</label>
-          <div className="mt-2 col-span-2">
-            <input
-              type="password"
-              name="pw"
-              id="pw"
-              placeholder='รหัสผ่าน'
-              value={userPassw}
-              onChange={(e) => setUserPassw(e.target.value)}
-              className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
-            />
-            {formErrors.st_password && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.st_password}</p>
-            )}
           </div>
-        </div>
-        <div className="grid grid-cols-3 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-            เบอร์โทร :</label>
-          <div className="mt-2 col-span-2">
-            <input
-              type="text"
-              name="tel"
-              id="tel"
-              placeholder='เบอร์โทร'
-              value={userTel}
-              onChange={(e) => setUserTel(e.target.value)}
-              className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
-            />
-            {formErrors.st_tel && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.st_tel}</p>
-            )}
+          <div className="grid grid-cols-4 items-center ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+              รหัสผ่าน :</label>
+            <div className="mt-2 col-span-3">
+              <input
+                type="password"
+                name="pw"
+                id="pw"
+                placeholder='รหัสผ่าน'
+                value={userPassw}
+                onChange={(e) => setUserPassw(e.target.value)}
+                className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
+              />
+              {formErrors.st_password && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.st_password}</p>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-3 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-            แผนก :</label>
-          <div className="mt-2 col-span-2 flex">
-            <div className="form-control">
-              <label className="label cursor-pointer ">
-                <input type="radio" name="depart" value={userDepart} onChange={() => setUserDepart("1")} checked={userDepart === "1"} className="radio checked:bg-[#C5B182] " />
-                <span className="label-text text-[#73664B] px-3 ">พนักงานฝ่ายขาย</span>
-              </label>
+          <div className="grid grid-cols-4 items-center ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+              เบอร์โทร :</label>
+            <div className="mt-2 col-span-3">
+              <input
+                type="text"
+                name="tel"
+                id="tel"
+                placeholder='เบอร์โทร'
+                value={userTel}
+                onChange={(e) => setUserTel(e.target.value)}
+                className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
+              />
+              {formErrors.st_tel && (
+                <p className="text-red-500 text-xs mt-1">{formErrors.st_tel}</p>
+              )}
             </div>
-            <div className="form-control ml-4">
-              <label className="label cursor-pointer">
-                <input type="radio" name="depart" value={userDepart} onChange={() => setUserDepart("2")} checked={userDepart === "2"} className="radio checked:bg-[#C5B182]" />
-                <span className="label-text text-[#73664B] px-3">พนักงานฝ่ายผลิต</span>
-              </label>
-            </div>
-            {/* <select id="countries"
+          </div>
+          <div className="grid grid-cols-4 items-center ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+              แผนก :</label>
+            <div className="mt-2 col-span-3 flex">
+              <div className="form-control">
+                <label className="label cursor-pointer ">
+                  <input type="radio" name="depart" value={userDepart} onChange={() => setUserDepart("1")} checked={userDepart === "1"} className="radio checked:bg-[#C5B182] " />
+                  <span className="label-text text-[#73664B] px-3 ">พนักงานฝ่ายขาย</span>
+                </label>
+              </div>
+              <div className="form-control ml-4">
+                <label className="label cursor-pointer">
+                  <input type="radio" name="depart" value={userDepart} onChange={() => setUserDepart("2")} checked={userDepart === "2"} className="radio checked:bg-[#C5B182]" />
+                  <span className="label-text text-[#73664B] px-3">พนักงานฝ่ายผลิต</span>
+                </label>
+              </div>
+              {/* <select id="countries"
               className="bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2">
               <option>พนักงานฝ่ายขาย</option>
               <option>พนักงานฝ่ายผลิต</option>
             </select> */}
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-3 items-center mt-3 ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-            วันที่เข้าทำงาน :</label>
-          <Datepicker
-            className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}
-            useRange={false}
-            asSingle={true}
-            value={value}
-            onChange={handleValueChange}
-          />
-        </div>
-      </form>
-      <div className="grid grid-cols-3 items-center mt-3" >
-        <button
-          onClick={handleCancelClick}
-          type="button"
-          className=" mx-auto w-1/3 text-white bg-[#C5B182] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
-          ยกเลิก</button>
-        <>
-          {isOpen && (
-            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-              <Dialog as="div" className="relative z-10" onClose={closeModal}>
-                <Transition.Child
-                  as={Fragment}
-                  enter="ease-out duration-300"
-                  enterFrom="opacity-0"
-                  enterTo="opacity-100"
-                  leave="ease-in duration-200"
-                  leaveFrom="opacity-100"
-                  leaveTo="opacity-0"
-                >
-                  <div className="fixed inset-0 bg-black/25" />
-                </Transition.Child>
-
-                <div className="fixed inset-0 overflow-y-auto">
-                  <div className="flex min-h-full items-center justify-center p-4 text-center">
-
-                    <Transition.Child
-                      as={Fragment}
-                      enter="ease-out duration-300"
-                      enterFrom="opacity-0 scale-95"
-                      enterTo="opacity-100 scale-100"
-                      leave="ease-in duration-200"
-                      leaveFrom="opacity-100 scale-100"
-                      leaveTo="opacity-0 scale-95"
-                    >
-                      <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                        <Dialog.Title
-                          as="h3"
-                          className="text-lg font-medium leading-6 text-[73664B]"
-                        >
-                          ยืนยันการเพิ่มพนักงาน
-                        </Dialog.Title>
-                        <div className="mt-2">
-                          <p className="text-sm text-[#73664B]">
-                            คุณต้องการเพิ่มพนักงานหรือไม่
-                          </p>
-                        </div>
-                        {/*  choose */}
-                        <div className="flex justify-end">
-                          <div className="inline-flex justify-end">
-                            <button
-                              type="button"
-                              className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                              onClick={closeModal}
-                            >
-                              ยกเลิก
-                            </button>
-
-                            <button
-                              type="button"
-                              className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                              onClick={InputSave}
-                            >
-                              ยืนยัน
-                            </button>
-                          </div>
-                        </div>
-                      </Dialog.Panel>
-                    </Transition.Child>
-                  </div>
-                </div>
-              </Dialog>
-            </Transition>
-
-          )
-          }
-        </>
-        <button onClick={() => {
-          const isValid = validateForm();
-          if (isValid) {
-            // ทำงานเมื่อ validateForm ผ่าน
-            console.log('Form is valid. Open the modal.');
-            // ทำการเรียก openModal ที่นี่
-            openModal();
-          } else {
-            // ทำงานเมื่อ validateForm ไม่ผ่าน
-            console.log('Form is not valid. Please check the errors.');
-          }
-        }} type="button" className="mx-auto w-1/3 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
+          <div className="grid grid-cols-4 items-center mt-3 ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+              วันที่เข้าทำงาน :</label>
+            <Datepicker
+              className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}
+              useRange={false}
+              asSingle={true}
+              value={value}
+              onChange={handleValueChange}
+            />
+          </div>
+        </form>
       </div>
+      <div className="flex justify-center">
+        <div className="w-1/2  mt-10  flex justify-start " >
+          <button
+            onClick={handleCancelClick}
+            type="button"
+            className=" text-white bg-[#C5B182] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 mb-2 ">
+            ยกเลิก</button>
+          <>
+            {isOpen && (
+              <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0"
+                    enterTo="opacity-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100"
+                    leaveTo="opacity-0"
+                  >
+                    <div className="fixed inset-0 bg-black/25" />
+                  </Transition.Child>
 
+                  <div className="fixed inset-0 overflow-y-auto">
+                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+
+                      <Transition.Child
+                        as={Fragment}
+                        enter="ease-out duration-300"
+                        enterFrom="opacity-0 scale-95"
+                        enterTo="opacity-100 scale-100"
+                        leave="ease-in duration-200"
+                        leaveFrom="opacity-100 scale-100"
+                        leaveTo="opacity-0 scale-95"
+                      >
+                        <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                          <Dialog.Title
+                            as="h3"
+                            className="text-lg font-medium leading-6 text-[73664B]"
+                          >
+                            ยืนยันการเพิ่มพนักงาน
+                          </Dialog.Title>
+                          <div className="mt-2">
+                            <p className="text-sm text-[#73664B]">
+                              คุณต้องการเพิ่มพนักงานหรือไม่
+                            </p>
+                          </div>
+                          {/*  choose */}
+                          <div className="flex justify-end">
+                            <div className="inline-flex justify-end">
+                              <button
+                                type="button"
+                                className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                onClick={closeModal}
+                              >
+                                ยกเลิก
+                              </button>
+
+                              <button
+                                type="button"
+                                className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                onClick={InputSave}
+                              >
+                                ยืนยัน
+                              </button>
+                            </div>
+                          </div>
+                        </Dialog.Panel>
+                      </Transition.Child>
+                    </div>
+                  </div>
+                </Dialog>
+              </Transition>
+
+            )
+            }
+          </>
+          <button onClick={() => {
+            const isValid = validateForm();
+            if (isValid) {
+              // ทำงานเมื่อ validateForm ผ่าน
+              console.log('Form is valid. Open the modal.');
+              // ทำการเรียก openModal ที่นี่
+              openModal();
+            } else {
+              // ทำงานเมื่อ validateForm ไม่ผ่าน
+              console.log('Form is not valid. Please check the errors.');
+            }
+          }} type="button" className="ml-3 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5  mb-2 ">บันทึก</button>
+        </div>
+
+      </div>
     </div>
-
   )
 }
 

@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { useRouter } from "next/router";
 import Link from "next/link";
 import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
@@ -14,7 +14,6 @@ function classNames(...classes) {
 let dataSet = null;
 
 function all() {
-
     // ตัวแปรแก็บข้อมูลจาก API
     const productsAPI = [
         { id: 1, name: 'โดนัท' },
@@ -24,10 +23,16 @@ function all() {
     // API สำหรับข้อมูลเมนู
     const menuAPI = [
         {
-            lot: "LOT01",
-            lotname: "ไข่ไก้",
-            lotstock: 6,
-            exp: "20/11/2555",
+            id: 1,
+            typeforsell: "กล่อง M",
+            unit: "กล่อง",
+            q: 4,
+        },
+        {
+            id: 2,
+            typeforsell: "กล่อง L",
+            unit: "กล่อง",
+            q: 6,
         },
     ]
 
@@ -59,7 +64,7 @@ function all() {
                 return product;
             });
         });
-        console.log("แก้ไขประเภทวัตถุดิบ : ",newValue); 
+        console.log("แก้ไขประเภทวัตถุดิบ : ", newValue);
 
     };
 
@@ -73,6 +78,7 @@ function all() {
 
     // stateข้อมูล ที่ add
     const [newProductName, setNewProductName] = useState('');
+
     const [isAdding, setAdding] = useState(false);
 
     // กดปุ่มเพิ่ม
@@ -80,6 +86,8 @@ function all() {
         setAdding(true); // ตั้งค่า isAdding เป็น true เมื่อคลิกปุ่ม "เพิ่ม"
         // ต่อไปคุณสามารถทำอย่างที่คุณทำกับ handleAddChanges ต่อไป
     };
+    // กำหนด selectedTab ในส่วนที่ใช้ React useState
+
     const handleAddChanges = () => {
         if (newProductName.trim() !== '') {
             setDataProduct((prevDataProduct) => [
@@ -90,9 +98,8 @@ function all() {
             setOpenInput(0);
             setAdding(false); // ตั้งค่า isAdding เป็น false เมื่อเพิ่มข้อมูลเสร็จสิ้น
         }
-        console.log("เพิ่มประเภทวัตถุดิบ : ",newProductName); //ข้อมูลที่เพิ่ม
+        console.log("เพิ่มประเภทวัตถุดิบ : ", newProductName); //ข้อมูลที่เพิ่ม
     };
-
 
 
 
@@ -115,13 +122,7 @@ function all() {
                         ค้นหา
                     </button>
                 </form>
-                <div className="mr-4 scale-90 flex items-center">
-                    <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex
-                     " onClick={handleAddProduct}>
-                        <PlusIcon className="h-5 w-5 text-white mr-2" />
-                        เพิ่ม
-                    </button>
-                </div>
+
             </div>
             <div className="w-full">
                 <div className="flex w-full flex-col">
@@ -135,6 +136,7 @@ function all() {
                             tab: "max-w-fit px-0 h-12",
                             tabContent: "group-data-[selected=true]:text-[#73664B]"
                         }}
+
                     >
                         {/* Tab Product */}
                         <Tab
@@ -145,7 +147,14 @@ function all() {
                                 </div>
                             }
                         >
+
                             <div className="relative overflow-x-auto mx-4">
+                                <div className="flex items-center justify-end mb-2">
+                                    <button className="scale-90 px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex" onClick={handleAddProduct}>
+                                        <PlusIcon className="h-5 w-5 text-white mr-2" />
+                                        เพิ่ม
+                                    </button>
+                                </div>
                                 <table className="w-full text-sm text-center table-fixed">
                                     <thead >
                                         <tr className="text-white  font-normal  bg-[#908362]  ">
@@ -202,39 +211,37 @@ function all() {
                                             </tr>
                                         ))}
                                         {isAdding && (
-                                                <>
-
-                                            <tr key="new" className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
-                                                <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
-                                                    {dataProduct.length + 1}
-                                                </td>
-                                                <td className="py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                    <input
-                                                        className="w-full h-9 focus:outline-none border"
-                                                        type="text"
-                                                        value={newProductName}
-                                                        onChange={(event) => setNewProductName(event.target.value)}
-                                                    />
-                                                </td>
-                                                <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem] flex items-center justify-end">
-                                                    <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">
-                                                        ยกเลิก
-                                                    </button>
-                                                    <button type="button" onClick={handleAddChanges} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">
-                                                        บันทึก
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            <>
+                                                <tr key="new" className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+                                                    <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                        {dataProduct.length + 1}
+                                                    </td>
+                                                    <td className="py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                        <input
+                                                            className="w-full h-9 focus:outline-none border"
+                                                            type="text"
+                                                            value={newProductName}
+                                                            onChange={(event) => setNewProductName(event.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem] flex items-center justify-end">
+                                                        <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">
+                                                            ยกเลิก
+                                                        </button>
+                                                        <button type="button" onClick={handleAddChanges} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">
+                                                            บันทึก
+                                                        </button>
+                                                    </td>
+                                                </tr>
                                             </>
-
                                         )}
-
                                     </tbody>
                                 </table>
                             </div>
 
 
                         </Tab>
+                        {/* tab2 */}
                         {/* Tab Menu */}
                         <Tab
                             key="menusell"
@@ -245,49 +252,55 @@ function all() {
                             }
                         >
                             <div className="second-tab-layout mx-4">
+                                <div className="flex items-center justify-end mb-2">
+                                    <Link href="/product/addmenuforsell" >
+                                        <button className="scale-90 px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex" >
+                                            <PlusIcon className="h-5 w-5 text-white mr-2" />
+                                            เพิ่ม
+                                        </button></Link>
+                                </div>
                                 <div className="relative overflow-x-auto ">
                                     <table className="w-full text-sm text-center text-gray-500">
                                         <thead className="">
                                             <tr className="text-white  font-normal  bg-[#908362]  ">
                                                 <td scope="col" className="px-6 py-3 ">
-                                                    ล็อตวัตถุดิบ
+                                                    ลำดับ
                                                 </td>
                                                 <td scope="col" className="px-12 py-3 ">
-                                                    รายการ
+                                                    ชื่อประเภทเมนูสำหรับขาย
                                                 </td>
                                                 <td scope="col" className="px-6 py-3">
-                                                    สต็อก
+                                                    หน่วยสินค้า
                                                 </td>
                                                 <td scope="col" className="px-6 py-3">
-                                                    วันหมดอายุ
+                                                    จำนวน
                                                 </td>
+                                                <td scope="col" className="px-6 py-3">
 
-                                                <td scope="col" className="px-6 py-3">
-                                                    รายละเอียด
                                                 </td>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {dataMenu.map((ingredients) => (
-                                                <tr key={ingredients.lot} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                <tr key={ingredients.id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                     <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
-                                                        {ingredients.lot}
+                                                        {ingredients.id}
                                                     </td>
                                                     <td className="px-6 py-1 text-left text-[#73664B]">
-                                                        {ingredients.lotname}
+                                                        {ingredients.typeforsell}
                                                     </td>
                                                     <td className="px-6 py-1 text-[#73664B]">
-                                                        {ingredients.lotstock}
+                                                        {ingredients.unit}
                                                     </td>
 
                                                     <td className="px-6 py-1 text-[#73664B]">
-                                                        {ingredients.exp}
+                                                        {ingredients.q}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center  text-[#73664B]">
-                                                        <button type="submit" >
-                                                            <Link href="/ingredients/detailall" className="w-full flex justify-center items-center">
-                                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
-                                                            </Link>
+                                                        <button type="button">
+                                                            <a href="/product/editmenuforsell" className="w-full flex justify-center items-center">
+                                                                <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                                            </a>
                                                         </button>
 
                                                     </td>
@@ -297,18 +310,13 @@ function all() {
                                     </table>
                                 </div>
                             </div>
-
-
                         </Tab>
-
                     </Tabs>
                 </div>
-
             </div>
-
-
         </div>
     )
 }
+
 
 export default all

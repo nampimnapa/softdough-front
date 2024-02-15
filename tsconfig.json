@@ -23,7 +23,7 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/ingredients/edit.js"
-  ],
+, "pages/api/hello.js"  ],
   "exclude": [
     "node_modules"
   ]
