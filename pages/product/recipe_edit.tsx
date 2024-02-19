@@ -16,7 +16,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function addrecipe() {
+function recipe_edit() {
     const ind =
         [{ ind_id: 1, ind_name: "แป้ง" },
         { ind_id: 2, ind_name: "นม" },
@@ -27,7 +27,7 @@ function addrecipe() {
         { un_id: 2, un_name: "ลิตร" },
         { un_id: 3, un_name: "สอบปุ๋ย" }
         ];
-
+    
 
     const [currentPage, setCurrentPage] = useState("item1");
 
@@ -39,7 +39,6 @@ function addrecipe() {
         if (currentPage !== "item2") {
             handleItemClick("item2");
         }
-        // 
         console.log(addedIngredients);
 
     };
@@ -53,46 +52,45 @@ function addrecipe() {
     // หากพบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว โปรแกรมจะอัพเดทปริมาณของวัตถุดิบนั้นๆในรายการโดยเพิ่มปริมาณใหม่ที่ผู้ใช้ระบุเข้าไป.
     // หากไม่พบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว โปรแกรมจะเพิ่มวัตถุดิบใหม่เข้าไปในรายการ.
     // ล้างข้อมูลในฟอร์ม: หลังจากที่ทำการเพิ่มวัตถุดิบลงในรายการเรียบร้อยแล้ว โปรแกรมจะล้างค่าที่ผู้ใช้กรอกในฟอร์มเพื่อเตรียมรับข้อมูลวัตถุดิบใหม่
-    // รับข้อมูลจากฟอร์ม: รับค่าที่ผู้ใช้กรอกในฟอร์มเช่น วัตถุดิบที่เลือก (ingredientId), ปริมาณ (ingredientQty), และหน่วย (unitId) จากนั้นนำไปใช้ในการสร้างวัตถุดิบใหม่.
     const handleSubmit = (event) => {
         event.preventDefault();
-        const ingredientId = parseInt((document.getElementById("ingredients") as HTMLSelectElement).value);
-        const ingredientName = ind.find((ingredient) => ingredient.ind_id === ingredientId).ind_name;
-        const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value); 
-        const unitId = parseInt((document.getElementById("unit") as HTMLSelectElement).value);
-        
-        const unitName = unit.find((unit) => unit.un_id === unitId).un_name;
-    
-        // Find the existing ingredient index
-        const existingIngredientIndex = addedIngredients.findIndex(
-            (ingredient) => ingredient.id === ingredientId && ingredient.unit === unitId
-        );
-    
+        const ingredientId = (document.getElementById("ingredients") as HTMLSelectElement).value;
+        const ingredientName = ind.find((ingredient) => ingredient.ind_id === parseInt(ingredientId)).ind_name;
+        const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value);
+        const unitId = (document.getElementById("unit") as HTMLSelectElement).value;  // Change here to get unit ID
+        const unitName = unit.find((unit) => unit.un_id === parseInt(unitId)).un_name;
+
+        // Check if the ingredient already exists in the addedIngredients array
+        const existingIngredientIndex = addedIngredients.findIndex((ingredient) => ingredient.name === ingredientName && ingredient.unit === unitId);
+
         if (existingIngredientIndex !== -1) {
-            // If the ingredient exists, update the quantity
-            setAddedIngredients((prevIngredients) => {
-                const updatedIngredients = [...prevIngredients];
-                // Calculate the new quantity by adding the existing quantity with the new quantity
-                updatedIngredients[existingIngredientIndex].quantity += ingredientQty;
-                return updatedIngredients;
+            // If the ingredient exists, update its quantity
+            const updatedIngredients = addedIngredients.map((ingredient, index) => {
+                if (index === existingIngredientIndex) {
+                    return {
+                        ...ingredient,
+                        quantity: ingredient.quantity + ingredientQty,
+                    };
+                }
+                return ingredient;
             });
+
+            setAddedIngredients(updatedIngredients);
         } else {
-            // If the ingredient doesn't exist, add a new ingredient
+            // If the ingredient does not exist, add it to the addedIngredients array
             const newIngredient = {
                 id: addedIngredients.length + 1,
-                name: ingredientId,
-                quantity: ingredientQty, // Set the quantity to the new value directly
-                unit: unitId,
+                name: ingredientName,
+                quantity: ingredientQty,
+                unit: unitName,  
             };
-            
-            setAddedIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+
+            setAddedIngredients([...addedIngredients, newIngredient]);
         }
-    
-        // Clear the input fields
+
+        // Clear input fields after adding ingredient
         (document.getElementById("count") as HTMLInputElement).value = "";
     };
-    
-
     const handleDeleteIngredient = (index) => {
         setAddedIngredients((prevIngredients) => {
             const updatedIngredients = [...prevIngredients];
@@ -105,12 +103,12 @@ function addrecipe() {
 
         <div className="h-screen">
             <button className='my-3 mx-5 '>
-                <Link href="/product/recipeall" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
+                <Link href="/product/recipe_detail" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
-                    สูตรอาหาร
+                    รายละเอียดสินค้า
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>เพิ่มสินค้า</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>แก้ไขสินค้า</p>
             <div className="carousel w-full">
                 <div id="item1" className="carousel-item w-full">
                     <div className="w-full">
@@ -229,28 +227,23 @@ function addrecipe() {
                                     <div className="flex-1 py-3 text-center">ปริมาณ</div>
                                     <div className="flex-1 py-3 text-center">หน่วย</div>
                                     <div className="flex-1 py-3 text-center"></div>
-
                                 </div>
                                 <div className="max-h-40 overflow-y-auto mb-5">
                                     <table className="w-full">
                                         <tbody className="w-full">
                                             {addedIngredients.slice().reverse().map((ingredient, index) => (
-                                                <tr key={ingredient.id} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                                    <td scope="col" className="flex-1 text-center">{ind.find((i) => i.ind_id === parseInt(ingredient.name)).ind_name}</td>
+                                                <tr key={ingredient.id} className=" even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                                    <td scope="col" className="flex-1 text-center ">{ingredient.name}</td>
                                                     <td scope="col" className="flex-1 text-center">{ingredient.quantity}</td>
-                                                    <td scope="col" className="flex-1 text-center">{unit.find((u) => u.un_id === parseInt(ingredient.unit)).un_name}</td>
+                                                    <td scope="col" className="flex-1 text-center">{ingredient.unit}</td>
                                                     <td scope="col" className="flex-1 text-center">
-                                                        <div className="flex items-center justify-center">
+                                                        <div className="flex items-center justify-center" >
                                                             <button onClick={() => handleDeleteIngredient(index)}>
-                                                                <TrashIcon className="h-5 w-5 text-red-500" />
-                                                            </button>
+                                                                <TrashIcon className="h-5 w-5 text-red-500" /></button>
                                                         </div>
                                                     </td>
                                                 </tr>
                                             ))}
-
-
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -271,6 +264,7 @@ function addrecipe() {
                                 <p className="text-sm pr-3">จำนวนวันที่อยู่ได้ของสินค้า :</p>
                                 <input
                                     placeholder="จำนวน"
+
                                     min="0"
                                     type="number"
                                     name="count"
@@ -300,7 +294,7 @@ function addrecipe() {
                 <div className="flex justify-start">
                     <button onClick={handleBackClick}>
                         <Link
-                            href={currentPage === "item2" ? "#item1" : "/product/recipeall"}
+                            href={currentPage === "item2" ? "#item1" : "/product/recipe_detail"}
                             type="button"
                             className="text-white bg-[#C5B182] focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 mb-2 ml-6"
                         >
@@ -327,4 +321,4 @@ function addrecipe() {
     )
 }
 
-export default addrecipe
+export default recipe_edit

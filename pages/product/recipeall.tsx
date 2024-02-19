@@ -46,7 +46,7 @@ function recipeall() {
                             เรดเวลเวด
                         </p>
                         <button type="button">
-                            <a href="#" className="w-full flex justify-center items-center">
+                            <a href="/product/recipe_edit" className="w-full flex justify-center items-center">
                                 <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
                             </a>
                         </button>
@@ -71,7 +71,8 @@ function recipeall() {
                             <Icon icon="system-uicons:reset" className="my-1 mx-1 text-sm text-[#DACB46] font-bold" /></button>
                         </div>
                         <button className="flex justify-end">
-                            <div className="badge badge-outline">สูตรอาหาร</div>
+                            <Link href="/product/recipe_detail">
+                            <div className="badge badge-outline">สูตรอาหาร</div></Link>
                         </button>
                     </div>
                 </div>
