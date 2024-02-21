@@ -58,45 +58,43 @@ function addrecipe() {
         event.preventDefault();
         const ingredientId = parseInt((document.getElementById("ingredients") as HTMLSelectElement).value);
         const ingredientName = ind.find((ingredient) => ingredient.ind_id === ingredientId).ind_name;
-        const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value); 
+        const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value);
         const unitId = parseInt((document.getElementById("unit") as HTMLSelectElement).value);
-        
         const unitName = unit.find((unit) => unit.un_id === unitId).un_name;
-    
-        // Find the existing ingredient index
+
+
+
         const existingIngredientIndex = addedIngredients.findIndex(
             (ingredient) => ingredient.id === ingredientId && ingredient.unit === unitId
         );
-    
         if (existingIngredientIndex !== -1) {
-            // If the ingredient exists, update the quantity
+            // หากพบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว
+            // อัพเดทปริมาณของวัตถุดิบนั้นๆในรายการโดยเพิ่มปริมาณใหม่ที่ผู้ใช้ระบุเข้าไป.
             setAddedIngredients((prevIngredients) => {
                 const updatedIngredients = [...prevIngredients];
-                // Calculate the new quantity by adding the existing quantity with the new quantity
                 updatedIngredients[existingIngredientIndex].quantity += ingredientQty;
                 return updatedIngredients;
             });
         } else {
-            // If the ingredient doesn't exist, add a new ingredient
+            // หากไม่พบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว
+            // เพิ่มวัตถุดิบใหม่เข้าไปในรายการ.
             const newIngredient = {
-                id: addedIngredients.length + 1,
+                id: addedIngredients.length,
                 name: ingredientId,
-                quantity: ingredientQty, // Set the quantity to the new value directly
+                quantity: ingredientQty,
                 unit: unitId,
             };
-            
+
             setAddedIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
         }
-    
         // Clear the input fields
         (document.getElementById("count") as HTMLInputElement).value = "";
     };
-    
 
-    const handleDeleteIngredient = (index) => {
+
+    const handleDeleteIngredient = (id) => {
         setAddedIngredients((prevIngredients) => {
-            const updatedIngredients = [...prevIngredients];
-            updatedIngredients.splice(index, 1);
+            const updatedIngredients = prevIngredients.filter((ingredient) => ingredient.id !== id);
             return updatedIngredients;
         });
     };
@@ -196,7 +194,7 @@ function addrecipe() {
                                 <div className=" flex items-center justify-center">
                                     <p className="text-sm px-5 py-2 text-[#73664B] flex justify-center ">ปริมาณ:</p>
                                     <input
-                                        min="0"
+                                        min="1"
                                         type="number"
                                         name="count"
                                         id="count"
@@ -229,19 +227,18 @@ function addrecipe() {
                                     <div className="flex-1 py-3 text-center">ปริมาณ</div>
                                     <div className="flex-1 py-3 text-center">หน่วย</div>
                                     <div className="flex-1 py-3 text-center"></div>
-
                                 </div>
                                 <div className="max-h-40 overflow-y-auto mb-5">
                                     <table className="w-full">
                                         <tbody className="w-full">
-                                            {addedIngredients.slice().reverse().map((ingredient, index) => (
+                                            {addedIngredients.slice().reverse().map((ingredient) => (
                                                 <tr key={ingredient.id} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
                                                     <td scope="col" className="flex-1 text-center">{ind.find((i) => i.ind_id === parseInt(ingredient.name)).ind_name}</td>
                                                     <td scope="col" className="flex-1 text-center">{ingredient.quantity}</td>
                                                     <td scope="col" className="flex-1 text-center">{unit.find((u) => u.un_id === parseInt(ingredient.unit)).un_name}</td>
                                                     <td scope="col" className="flex-1 text-center">
                                                         <div className="flex items-center justify-center">
-                                                            <button onClick={() => handleDeleteIngredient(index)}>
+                                                            <button onClick={() => handleDeleteIngredient(ingredient.id)}>
                                                                 <TrashIcon className="h-5 w-5 text-red-500" />
                                                             </button>
                                                         </div>
