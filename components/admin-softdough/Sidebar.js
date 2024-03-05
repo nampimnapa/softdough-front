@@ -31,7 +31,7 @@ const ingredientDropdown = [
 const productDropdown = [
   { title: "ประเภทสินค้า/สำหรับขาย", href: "/product/all" },
   { title: "สูตรอาหาร", href: "/product/recipeall" },
-  { title: "เมนูสำหรับขาย", href: "/product/menusell" },
+  { title: "เมนูสำหรับขาย", href: "/product/sell_all" },
 ];
 // การผลิต
 const manufactureDropdown = [

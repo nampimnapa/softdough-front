@@ -47,14 +47,22 @@ function recipe_detail() {
                     <p className="font-medium text-[#73664B]">สินค้า</p>
                     <button>
                         <Link href="/product/recipe_edit#item1">
-                        <PencilSquareIcon className="ml-3 h-4 w-4 text-[#73664B]" /></Link>
+                            <PencilSquareIcon className="ml-3 h-4 w-4 text-[#73664B]" /></Link>
                     </button>
                 </div>
                 <div className="border-l border-[#E3D8BF] ml-8 mt-2 text-[#73664B] ">
-                    <p className="ml-3">ประเภทสินค้า :</p>
-                    <p className="ml-3">ชื่อสินค้า :</p>
-                    <p className="ml-3">จำนวนขั้นต่ำ :</p>
-                    <p className="ml-3">หน่วยสินค้า :</p>
+                    <div className="flex">
+                        <div className="w-full">
+                            <p className="ml-3 w-full">ประเภทสินค้า :</p>
+                            <p className="ml-3">ชื่อสินค้า :</p>
+                            <p className="ml-3">จำนวนขั้นต่ำ :</p>
+                            <p className="ml-3">หน่วยสินค้า :</p>
+                        </div>
+                        <div className="w-full flex">
+                            <p className="ml-3">รูปภาพ :</p>
+                            <img src="/images/logo.svg" alt="imgdonut" className="w-24 h-24" />
+                        </div>
+                    </div>
                 </div>
             </div>
             <div>
@@ -62,7 +70,7 @@ function recipe_detail() {
                     <p className="font-medium text-[#73664B]">สูตรอาหาร</p>
                     <button>
                         <Link href="/product/recipe_edit#item2">
-                        <PencilSquareIcon className="ml-3 h-4 w-4 text-[#73664B]" /></Link>
+                            <PencilSquareIcon className="ml-3 h-4 w-4 text-[#73664B]" /></Link>
                     </button>
                 </div>
                 <div className="border-l border-[#E3D8BF] ml-8 mt-2 text-[#73664B]">

@@ -248,7 +248,7 @@ function addstaff() {
             </div>
           </div>
           <div className="grid grid-cols-4 items-center mt-3 ">
-            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+            <label className="mr- block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
               วันที่เข้าทำงาน :</label>
             <Datepicker
               className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}

@@ -39,8 +39,28 @@ function addrecipe() {
         if (currentPage !== "item2") {
             handleItemClick("item2");
         }
-        // 
-        console.log(addedIngredients);
+        else {
+            const productData = {
+                pd_name: product.name,
+                pd_qtyminimum: product.qtymin,
+                status: product.status,
+                picture: product.img,
+                pdc_id: product.pd_unit // Assuming pd_unit is the correct property, adjust as needed
+            };
+
+            const recipeData = {
+                qtyLifetime: recipe.qtyLifetime,
+                produced_qty: recipe.produced_qty,
+                ingredients: addedIngredients.map((ingredient) => ({
+                    name: parseInt(ingredient.id),
+                    quantity: ingredient.quantity,
+                    unit: parseInt(ingredient.unit) // Use the unit ID instead of the unit name
+                }))
+            };
+            console.log("Product Data:", productData);
+            console.log("Recipe Data:", recipeData);
+        }
+
 
     };
     const handleBackClick = () => {
@@ -60,32 +80,24 @@ function addrecipe() {
         const ingredientName = ind.find((ingredient) => ingredient.ind_id === ingredientId).ind_name;
         const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value);
         const unitId = parseInt((document.getElementById("unit") as HTMLSelectElement).value);
-        const unitName = unit.find((unit) => unit.un_id === unitId).un_name;
+        const unitName = unit.find((unit) => unit.un_id === unitId).un_name; // ค้นหาชื่อของหน่วยวัดจาก ID
+        const existingIngredient = addedIngredients.find((ingredient) => ingredient.id === ingredientId && ingredient.unit === unitId);
 
-
-
-        const existingIngredientIndex = addedIngredients.findIndex(
-            (ingredient) => ingredient.id === ingredientId && ingredient.unit === unitId
-        );
-        if (existingIngredientIndex !== -1) {
-            // หากพบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว
-            // อัพเดทปริมาณของวัตถุดิบนั้นๆในรายการโดยเพิ่มปริมาณใหม่ที่ผู้ใช้ระบุเข้าไป.
-            setAddedIngredients((prevIngredients) => {
-                const updatedIngredients = [...prevIngredients];
-                updatedIngredients[existingIngredientIndex].quantity += ingredientQty;
-                return updatedIngredients;
-            });
+        if (existingIngredient) {
+            // If the ingredient already exists, update the quantity
+            setAddedIngredients((prevIngredients) => (
+                prevIngredients.map((ingredient) =>
+                    ingredient.id === ingredientId && ingredient.unit === unitId
+                        ? { ...ingredient, quantity: ingredient.quantity + ingredientQty }
+                        : ingredient
+                )
+            ));
         } else {
-            // หากไม่พบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว
-            // เพิ่มวัตถุดิบใหม่เข้าไปในรายการ.
-            const newIngredient = {
-                id: addedIngredients.length,
-                name: ingredientId,
-                quantity: ingredientQty,
-                unit: unitId,
-            };
-
-            setAddedIngredients((prevIngredients) => [...prevIngredients, newIngredient]);
+            // If the ingredient doesn't exist, add it to the list
+            setAddedIngredients((prevIngredients) => [
+                ...prevIngredients,
+                { id: ingredientId, quantity: ingredientQty, unit: unitId }
+            ]);
         }
         // Clear the input fields
         (document.getElementById("count") as HTMLInputElement).value = "";
@@ -98,6 +110,32 @@ function addrecipe() {
             return updatedIngredients;
         });
     };
+    const [recipe, setRecipe] = useState({
+        qtyLifetime: 0,
+        produced_qty: 0
+    });
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setRecipe((prevRecipe) => ({
+            ...prevRecipe,
+            [name]: value
+        }));
+    };
+    const [product, setProduct] = useState({
+        name: '',         // Provide a default or leave it as an empty string
+        qtymin: 0,        // Provide a default or leave it as 0
+        status: 'active', // Provide a default or leave it as a default status
+        img: null,        // Provide a default or leave it as null
+        pd_unit: ''
+    });
+    const handleProductInputChange = (e) => {
+        const { name, value } = e.target;
+        setProduct((prevProduct) => ({
+            ...prevProduct,
+            [name]: value
+        }));
+    };
+
 
     return (
 
@@ -113,12 +151,13 @@ function addrecipe() {
                 <div id="item1" className="carousel-item w-full">
                     <div className="w-full">
                         <div className="flex justify-between w-full my-2">
-                            <div className="w-1/4 flex h-min items-center ">
+                            <div className="w-1/4 flex h-min items-center">
                                 <p className="text-sm pl-6 text-[#73664B] mr-4 w-full ">ประเภทสินค้า :</p>
                                 <select
                                     id="product"
                                     className=" bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
                                     name="unit"
+                                    onChange={handleProductInputChange}
                                 >
                                     <option disabled selected value="">
                                         เลือกประเภทสินค้า
@@ -127,9 +166,12 @@ function addrecipe() {
                                     <option>ดิป</option>
                                 </select>
                             </div>
-                            <div className="flex w-1/2 ">
+                            <div className="flex w-1/2 items-center">
                                 <label className="text-sm mr-4 text-[#73664B]">รูปภาพ :</label>
                                 <input
+                                    onChange={handleProductInputChange}
+                                    name="img"
+                                    id="img"
                                     type="file"
                                     className="file-input file-input-bordered file-input-sm w-full max-w-xs text-[#73664B]"
                                     accept="image/*"
@@ -139,6 +181,7 @@ function addrecipe() {
                         <div className="grid grid-cols-3 w-1/3 my-2 h-min">
                             <p className="text-sm px-6 py-2 text-[#73664B] w-full">ชื่อสินค้า :</p>
                             <input
+                                onChange={handleProductInputChange}
                                 placeholder="ชื่อสินค้า"
                                 type="text"
                                 name="name"
@@ -150,10 +193,11 @@ function addrecipe() {
                         <div className="grid grid-cols-2 w-1/3 my-2">
                             <p className="text-sm px-6 py-2 text-[#73664B]">จำนวนสินค้าชั้นต่ำ :</p>
                             <input
+                                onChange={handleProductInputChange}
                                 placeholder="จำนวนสินค้าขั้นต่ำ"
                                 type="text"
-                                name="name"
-                                id="name"
+                                name="qtymin"
+                                id="qtymin"
                                 autoComplete="off"
                                 className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm placeholder:text-[#C5B182] sm:text-sm sm:leading-6 focus:outline-none"
                             />
@@ -161,9 +205,10 @@ function addrecipe() {
                         <div className="flex items-center w-1/4">
                             <p className="text-sm pl-6 text-[#73664B]">หน่วยสินค้า :</p>
                             <select
-                                id="product"
+                                onChange={handleProductInputChange}
+                                id="pd_unit"
                                 className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 ml-7"
-                                name="unit"
+                                name="pd_unit"
                             >
                                 <option disabled selected value="">
                                     เลือกหน่วย
@@ -178,7 +223,7 @@ function addrecipe() {
                 <div id="item2" className="carousel-item w-full " >
                     <div>
                         <p className="text-[#73664B] mx-6 my-2">สูตรอาหาร</p>
-                        <form >
+                        <form>
                             <div className="grid grid-cols-4">
                                 <div className="flex items-center justify-center">
                                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:</p>
@@ -218,7 +263,7 @@ function addrecipe() {
                                         type="submit"
                                         value="เพิ่มวัตถุดิบ"
                                         className="text-lg text-white border  bg-[#F2B461] rounded-full py-2 px-2 ">เพิ่มวัตถุดิบ</button></div>
-                            </div >
+                            </div>
                         </form>
                         <div className="mx-6 mt-3">
                             <div className="flex flex-col">
@@ -233,7 +278,7 @@ function addrecipe() {
                                         <tbody className="w-full">
                                             {addedIngredients.slice().reverse().map((ingredient) => (
                                                 <tr key={ingredient.id} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                                    <td scope="col" className="flex-1 text-center">{ind.find((i) => i.ind_id === parseInt(ingredient.name)).ind_name}</td>
+                                                    <td scope="col" className="flex-1 text-center">{ind.find((i) => i.ind_id === parseInt(ingredient.id)).ind_name}</td>
                                                     <td scope="col" className="flex-1 text-center">{ingredient.quantity}</td>
                                                     <td scope="col" className="flex-1 text-center">{unit.find((u) => u.un_id === parseInt(ingredient.unit)).un_name}</td>
                                                     <td scope="col" className="flex-1 text-center">
@@ -245,9 +290,6 @@ function addrecipe() {
                                                     </td>
                                                 </tr>
                                             ))}
-
-
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -255,11 +297,12 @@ function addrecipe() {
                             <div className="flex mx-6 items-center">
                                 <p className="text-sm pr-3">สูตรอาหารผลิตได้ :</p>
                                 <input
+                                    onChange={handleInputChange}
                                     placeholder="จำนวน"
-                                    min="0"
+                                    min="1"
                                     type="number"
-                                    name="count"
-                                    id="count"
+                                    name="qtyLifetime"
+                                    id="qtyLifetime"
                                     className="px-3 bg-[#FFFFDD] w-1/12 block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                                 />
                                 <p className="text-sm pl-3">ชิ้น</p>
@@ -267,11 +310,12 @@ function addrecipe() {
                             <div className="flex mx-6 my-2 items-center">
                                 <p className="text-sm pr-3">จำนวนวันที่อยู่ได้ของสินค้า :</p>
                                 <input
+                                    onChange={handleInputChange}
                                     placeholder="จำนวน"
-                                    min="0"
+                                    min="1"
                                     type="number"
-                                    name="count"
-                                    id="count"
+                                    name="produced_qty"
+                                    id="produced_qty"
                                     className="px-3 bg-[#FFFFDD] w-1/12 block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                                 />
                                 <p className="text-sm pl-3">วัน</p>
