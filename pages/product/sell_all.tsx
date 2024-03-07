@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { ChevronDownIcon, } from '@heroicons/react/20/solid'
 import Link from "next/link";
-import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
 import { Icon } from '@iconify/react';
 
@@ -65,11 +65,16 @@ function sell_all() {
             <div className="flex flex-wrap ">
                 {menusell.map((menu) => (
                     <div key={menu.id} className="card w-52 h-52 bg-base-100 shadow-sm mx-2  ml-5">
-                        <figure className="mt-3">
-                            {/* You can replace the image source with the actual image URL */}
+                        <div className="flex justify-end mt-1">
+                            <Link href='/product/sell_edit'>
+                                <PencilSquareIcon className="h-5 w-5 text-[#73664B] mr-2" /></Link>
+                            <Link href='/product/sell_detail'>
+                                <InformationCircleIcon className="h-5 w-5 text-[#73664B]  mr-2" /></Link>
+                        </div>
+                        <figure className="">
                             <img src="/images/logo.svg" alt={menu.name} className="w-32 h-32" />
                         </figure>
-                        <div className="card-body">
+                        <div className="card-body p-0 ">
                             <div className="text-center">
                                 <p className="text-mediem text-[#73664B]">
                                     {menu.name}
