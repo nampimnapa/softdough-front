@@ -61,8 +61,9 @@ function sell_detail() {
                     </div>
                 </div>
             </div>
-            <button type="button" className="ml-6 mt-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
-
+            <Link href='/product/sell_all'>
+                <button type="button" className="ml-6 mt-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
+            </Link>
         </div>
     )
 }

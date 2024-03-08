@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
 import { Icon } from '@iconify/react';
-import { CheckboxGroup, Checkbox, Input, colors } from "@nextui-org/react";
+import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 
 import { Dialog, Transition } from '@headlessui/react';
@@ -16,7 +16,7 @@ const kanit = Kanit({
 });
 
 function sell_add() {
-    const [selectedOption, setSelectedOption] = useState("fix");
+    const [selectedOption, setSelectedOption] = useState("");
 
     const handleRadioChange = (option) => {
         setSelectedOption(option);
@@ -54,30 +54,20 @@ function sell_add() {
             setCount((prevCount) => prevCount - 1);
         }
     };
-    const [selectedProduct, setSelectedProduct] = useState('');
+
+    // const [selectedProduct, setSelectedProduct] = useState('');
     const [selectedProducts, setSelectedProducts] = useState([]);
 
-
-
-    const handleCheckboxChange = (productName) => {
-        if (selectedProducts.includes(productName)) {
-            setSelectedProducts(selectedProducts.filter((product) => product !== productName));
-        } else {
-            setSelectedProducts([...selectedProducts, productName]);
-        }
-    };
     const handleProductChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedOptions = Array.from(event.target.selectedOptions).map((option) => option.value);
         setSelectedProducts(selectedOptions);
     };
-
-
     const product = [
         { value: 'เรดเวลเวด', label: 'Red Velvet' },
         { value: 'ออริจินอล', label: 'Original' },
         { value: 'ใบเตย', label: 'Pandan' },
     ];
-    
+
     const [values, setValues] = React.useState(new Set([]));
     const [isOpen, setIsOpen] = useState(false);
 
@@ -96,6 +86,46 @@ function sell_add() {
 
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
+    const [additionalProducts, setAdditionalProducts] = useState([]); // เก็บรายการสินค้าเพิ่มเติม
+
+
+
+    const [countLimit, setCountLimit] = useState(0); // Set the initial count limit to 1
+    const [selectedType, setSelectedType] = useState('');
+
+    const handleTypeChange = (event) => {
+        const selectedTypeName = event.target.value;
+        setSelectedType(selectedTypeName);
+
+        // ค้นหาประเภทเมนูที่ถูกเลือกในอาร์เรย์ typesellmenu
+        const selectedMenu = typesellmenu.find(menu => menu.name === selectedTypeName);
+
+        // อัปเดตขีดจำกัดของ count ขึ้นอยู่กับประเภทเมนูที่ถูกเลือก
+        if (selectedMenu) {
+            setCountLimit(selectedMenu.num);
+        } else {
+            console.error('ประเภทเมนูที่เลือกไม่ถูกต้อง');
+        }
+    };
+
+    const handleAddProduct = () => {
+        if (count <= countLimit) {
+            // สร้างอาร์เรย์ใหม่ที่มีสินค้าตามที่เลือก
+            const newProducts = selectedProducts.map(productValue => ({ value: productValue, count }));
+
+            // เพิ่มสินค้าใหม่เข้าไปในรายการ additionalProducts
+            setAdditionalProducts([...additionalProducts, ...newProducts]);
+
+            // รีเซ็ตสินค้าที่เลือก เพื่อให้ผู้ใช้สามารถเลือกสินค้าใหม่
+            setSelectedProducts([]);
+
+            
+        } else {
+            console.error('เกินขีดจำกัดสำหรับรายการเมนูนี้หรือ count ไม่ถูกต้อง');
+        }
+    };
+
+    console.log(selectedProducts, additionalProducts);
 
 
 
@@ -108,6 +138,7 @@ function sell_add() {
                 </Link>
             </button>
             <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>เพิ่มเมนูสำหรับขาย</p>
+
             <div className="grid grid-cols-3 w-1/3 my-2 h-min">
                 <p className="text-sm px-6 py-2 text-[#73664B] w-full">ชื่อเมนู :</p>
                 <input
@@ -125,6 +156,7 @@ function sell_add() {
                     id="product"
                     className=" bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2  w-1/4"
                     name="unit"
+                    onChange={handleTypeChange}
                 >
                     <option disabled selected >
                         ประเภทเมนูสำหรับขาย
@@ -167,36 +199,79 @@ function sell_add() {
                 </div>
                 {/* fix */}
                 {selectedOption === "fix" && (
-                    <div className="flex items-center w-full">
-                        <div className="flex h-min items-center w-full">
-                            <p className="text-sm pl-4 text-[#73664B] mr-4 w-1/4">เลือกสินค้า :</p>
-                            <select
-                                id="product"
-                                className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 w-1/2"
-                                name="unit"
-                                onChange={handleProductChange}
-                            >
-                                <option disabled selected>
-                                    เลือกสินค้า
-                                </option>
-                                <option value="เรดเวลเวด">เรดเวลเวด</option>
-                                <option value="ออริจินอล">ออริจินอล</option>
-                                <option value="ใบเตย">ใบเตย</option>
-                            </select>
-                        </div>
-                        <div className="flex mt-2 w-full">
-                            <p className="text-sm px-4 py-2 text-[#73664B] ">จำนวนชิ้น :</p>
-                            <div className="flex items-center w-1/4">
-                                <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleDecrement} >
-                                    <svg className="text-[#73664B]"
-                                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
-                                </button>
-                                <span className="w-1/2 text-center">{count}</span>
-                                <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
-                                    <svg className="text-[#73664B]"
-                                        xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
-                                </button>
+                    <div>
+                        <div className="flex items-center w-full">
+                            <div className="flex h-min items-center w-full">
+                                <p className="text-sm pl-4 text-[#73664B] mr-4 w-1/4">เลือกสินค้า :</p>
+                                <select
+                                    id="product"
+                                    className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 w-1/2"
+                                    name="unit"
+                                    onChange={handleProductChange}
+                                >
+                                    <option disabled selected>
+                                        เลือกสินค้า
+                                    </option>
+                                    <option value="เรดเวลเวด">เรดเวลเวด</option>
+                                    <option value="ออริจินอล">ออริจินอล</option>
+                                    <option value="ใบเตย">ใบเตย</option>
+                                </select>
                             </div>
+                            <div className="flex mt-2 w-full">
+                                <p className="text-sm px-4 py-2 text-[#73664B] ">จำนวนชิ้น :</p>
+                                <div className="flex items-center w-1/4">
+                                    <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleDecrement} >
+                                        <svg className="text-[#73664B]"
+                                            xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
+                                    </button>
+                                    <span className="w-1/2 text-center">{count}</span>
+                                    <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
+                                        <svg className="text-[#73664B]"
+                                            xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                        {additionalProducts.length > 0 && (
+                            <div className="flex items-center w-full">
+                                <div className="flex h-min items-center w-full">
+                                    <p className="text-sm pl-4 text-[#73664B] mr-4 w-1/4">เลือกสินค้า :</p>
+                                    <select
+                                        id="product"
+                                        className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 w-1/2"
+                                        name="unit"
+                                        onChange={handleProductChange}
+                                    >
+                                        <option disabled selected>
+                                            เลือกสินค้า
+                                        </option>
+                                        <option value="เรดเวลเวด">เรดเวลเวด</option>
+                                        <option value="ออริจินอล">ออริจินอล</option>
+                                        <option value="ใบเตย">ใบเตย</option>
+                                    </select>
+                                </div>
+                                <div className="flex mt-2 w-full">
+                                    <p className="text-sm px-4 py-2 text-[#73664B] ">จำนวนชิ้น :</p>
+                                    <div className="flex items-center w-1/4">
+                                        <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleDecrement} >
+                                            <svg className="text-[#73664B]"
+                                                xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
+                                        </button>
+                                        <span className="w-1/2 text-center">{count}</span>
+                                        <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
+                                            <svg className="text-[#73664B]"
+                                                xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        )}
+                        <div className="gap-2 mx-4">
+                            <Button radius="full" size="sm" className="text-white bg-[#73664B]" onClick={handleAddProduct}>
+                                เลือกสินค้าเพิ่มเติม
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -260,17 +335,7 @@ function sell_add() {
                                         </SelectItem>
                                     ))}
                                 </Select>
-                                {/* <select
-                                    id="product"
-                                    className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 w-1/2"
-                                    name="unit"
-                                    onChange={handleProductChange}
-                                >
-                                    {product.map((product) => (
-                                        <option key={product.value} value={product.value}>{product.value}</option>
-                                    )
-                                    )}
-                                </select> */}
+
                             </div>
                             <div className="w-full flex ">
                                 <div className="ml-10 items-center">
@@ -307,12 +372,13 @@ function sell_add() {
             </div>
             <div className="flex justify-start">
                 <div className="w-1/2  mt-10  flex justify-start " >
-                    <button>
-                        <Link href="/product/sell_all"
+                    <Link href="/product/sell_all">
+                        <Button href="/product/sell_all"
                             onClick={handleCancel}
                             type="button"
                             className=" text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
-                            ยกเลิก</Link></button>
+                            ยกเลิก</Button>
+                    </Link>
                     <>
                         {isOpen && (
                             <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
@@ -381,7 +447,7 @@ function sell_add() {
                         )
                         }
                     </>
-                    <button onClick={openModal} type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
+                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</Button>
                 </div >
             </div>
 
