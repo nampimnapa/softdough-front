@@ -182,8 +182,9 @@ function sell_add() {
                     className=" bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2  w-1/4"
                     name="unit"
                     onChange={handleTypeChange}
+                    defaultValue="ประเภทเมนูสำหรับขาย"
                 >
-                    <option disabled selected >
+                    <option disabled >
                         ประเภทเมนูสำหรับขาย
                     </option>
                     {typesellmenu.map((menu) => (
@@ -233,8 +234,9 @@ function sell_add() {
                                     className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 w-1/2"
                                     name="unit"
                                     onChange={handleProductChange}
+                                    defaultValue = "เลือกสินค้า"
                                 >
-                                    <option disabled selected>
+                                    <option disabled>
                                         เลือกสินค้า
                                     </option>
                                     <option value="เรดเวลเวด">เรดเวลเวด</option>
@@ -382,7 +384,7 @@ function sell_add() {
                     <div className="mt-2 col-span-3 flex ml-3">
                         <div className="form-control">
                             <label className="label cursor-pointer ">
-                                <input type="radio" name="status" className="radio checked:bg-[#C5B182]" checked />
+                                <input type="radio" name="status" className="radio checked:bg-[#C5B182]" defaultChecked />
                                 <span className="text-sm text-[#73664B] px-3 ">ใช้งานอยู่</span>
                             </label>
                         </div>
