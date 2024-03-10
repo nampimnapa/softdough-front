@@ -16,6 +16,7 @@ const kanit = Kanit({
 });
 
 function sell_add() {
+
     const [selectedOption, setSelectedOption] = useState("");
 
     const handleRadioChange = (option) => {
@@ -44,23 +45,25 @@ function sell_add() {
         },
     ]
     const [count, setCount] = useState(1);
-
-    const handleIncrement = () => {
-        setCount((prevCount) => prevCount + 1);
-    };
-
-    const handleDecrement = () => {
-        if (count > 1) {
-            setCount((prevCount) => prevCount - 1);
-        }
-    };
-
-    // const [selectedProduct, setSelectedProduct] = useState('');
+    const [selectedCount, setSelectedCount] = useState(1);
     const [selectedProducts, setSelectedProducts] = useState([]);
 
     const handleProductChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedOptions = Array.from(event.target.selectedOptions).map((option) => option.value);
+        const selectedOptions = Array.from(event.target.selectedOptions).map((option) => ({
+            value: option.value,
+            count: 1,
+        }));
         setSelectedProducts(selectedOptions);
+    };
+
+    const handleIncrement = () => {
+        setSelectedCount((prevCount) => prevCount + 1);
+    };
+
+    const handleDecrement = () => {
+        if (selectedCount > 1) {
+            setSelectedCount((prevCount) => prevCount - 1);
+        }
     };
     const product = [
         { value: 'เรดเวลเวด', label: 'Red Velvet' },
@@ -86,10 +89,8 @@ function sell_add() {
 
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
+
     const [additionalProducts, setAdditionalProducts] = useState([]); // เก็บรายการสินค้าเพิ่มเติม
-
-
-
     const [countLimit, setCountLimit] = useState(0); // Set the initial count limit to 1
     const [selectedType, setSelectedType] = useState('');
 
@@ -108,29 +109,53 @@ function sell_add() {
         }
     };
 
+    // if (selectedCount <= countLimit) {
+    //     // เพิ่มข้อมูล count แยกตามแต่ละรายการใน selectedProducts
+    //     const newProducts = selectedProducts.map(product => ({ ...product, count: selectedCount }));
+
+    //     // เพิ่มสินค้าใหม่เข้าไปในรายการ additionalProducts
+    //     setAdditionalProducts([...additionalProducts, ...newProducts]);
+
+    //     // รีเซ็ตสินค้าที่เลือก เพื่อให้ผู้ใช้สามารถเลือกสินค้าใหม่
+    //     setSelectedProducts([]);
+    //     // รีเซ็ต count ที่ระดับ global ให้กลับไปที่ 1
+    //     setSelectedCount(1);
+    // } else {
+    //     console.error('เกินขีดจำกัดสำหรับรายการเมนูนี้หรือ count ไม่ถูกต้อง');
+    // }
     const handleAddProduct = () => {
-        if (count <= countLimit) {
-            // สร้างอาร์เรย์ใหม่ที่มีสินค้าตามที่เลือก
-            const newProducts = selectedProducts.map(productValue => ({ value: productValue, count }));
+        let canAddProducts = true;
 
-            // เพิ่มสินค้าใหม่เข้าไปในรายการ additionalProducts
-            setAdditionalProducts([...additionalProducts, ...newProducts]);
+        // Validate count for each selected product
+        selectedProducts.forEach(product => {
+            if (count > countLimit) {
+                console.error(`Exceeded the limit for ${product.value}`);
+                canAddProducts = false;
+            }
+        });
 
-            // รีเซ็ตสินค้าที่เลือก เพื่อให้ผู้ใช้สามารถเลือกสินค้าใหม่
+        if (canAddProducts) {
+            // Calculate total count for each product
+            const newProducts = selectedProducts.map(product => ({
+                ...product,
+                count: product.count * selectedCount,
+            }));
+
+            // Add products to additionalProducts
+            setAdditionalProducts(prevProducts => [...prevProducts, ...newProducts]);
+
+            // Reset selected products and count
             setSelectedProducts([]);
-
-            
-        } else {
-            console.error('เกินขีดจำกัดสำหรับรายการเมนูนี้หรือ count ไม่ถูกต้อง');
+            setSelectedCount(1);
         }
     };
 
-    console.log(selectedProducts, additionalProducts);
+    console.log(additionalProducts);
 
 
 
     return (
-        <div className='h-screen'>
+        <div className=''>
             <button className='my-3 mx-5 '>
                 <Link href="/product/recipeall" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
@@ -224,7 +249,7 @@ function sell_add() {
                                         <svg className="text-[#73664B]"
                                             xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
                                     </button>
-                                    <span className="w-1/2 text-center">{count}</span>
+                                    <span className="w-1/2 text-center">{selectedCount}</span>
                                     <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
                                         <svg className="text-[#73664B]"
                                             xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
@@ -258,7 +283,7 @@ function sell_add() {
                                             <svg className="text-[#73664B]"
                                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
                                         </button>
-                                        <span className="w-1/2 text-center">{count}</span>
+                                        <span className="w-1/2 text-center">{selectedCount}</span>
                                         <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
                                             <svg className="text-[#73664B]"
                                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
