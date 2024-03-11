@@ -7,6 +7,7 @@ import { Disclosure } from "@headlessui/react";
 import {
   ChartPieIcon,
   ChevronUpIcon,
+  ChevronDownIcon,
   CubeIcon,
   MegaphoneIcon,
   Cog6ToothIcon,
@@ -21,14 +22,14 @@ import { Icon } from '@iconify/react';
 
 // วัตถุดิบ
 const ingredientDropdown = [
-  { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/instore" },
-  { title: "วัตถุดิบทั้งหมด", href: "/ingredients/all" },
+  { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/ingredientlot" },
+  { title: "วัตถุดิบทั้งหมด", href: "/ingredients/ingredientall" },
   { title: "วัตถุดิบที่ใช้", href: "/ingredients/using" },
   { title: "รออนุมัติ", href: "/ingredients/pending" },
 ];
 // สินค้า
 const productDropdown = [
-  { title: "ประเภทสินค้า/สำหรับขาย", href: "/product/forsell" },
+  { title: "ประเภทสินค้า/สำหรับขาย", href: "/product/type" },
   { title: "สูตรอาหาร", href: "/product/recipes" },
   { title: "เมนูสำหรับขาย", href: "/product/menusell" },
 ];
@@ -99,7 +100,7 @@ const Sidebar = ({ children, className }) => {
           <MenuDropdown
             title="วัตถุดิบ"
             startIcon={<CubeIcon className="h-5 w-5 inherit " />}
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit " />}>
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit " />}>
             {ingredientDropdown.map((item, index) => (
               <React.Fragment key={index}>
                 <MenuLink
@@ -117,7 +118,7 @@ const Sidebar = ({ children, className }) => {
             title="สินค้า"
             startIcon={<Icon icon="solar:donut-outline" className="h-5 w-5 inherit"
             />}
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {productDropdown.map((item, index) => (
               <React.Fragment key={index}>
@@ -136,7 +137,7 @@ const Sidebar = ({ children, className }) => {
             title="การผลิต"
             startIcon={<Icon icon="tabler:tools-kitchen-2"
               className="h-5 w-5 inherit" />}
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {manufactureDropdown.map((item, index) => (
               <React.Fragment key={index}>
@@ -154,7 +155,7 @@ const Sidebar = ({ children, className }) => {
           <MenuDropdown
             title="รายการขาย"
             startIcon={<QueueListIcon className="h-5 w-5 inherit" />}
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {sellDropdown.map((item, index) => (
               <React.Fragment key={index}>
@@ -171,7 +172,7 @@ const Sidebar = ({ children, className }) => {
           <MenuDropdown
             title="โปรโมชัน"
             startIcon={<MegaphoneIcon className="h-5 w-5 inherit" />}
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit" />}>
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}>
             {promotionDropdown.map((item, index) => (
               <React.Fragment key={index}>
                 <MenuLink
@@ -187,7 +188,7 @@ const Sidebar = ({ children, className }) => {
           <MenuDropdown
             title="รายการจ่าย"
             startIcon={<CurrencyDollarIcon className="h-5 w-5 inherit" />}
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {payDropdown.map((item, index) => (
               <React.Fragment key={index}>
@@ -204,7 +205,7 @@ const Sidebar = ({ children, className }) => {
           <MenuDropdown
             title="พนักงาน"
             startIcon={<UserGroupIcon className="h- w-5 inherit" />}
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit" />}>
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}>
             {staffDropdown.map((item, index) => (
               <React.Fragment key={index}>
                 <MenuLink
@@ -220,7 +221,7 @@ const Sidebar = ({ children, className }) => {
             title="ตั้งค่า"
             startIcon={<Cog6ToothIcon className="h-5 w-5 inherit" />
             }
-            endIcon={<ChevronUpIcon className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {settingDropdown.map((item, index) => (
               <React.Fragment key={index}>

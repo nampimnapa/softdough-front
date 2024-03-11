@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const {nextui} = require("@nextui-org/react");
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,6 +11,7 @@ module.exports = {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
     "./node_modules/tw-elements-react/dist/js/**/*.js",
+    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
     extend: {
@@ -21,7 +23,8 @@ module.exports = {
     },
   },
   plugins: [require("tw-elements-react/dist/plugin.cjs"),
-  require("daisyui")
+  require("daisyui"),
+  nextui()
   ]
   ,
 }

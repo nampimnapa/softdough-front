@@ -1,0 +1,431 @@
+import React, { Fragment, useEffect, useState,ChangeEvent } from "react";
+import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import Link from "next/link";
+import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { Kanit } from "next/font/google";
+// import { HiOutlineTrash } from "react-icons/hi";
+// import { FiSave } from "react-icons/fi";
+import { Tabs, Tab, Chip } from "@nextui-org/react";
+import { useRouter } from 'next/router';
+
+function classNames(...classes) {
+    return classes.filter(Boolean).join(' ')
+}
+
+let dataSet = null;
+
+function all() {
+    const router = useRouter();
+    const [productsAPI, setPd] = useState<any[]>([]);
+    const [formData, setFormData] = useState({
+        pdc_name: ''
+    });
+
+    // ตัวแปรแก็บข้อมูลจาก API
+    // const productsAPI = [
+    //     { id: 1, name: 'โดนัท' },
+    //     { id: 2, name: 'ดิป' },
+    // ];
+    useEffect(() => {
+        // Fetch staff data on component mount
+        fetch('http://localhost:8080/product/readcat')
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setPd(data); // Assuming the response is an array of staff objects
+                // setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                // setLoading(false);
+            });
+    }, []);
+    // API สำหรับข้อมูลเมนู
+    const menuAPI = [
+        {
+            lot: "LOT01",
+            lotname: "ไข่ไก้",
+            lotstock: 6,
+            exp: "20/11/2555",
+        },
+    ]
+    console.log(productsAPI)
+    // เอาจากตัวแปรที่ได้จาก API มาทำเป็น State
+    // const [dataProduct, setDataProduct] = useState(productsAPI);
+    // console.log(dataProduct)
+    const [dataMenu, setDataMenu] = useState(menuAPI);
+    const [isEditing, setIsEditing] = useState(false);
+    const [openInput, setOpenInput] = useState(0);
+
+    const changeInput = (id: any) => {
+        setOpenInput(id);
+        setIsEditing(true);
+    }
+    // อันนี้เช็คเผื่อเปลี่ยนไอคอนเมื่อมีการกดแก้ไข
+    const handleSaveChanges = () => {
+        setOpenInput(0);
+        setIsEditing(false);
+    };
+
+    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
+        const newValue = event.target.value;
+        // ใช้ setDataProduct เพื่ออัปเดต State
+        setPd(prevProducts => {
+            return prevProducts.map(product => {
+                if (product.id === id) {
+                    // อัปเดตข้อมูลเฉพาะของสินค้าที่ต้องการ
+                    return { ...product, name: newValue };
+                }
+                return product;
+            });
+        });
+        console.log("แก้ไขประเภทวัตถุดิบ : ", newValue);
+
+    };
+
+    const handleCancelEdit = () => {
+        setPd(productsAPI)
+        // ยกเลิกการแก้ไข
+        setOpenInput(0);
+        setAdding(false);
+        setIsEditing(false);
+    };
+
+    // stateข้อมูล ที่ add
+    const [newProductName, setNewProductName] = useState('');
+    const [isAdding, setAdding] = useState(false);
+
+    // กดปุ่มเพิ่ม
+    const handleAddProduct = () => {
+        setAdding(true); // ตั้งค่า isAdding เป็น true เมื่อคลิกปุ่ม "เพิ่ม"
+        // ต่อไปคุณสามารถทำอย่างที่คุณทำกับ handleAddChanges ต่อไป
+
+
+    };
+    // const [valueForm, setValueForm] = useState(
+    //     {
+    //         // st_id: 
+    //         st_name: ""
+    //     }
+    // );
+    // const handleAddProduct = async (event: React.FormEvent<HTMLFormElement>)  => {
+    //     setAdding(true); // ตั้งค่า isAdding เป็น true เมื่อคลิกปุ่ม "เพิ่ม"
+    //     // ต่อไปคุณสามารถทำอย่างที่คุณทำกับ handleAddChanges ต่อไป
+    //     event.preventDefault();
+
+    //     try {
+    //         // Send data to the server
+    //         const response = await fetch('http://localhost:8080/product/addcat', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(formData),
+    //         });
+
+    //         const responseData = await response.json();
+
+    //         if (responseData.message === 'success') {
+    //             // setMessage('Data added successfully');
+    //             router.push('../product/type');
+    //         } else {
+    //             // setMessage(responseData.message || 'Error occurred');
+    //         }
+
+    //         // Reset the form after submission
+    //         (event.target as HTMLFormElement).reset();
+    //     } catch (error) {
+    //         console.error('Error:', error);
+    //         // setMessage('Error occurred');
+    //     }
+    // };
+    // const handleAddChanges = async (event: React.FormEvent<HTMLFormElement>) => {
+    //     if (newProductName.trim() !== '') {
+    //         setPd((prevDataProduct) => [
+    //             ...prevDataProduct,
+    //             { id: prevDataProduct.length + 1, name: newProductName },
+    //         ]);
+    //         setNewProductName('');
+    //         setOpenInput(0);
+    //         setAdding(false); // ตั้งค่า isAdding เป็น false เมื่อเพิ่มข้อมูลเสร็จสิ้น
+    //     }
+    //     console.log("เพิ่มประเภทวัตถุดิบ : ",newProductName); //ข้อมูลที่เพิ่ม
+
+    //from
+    // event.preventDefault();
+
+    // try {
+    //     // Send data to the server
+    //     const response = await fetch('http://localhost:8080/product/addcat', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify(formData),
+    //     });
+
+    //     const responseData = await response.json();
+
+    //     if (responseData.message === 'success') {
+    //         // setMessage('Data added successfully');
+    //         router.push('../product/type');
+    //     } else {
+    //         // setMessage(responseData.message || 'Error occurred');
+    //     }
+
+    //     // Reset the form after submission
+    //     (event.target as HTMLFormElement).reset();
+    // } catch (error) {
+    //     console.error('Error:', error);
+    //     // setMessage('Error occurred');
+    // }
+    // const handleAddChanges = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    //     const { name, value } = e.target;
+    //     setValueForm((prevIngredient) => ({
+    //       ...prevIngredient,
+    //       [name]: value,
+    //     }));
+    //   };
+
+    const handleAddChangess = async () => {
+        
+        console.log('test',newProductName)
+        const response = await fetch(`http://localhost:8080/product/addcat`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newProductName),
+            
+            
+        });
+        // console.log('ress',response);
+        const responseData = await response.json();
+        console.log(responseData);
+        if (responseData.message === 'success') {
+            console.log("success")
+            //   setIsOpen(false);
+        }
+
+    };
+    // };
+
+
+    // console.log(dataProduct)
+ 
+    return (
+        <div className="h-screen">
+            <p className='text-[#F2B461] font-medium m-4'>ประเภทสินค้า/สำหรับขาย</p>
+            <div className="flex justify-between">
+                <form className="flex items-center w-full transform scale-75  ">
+                    <div className="relative w-1/2 ">
+                        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
+                            <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
+                        </div>
+                        <input type="text"
+                            id="simple-search"
+                            className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
+                            placeholder="ค้นหา" required ></input>
+                    </div>
+                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
+                        ค้นหา
+                    </button>
+                </form>
+                <div className="mr-4 scale-90 flex items-center">
+                    <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex
+                     "
+                        onClick={handleAddProduct}>
+                        <PlusIcon className="h-5 w-5 text-white mr-2" />
+                        เพิ่ม
+                    </button>
+                </div>
+            </div>
+            <div className="w-full">
+                <div className="flex w-full flex-col">
+                    <Tabs
+                        aria-label="Options"
+                        color="primary"
+                        variant="underlined"
+                        classNames={{
+                            tabList: "gap-6 w-full relative rounded-none p-0 mx-5 border-b-1 border-b-[#E3D8BF]",
+                            cursor: "w-full bg-[#73664B]",
+                            tab: "max-w-fit px-0 h-12",
+                            tabContent: "group-data-[selected=true]:text-[#73664B]"
+                        }}
+                    >
+                        {/* Tab Product */}
+                        <Tab
+                            key="product"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <span>สินค้า</span>
+                                </div>
+                            }
+                        >
+                            <div className="relative overflow-x-auto mx-4">
+                                <table className="w-full text-sm text-center table-fixed">
+                                    <thead >
+                                        <tr className="text-white  font-normal  bg-[#908362]  ">
+                                            <td scope="col" className="px-3 py-3 w-64">
+                                                ลำดับ
+                                            </td>
+                                            <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
+                                                ชื่อประเภทสินค้า
+                                            </td>
+                                            <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {productsAPI.map((ingredient) => (
+                                            <tr key={ingredient.pdc_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                    {ingredient.pdc_id}
+                                                </td>
+                                                {openInput === ingredient.pdc_id ? (
+                                                    <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                        <input
+                                                            className="w-full h-9 focus:outline-none border"
+                                                            type="text"
+                                                            defaultValue={ingredient.pdc_name}
+                                                            onChange={(event) => handleInputChange(event, ingredient.pdc_id)}
+
+                                                        />
+                                                    </td>
+                                                ) : (
+                                                    <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                        {ingredient.pdc_name}
+                                                    </td>
+                                                )}
+                                                {isEditing && openInput === ingredient.id ? (
+                                                    <>
+                                                        <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem]  flex items-center justify-end">
+                                                            <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก
+                                                            </button>
+                                                            <button type="button" onClick={handleSaveChanges} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก
+                                                            </button>
+                                                        </td>
+                                                    </>
+                                                ) : (
+                                                    <td className="me-2 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
+                                                        <button type="button" onClick={() => changeInput(ingredient.id)}>
+                                                            <a href="#" className="w-full flex justify-center items-center">
+                                                                <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                                            </a>
+                                                        </button>
+                                                    </td>
+                                                )}
+
+                                            </tr>
+                                        ))}
+                                        {isAdding && (
+                                            <>
+
+                                                <tr key="new" className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+                                                    <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                        {productsAPI.length + 1}
+                                                    </td>
+                                                    <td className="py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                        <input
+                                                            className="w-full h-9 focus:outline-none border"
+                                                            type="text"
+                                                            value={newProductName}
+                                                            onChange={(event) => setNewProductName(event.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem] flex items-center justify-end">
+                                                        <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">
+                                                            ยกเลิก
+                                                        </button>
+                                                        <button type="button" onClick={handleAddChangess} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">
+                                                            บันทึก
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </>
+
+                                        )}
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </Tab>
+                        {/* Tab Menu */}
+                        <Tab
+                            key="menusell"
+                            title={
+                                <div className="flex items-center space-x-2">
+                                    <span>เมนูสำหรับขาย</span>
+                                </div>
+                            }
+                        >
+                            <div className="second-tab-layout mx-4">
+                                <div className="relative overflow-x-auto ">
+                                    <table className="w-full text-sm text-center text-gray-500">
+                                        <thead className="">
+                                            <tr className="text-white  font-normal  bg-[#908362]  ">
+                                                <td scope="col" className="px-6 py-3 ">
+                                                    ล็อตวัตถุดิบ
+                                                </td>
+                                                <td scope="col" className="px-12 py-3 ">
+                                                    รายการ
+                                                </td>
+                                                <td scope="col" className="px-6 py-3">
+                                                    สต็อก
+                                                </td>
+                                                <td scope="col" className="px-6 py-3">
+                                                    วันหมดอายุ
+                                                </td>
+
+                                                <td scope="col" className="px-6 py-3">
+                                                    รายละเอียด
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {dataMenu.map((ingredients) => (
+                                                <tr key={ingredients.lot} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                    <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
+                                                        {ingredients.lot}
+                                                    </td>
+                                                    <td className="px-6 py-1 text-left text-[#73664B]">
+                                                        {ingredients.lotname}
+                                                    </td>
+                                                    <td className="px-6 py-1 text-[#73664B]">
+                                                        {ingredients.lotstock}
+                                                    </td>
+
+                                                    <td className="px-6 py-1 text-[#73664B]">
+                                                        {ingredients.exp}
+                                                    </td>
+                                                    <td className="px-6 py-4 flex items-center justify-center  text-[#73664B]">
+                                                        <button type="submit" >
+                                                            <Link href="/ingredients/detailall" className="w-full flex justify-center items-center">
+                                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
+                                                            </Link>
+                                                        </button>
+
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </Tab>
+
+                    </Tabs>
+                </div>
+
+            </div>
+
+
+        </div>
+    )
+}
+
+export default all
