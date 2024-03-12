@@ -16,11 +16,11 @@ const kanit = Kanit({
 
 function sell_add() {
 
-    const [selectedOption, setSelectedOption] = useState("");
+    // const [selectedOption, setSelectedOption] = useState("");
 
-    const handleRadioChange = (option) => {
-        setSelectedOption(option);
-    };
+    // const handleRadioChange = (option) => {
+    //     setSelectedOption(option);
+    // };
     const typesellmenu = [
         {
             id: 1,
@@ -47,13 +47,13 @@ function sell_add() {
     const [selectedCount, setSelectedCount] = useState(1);
     const [selectedProducts, setSelectedProducts] = useState([]);
 
-    const handleProductChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedOptions = Array.from(event.target.selectedOptions).map((option) => ({
-            value: option.value,
-            count: 1,
-        }));
-        setSelectedProducts(selectedOptions);
-    };
+    // const handleProductChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //     const selectedOptions = Array.from(event.target.selectedOptions).map((option) => ({
+    //         value: option.value,
+    //         count: 1,
+    //     }));
+    //     setSelectedProducts(selectedOptions);
+    // };
 
     const handleIncrement = () => {
         setSelectedCount((prevCount) => prevCount + 1);
@@ -88,9 +88,9 @@ function sell_add() {
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
 
-    const [additionalProducts, setAdditionalProducts] = useState([]); // เก็บรายการสินค้าเพิ่มเติม
+    // const [additionalProducts, setAdditionalProducts] = useState([]); // เก็บรายการสินค้าเพิ่มเติม
     const [countLimit, setCountLimit] = useState(0); // Set the initial count limit to 1
-    const [selectedType, setSelectedType] = useState('');
+    const [selectedType, setSelectedType] = useState('ประเภทเมนูสำหรับขาย');
 
     const handleTypeChange = (event) => {
         const selectedTypeName = event.target.value;
@@ -121,32 +121,60 @@ function sell_add() {
     // } else {
     //     console.error('เกินขีดจำกัดสำหรับรายการเมนูนี้หรือ count ไม่ถูกต้อง');
     // }
-    const handleAddProduct = () => {
-        let canAddProducts = true;
+    // const handleAddProduct = () => {
+    //     let canAddProducts = true;
 
-        // Validate count for each selected product
-        selectedProducts.forEach(product => {
-            if (count > countLimit) {
-                console.error(`Exceeded the limit for ${product.value}`);
-                canAddProducts = false;
-            }
-        });
+    //     // Validate count for each selected product
+    //     selectedProducts.forEach(product => {
+    //         if (count > countLimit) {
+    //             console.error(`Exceeded the limit for ${product.value}`);
+    //             canAddProducts = false;
+    //         }
+    //     });
 
-        if (canAddProducts) {
-            // Calculate total count for each product
-            const newProducts = selectedProducts.map(product => ({
-                ...product,
-                count: product.count * selectedCount,
-            }));
+    //     if (canAddProducts) {
+    //         // Calculate total count for each product
+    //         const newProducts = selectedProducts.map(product => ({
+    //             ...product,
+    //             count: product.count * selectedCount,
+    //         }));
 
-            // Add products to additionalProducts
-            setAdditionalProducts(prevProducts => [...prevProducts, ...newProducts]);
+    //         // Add products to additionalProducts
+    //         setAdditionalProducts(prevProducts => [...prevProducts, ...newProducts]);
 
-            // Reset selected products and count
-            setSelectedProducts([]);
-            setSelectedCount(1);
-        }
+    //         // Reset selected products and count
+    //         setSelectedProducts([]);
+    //         setSelectedCount(1);
+    //     }
+    // };
+
+
+    // OSP101 Dev
+
+    const [selectedOption, setSelectedOption] = useState('');
+    const [additionalProducts, setAdditionalProducts] = useState([]);
+
+    const handleRadioChange = (value) => {
+        setSelectedOption(value);
     };
+
+    const handleAddProduct = () => {
+        setAdditionalProducts([...additionalProducts, { product: '', quantity: 1 }]);
+    };
+
+    const handleProductChange = (index, value) => {
+        const updatedProducts = [...additionalProducts];
+        updatedProducts[index].product = value;
+        setAdditionalProducts(updatedProducts);
+    };
+
+    const handleQuantityChange = (index, delta) => {
+        const updatedProducts = [...additionalProducts];
+        updatedProducts[index].quantity = Math.max(0, updatedProducts[index].quantity + delta);
+        setAdditionalProducts(updatedProducts);
+    };
+
+
 
     console.log(additionalProducts);
 
@@ -205,94 +233,66 @@ function sell_add() {
                 <div className="mt-2 col-span-3 flex ml-3">
                     <div className="form-control">
                         <label className="label cursor-pointer ">
-                            <input type="radio" name="depart" className="radio checked:bg-[#C5B182]"
+                            <input type="radio" name="depart" className={`radio  ${selectedType === "ประเภทเมนูสำหรับขาย" ? "checked:bg-[#e0d2b2]" : "checked:bg-[#C5B182]"}`}
                                 checked={selectedOption === "fix"}
                                 onChange={() => handleRadioChange("fix")}
+                                disabled={selectedType === 'ประเภทเมนูสำหรับขาย'}
+                                onClick={handleAddProduct}
                             />
-                            <span className="text-sm text-[#73664B] px-3 ">เมนูกำหนดไว้</span>
+                            <span className={`text-sm  ${selectedType === "ประเภทเมนูสำหรับขาย" ? "text-[#dad6cd] cursor-not-allowed" : "text-[#73664B]"} px-3 `}>เมนูกำหนดไว้</span>
                         </label>
                     </div>
                     <div className="form-control ml-4">
                         <label className="label cursor-pointer">
-                            <input type="radio" name="depart" className="radio checked:bg-[#C5B182]"
+                            <input type="radio" name="depart" className={`radio  ${selectedType === "ประเภทเมนูสำหรับขาย" ? "checked:bg-[#e0d2b2]" : "checked:bg-[#C5B182]"}`}
                                 checked={selectedOption === "mix"}
-                                onChange={() => handleRadioChange("mix")} />
-                            <span className="text-sm text-[#73664B] px-3">เมนูคละหน้าร้าน</span>
+                                onChange={() => handleRadioChange("mix")}
+                                disabled={selectedType === 'ประเภทเมนูสำหรับขาย'} />
+                            <span className={`text-sm  ${selectedType === "ประเภทเมนูสำหรับขาย" ? "text-[#dad6cd] cursor-not-allowed" : "text-[#73664B]"} px-3 `}>เมนูคละหน้าร้าน</span>
                         </label>
                     </div>
                 </div>
-                {/* fix */}
-                {selectedOption === "fix" && (
-                    <div>
-                        <div className="flex items-center w-full">
-                            <div className="flex h-min items-center w-full">
-                                <p className="text-sm pl-4 text-[#73664B] mr-4 w-1/4">เลือกสินค้า :</p>
-                                <select
-                                    id="product"
-                                    className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 w-1/2"
-                                    name="unit"
-                                    onChange={handleProductChange}
-                                    defaultValue = "เลือกสินค้า"
-                                >
-                                    <option disabled>
-                                        เลือกสินค้า
-                                    </option>
-                                    <option value="เรดเวลเวด">เรดเวลเวด</option>
-                                    <option value="ออริจินอล">ออริจินอล</option>
-                                    <option value="ใบเตย">ใบเตย</option>
-                                </select>
-                            </div>
-                            <div className="flex mt-2 w-full">
-                                <p className="text-sm px-4 py-2 text-[#73664B] ">จำนวนชิ้น :</p>
-                                <div className="flex items-center w-1/4">
-                                    <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleDecrement} >
-                                        <svg className="text-[#73664B]"
-                                            xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
-                                    </button>
-                                    <span className="w-1/2 text-center">{selectedCount}</span>
-                                    <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
-                                        <svg className="text-[#73664B]"
-                                            xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
-                                    </button>
-                                </div>
-                            </div>
 
-                        </div>
-                        {additionalProducts.length > 0 && (
-                            <div className="flex items-center w-full">
-                                <div className="flex h-min items-center w-full">
+                {/* fix */}
+                {selectedOption === 'fix' && (
+                    <div>
+                        <div>
+                            {additionalProducts.map((product, index) => (
+                                <div key={index} className="flex items-center w-full">
+                                    <div className="flex h-min items-center w-full">
                                     <p className="text-sm pl-4 text-[#73664B] mr-4 w-1/4">เลือกสินค้า :</p>
                                     <select
-                                        id="product"
+                                        // value={product.product}
                                         className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 w-1/2"
-                                        name="unit"
-                                        onChange={handleProductChange}
+                                        onChange={(e) => handleProductChange(index, e.target.value)}
+                                        defaultValue = "เลือกสินค้า"
                                     >
-                                        <option disabled selected>
+                                        <option disabled>
                                             เลือกสินค้า
                                         </option>
                                         <option value="เรดเวลเวด">เรดเวลเวด</option>
                                         <option value="ออริจินอล">ออริจินอล</option>
                                         <option value="ใบเตย">ใบเตย</option>
                                     </select>
-                                </div>
-                                <div className="flex mt-2 w-full">
+                                    </div>
+                                    <div className="flex mt-2 w-full">
                                     <p className="text-sm px-4 py-2 text-[#73664B] ">จำนวนชิ้น :</p>
                                     <div className="flex items-center w-1/4">
-                                        <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleDecrement} >
+                                        <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={() => handleQuantityChange(index, -1)} >
                                             <svg className="text-[#73664B]"
                                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
                                         </button>
-                                        <span className="w-1/2 text-center">{selectedCount}</span>
-                                        <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
+                                        <span className="w-1/2 text-center">{product.quantity}</span>
+                                        <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={() => handleQuantityChange(index, 1)}>
                                             <svg className="text-[#73664B]"
                                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
                                         </button>
                                     </div>
                                 </div>
+                                </div>
+                            ))}
+                        </div>
 
-                            </div>
-                        )}
                         <div className="gap-2 mx-4">
                             <Button radius="full" size="sm" className="text-white bg-[#73664B]" onClick={handleAddProduct}>
                                 เลือกสินค้าเพิ่มเติม

@@ -21,11 +21,37 @@ module.exports = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      colors: {
+        primary: '#73664B',
+        secondary: '#C5B182',
+        tertiary: '#73664B',
+        fourth: '#FFFFDD'
+        // Add more custom colors as needed
+      },
     },
   },
   plugins: [require("tw-elements-react/dist/plugin.cjs"),
   require("daisyui"),
-  nextui()
+  nextui({
+    themes: {
+      light: {
+        colors: {
+          primary: '#73664B',
+          secondary: '#C5B182',
+          tertiary: '#F2B461',
+          fourth: '#FFFFDD'
+        },
+      },
+      dark: {
+        colors: {
+          primary: '#73664B',
+          secondary: '#C5B182',
+          tertiary: '#F2B461',
+          fourth: '#FFFFDD'
+        },
+      },
+    }
+  })
   ]
   ,
 }
