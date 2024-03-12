@@ -6,7 +6,6 @@ import { Kanit } from "next/font/google";
 import { Icon } from '@iconify/react';
 import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
-
 import { Dialog, Transition } from '@headlessui/react';
 
 const kanit = Kanit({
@@ -86,7 +85,6 @@ function sell_add() {
     };
     // cancel
     const handleCancel = () => {
-
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
 

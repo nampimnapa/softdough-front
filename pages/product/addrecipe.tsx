@@ -11,6 +11,7 @@ import { Kanit } from "next/font/google";
 import { useRouter } from "next/router";
 import { Input } from "@nextui-org/react";
 import { Dialog, Transition } from '@headlessui/react';
+
 const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
