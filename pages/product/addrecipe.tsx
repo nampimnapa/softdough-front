@@ -36,7 +36,7 @@ function addrecipe() {
         setCurrentPage(itemId); // อัพเดท state เมื่อมีการคลิกที่ลิงก์
     };
 
-    const handleNextClick = () => {
+    const handleNextClick = async () => {
         if (currentPage !== "item2") {
             handleItemClick("item2");
         }
@@ -61,6 +61,26 @@ function addrecipe() {
             console.log("Product Data:", productData);
             console.log("Recipe Data:", recipeData);
         }
+
+        // try {
+        //     const response = await fetch('http://localhost:8080/production/addProductionOrder', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(postData),
+        //     });
+
+        //     if (!response.ok) {
+        //         throw new Error('ไม่สามารถเพิ่มใบสั่งผลิตได้');
+        //     }
+
+           
+            
+        // } catch (error) {
+        //     console.error('เกิดข้อผิดพลาดในการเพิ่มใบสั่งผลิต:', error.message);
+        //     // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
+        // }
 
 
     };

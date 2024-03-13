@@ -37,6 +37,7 @@ function add() {
     // กรองสินค้าตามประเภทที่ถูกเลือก
     const filteredProducts = pd.filter(product => product.type === selectedProductType);
 
+
     const [addedDetail, setAddedDetail] = useState([]);
 
     // รายละเอียดใบสั่งผลิต
@@ -44,14 +45,16 @@ function add() {
         type: '',
         pd: '',
         num: 1,
+        status: 1
     });
+    
     const handleAddDetail = () => {
         event.preventDefault();
         const selectedProductType = parseInt((document.getElementById("productType") as HTMLSelectElement).value);
         const selectedProductId = parseInt((document.getElementById("product") as HTMLSelectElement).value);
         const selectedProduct = filteredProducts.find(product => product.id === selectedProductId);
         const typepd = product_type.find(type => type.id === selectedProductType)?.name;
-        const existingDetailIndex = addedDetail.findIndex(detail => detail.pd === selectedProduct?.name);
+
         if (!selectedProduct) {
             alert("กรุณาเลือกสินค้า");
             return;
@@ -63,15 +66,28 @@ function add() {
             alert("กรุณากรอกจำนวนที่ถูกต้อง");
             return;
         }
+
+        const existingDetailIndex = addedDetail.findIndex(detail => detail.pd_id === selectedProductId);
+
         if (existingDetailIndex !== -1) {
-            const updatedAddedDetail = [...addedDetail];
-            updatedAddedDetail[existingDetailIndex].num += parseInt((document.getElementById("num") as HTMLInputElement).value);
+            // Product already exists in the addedDetail array, update the quantity
+            const updatedAddedDetail = addedDetail.map((detail, index) => {
+                if (index === existingDetailIndex) {
+                    return {
+                        ...detail,
+                        num: detail.num + enteredQuantity,
+                    };
+                }
+                return detail;
+            });
+
             setAddedDetail(updatedAddedDetail);
         } else {
+            // Product does not exist, add a new detail
             const newDetail = {
-                type: selectedProductType || '', // Use typepd here
-                pd: selectedProduct?.name || '',
-                num: parseInt((document.getElementById("num") as HTMLInputElement).value),
+                type: typepd || '',
+                pd_id: selectedProduct?.id || '',
+                num: enteredQuantity,
             };
 
             setAddedDetail(prevDetail => [...prevDetail, newDetail]);
@@ -81,6 +97,7 @@ function add() {
         (document.getElementById("product") as HTMLSelectElement).value = "";
         (document.getElementById("num") as HTMLInputElement).value = "";
     };
+
     const handleDeleteDetail = (index) => {
         const updatedAddedDetail = [...addedDetail];
         updatedAddedDetail.splice(index, 1);
@@ -95,13 +112,59 @@ function add() {
     const openModal = () => {
         setIsOpen(true);
     };
-    const handleConfirm = () => {
+
+
+
+    const [postData, setpostData] = useState({
+        type: '',
+        pd: '',
+        num: 1,
+        pdo_status: 1
+    });
+
+    const handleConfirm = async () => {
         console.log("รายละเอียดสินค้าทั้งหมด:", addedDetail);
         closeModal();
+
+        const productionOrder = [{ pdo_status: 1 }];
+        const productionOrderdetail = addedDetail.map(detail => ({ qty: detail.num, pd_id: detail.pd_id }));
+
+        const postData = {
+            productionOrder,
+            productionOrderdetail
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/production/addProductionOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData),
+            });
+
+            if (!response.ok) {
+                throw new Error('ไม่สามารถเพิ่มใบสั่งผลิตได้');
+            }
+
+            console.log('เพิ่มใบสั่งผลิตเรียบร้อยแล้ว!');
+            closeModal();
+        } catch (error) {
+            console.error('เกิดข้อผิดพลาดในการเพิ่มใบสั่งผลิต:', error.message);
+            // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
+        }
     };
+
+
     const handleCancel = () => {
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
+    const getProductNameById = (productId) => {
+        const product = pd.find((item) => item.id === productId);
+        return product ? product.name : '';
+    };
+
+
 
 
 
@@ -176,7 +239,7 @@ function add() {
                                     {addedDetail.map((detail, index) => (
                                         <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
                                             <td scope="col" className="flex-1 text-center">{detail.type}</td>
-                                            <td scope="col" className="flex-1 text-center">{detail.pd}</td>
+                                            <td scope="col" className="flex-1 text-center">{getProductNameById(detail.pd_id)}</td>
                                             <td scope="col" className="flex-1 text-center">{detail.num}</td>
                                             <td scope="col" className="flex-1 text-center">
                                                 <div className="flex items-center justify-center">
