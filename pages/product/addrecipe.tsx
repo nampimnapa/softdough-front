@@ -200,10 +200,16 @@ function addrecipe() {
     const router = useRouter();
     const { id } = router.query;
     const [unitOptions, setUnitOptions] = useState([]);
+    const [productCat, setProductCat] = useState([]);
     interface UnitType {
         un_id: string;
         un_name: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+
+    interface ProductCat {
+        pdc_id: string;
+        pdc_name: string;
     }
     useEffect(() => {
         
@@ -211,6 +217,15 @@ function addrecipe() {
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+        fetch('http://localhost:8080/product/readcat')
+        .then(response => response.json())
+            .then(data => {
+                setProductCat(data);
             })
             .catch(error => {
                 console.error('Error fetching unit data:', error);
@@ -240,9 +255,9 @@ function addrecipe() {
                                     name="unit"
                                     onChange={handleProductInputChange}
                                 >
-                                    {unitOptions.map((unit: UnitType) => (
-                                        <option key={unit.un_id} value={unit.un_id}>
-                                            {unit.un_name}
+                                    {productCat.map((unit: ProductCat) => (
+                                        <option key={unit.pdc_id} value={unit.pdc_id}>
+                                            {unit.pdc_name}
                                         </option>
                                     ))}
                                 </select>
