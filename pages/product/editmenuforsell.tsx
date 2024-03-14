@@ -1,4 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+
 import Link from "next/link";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
@@ -64,6 +66,46 @@ function editmenuforsell() {
         });
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
+    const router = useRouter();
+    const { id } = router.query;
+    const [SaleMenu, setSaleMenu] = useState([]);
+    interface SaleMenu {
+        smt_id: string;
+        smt_name: string;
+        un_id: string;
+        qty_per_unit: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        fetch(`http://localhost:8080/salesmenu/readsmt`)
+            .then(response => response.json())
+            .then(data => {
+                setSaleMenu(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
+
+    const [unitOptions, setUnitOptions] = useState([]);
+    interface UnitType {
+        un_id: string;
+        un_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+
+        fetch(`http://localhost:8080/ingredient/unit`)
+            .then(response => response.json())
+            .then(data => {
+                setUnitOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
 
 
     return (
@@ -80,7 +122,7 @@ function editmenuforsell() {
                     <p className="text-sm px-6 py-2 text-[#73664B]">ชื่อประเภทเมนูสำหรับขาย :</p>
                     <input
                         // ต้องเป็น defult สำหรับแก้ไข
-                        value={formData.name}
+                        value={SaleMenu.length > 0 ? SaleMenu[0].smt_name : ''} // ใช้ smt_name จาก SaleMenu ที่ index 0
                         onChange={handleChange}
                         type="text"
                         name="name"
@@ -94,14 +136,13 @@ function editmenuforsell() {
                     <select id="countries"
                         className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
                         name="unit"
-                        value={formData.unit}
+                        value={SaleMenu.length > 0 ? SaleMenu[0].un_id : ''} // Set the value to un_id
                         onChange={handleChange}>
-                        <option disabled selected value="">
-                            เลือกหน่วยสินค้า
-                        </option>
-                        <option value="1">กล่อง</option>
-                        <option value="2">ถ้วย</option>
-                        <option value="3">อื่นๆ</option>
+                        {unitOptions.map((unit: UnitType) => (
+                            <option key={unit.un_id} value={unit.un_id}>
+                                {unit.un_name}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 <div className="grid grid-cols-2 mt-2">
@@ -111,7 +152,7 @@ function editmenuforsell() {
                             <svg className="text-[#73664B]"
                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
                         </button>
-                        <span className="w-1/6 text-center">{formData.count}</span>
+                        <span className="w-1/6 text-center">{SaleMenu.length > 0 ? SaleMenu[0].un_id : ''}</span>
                         <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
                             <svg className="text-[#73664B]"
                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
@@ -122,7 +163,7 @@ function editmenuforsell() {
                     <div className="w-1/2  mt-10  flex justify-start " >
                         <button>
                             <Link href="/product/all"
-                            onClick={handleCancel}
+                                onClick={handleCancel}
                                 type="button"
                                 className=" text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
                                 ยกเลิก</Link></button>

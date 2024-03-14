@@ -23,9 +23,9 @@ function addmenuforsell() {
     };
     // เก็บจำนวน
     const [formData, setFormData] = useState({
-        name: '',
-        unit: '',
-        count: 1
+        smt_name: '',
+        un_id: '',
+        qty_per_unit: 1
     });
 
     const handleChange = (event) => {
@@ -38,23 +38,59 @@ function addmenuforsell() {
     const handleIncrement = () => {
         setFormData({
             ...formData,
-            count: formData.count + 1
+            qty_per_unit: formData.qty_per_unit + 1
         });
     };
 
     const handleDecrement = () => {
-        if (formData.count > 1) {
+        if (formData.qty_per_unit > 1) {
             setFormData({
                 ...formData,
-                count: formData.count - 1
+                qty_per_unit: formData.qty_per_unit - 1
             });
         }
     };
 
-    const handleConfirm = () => {
-        console.log("Name: ", formData.name, " Unit : ", formData.unit, " Count : ", formData.count);
+    const handleConfirm = async () => {
+        console.log("Name: ", formData.smt_name, " Unit : ", formData.un_id, " Count : ", formData.qty_per_unit);
         closeModal();
+        try {
+            const response = await fetch('http://localhost:8080/salesmenu/addtype', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error('ไม่สามารถเพิ่ม');
+            }
+
+            console.log('success');
+        } catch (error) {
+            console.error('เกิดข้อผิดพลาด:', error.message);
+            // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
+        }
     };
+    const { id } = router.query;
+    const [unitOptions, setUnitOptions] = useState([]);
+    interface UnitType {
+        un_id: string;
+        un_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        fetch(`http://localhost:8080/ingredient/unit`)
+            .then(response => response.json())
+            .then(data => {
+                setUnitOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
     return (
         <div className='h-screen'>
             <button className='my-3 mx-5 '>
@@ -71,24 +107,23 @@ function addmenuforsell() {
                         onChange={handleChange}
                         placeholder="ชื่อประเภทเมนูสำหรับขาย"
                         type="text"
-                        name="name"
-                        id="name"
+                        name="smt_name"
+                        id="smt_name"
                         autoComplete="off"
                         className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6 focus:outline-none"
                     />
                 </div>
                 <div className="grid grid-cols-2 mt-2">
                     <p className="text-sm px-6 py-2 text-[#73664B]">หน่วยสินค้า :</p>
-                    <select id="countries"
+                    <select id="un_id"
                         onChange={handleChange}
                         className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
-                        name="unit">
-                        <option disabled selected value="">
-                            เลือกหน่วยสินค้า
-                        </option>
-                        <option>กล่อง</option>
-                        <option>กล่อง</option>
-                        <option>กล่อง</option>
+                        name="un_id">
+                        {unitOptions.map((unit: UnitType) => (
+                            <option key={unit.un_id} value={unit.un_id}>
+                                {unit.un_name}
+                            </option>
+                        ))}
                     </select>
                 </div>
                 <div className="grid grid-cols-2 mt-2">
@@ -98,7 +133,7 @@ function addmenuforsell() {
                             <svg className="text-[#73664B]"
                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
                         </button>
-                        <span className="w-1/6 text-center"> {formData.count} </span>
+                        <span className="w-1/6 text-center"> {formData.qty_per_unit} </span>
                         <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
                             <svg className="text-[#73664B]"
                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>

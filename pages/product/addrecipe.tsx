@@ -36,54 +36,7 @@ function addrecipe() {
         setCurrentPage(itemId); // อัพเดท state เมื่อมีการคลิกที่ลิงก์
     };
 
-    const handleNextClick = async () => {
-        if (currentPage !== "item2") {
-            handleItemClick("item2");
-        }
-        else {
-            const productData = {
-                pd_name: product.name,
-                pd_qtyminimum: product.qtymin,
-                status: product.status,
-                picture: product.img,
-                pdc_id: product.pd_unit // Assuming pd_unit is the correct property, adjust as needed
-            };
 
-            const recipeData = {
-                qtyLifetime: recipe.qtyLifetime,
-                produced_qty: recipe.produced_qty,
-                ingredients: addedIngredients.map((ingredient) => ({
-                    name: parseInt(ingredient.id),
-                    quantity: ingredient.quantity,
-                    unit: parseInt(ingredient.unit) // Use the unit ID instead of the unit name
-                }))
-            };
-            console.log("Product Data:", productData);
-            console.log("Recipe Data:", recipeData);
-        }
-
-        // try {
-        //     const response = await fetch('http://localhost:8080/production/addProductionOrder', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify(postData),
-        //     });
-
-        //     if (!response.ok) {
-        //         throw new Error('ไม่สามารถเพิ่มใบสั่งผลิตได้');
-        //     }
-
-           
-            
-        // } catch (error) {
-        //     console.error('เกิดข้อผิดพลาดในการเพิ่มใบสั่งผลิต:', error.message);
-        //     // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
-        // }
-
-
-    };
     const handleBackClick = () => {
         handleItemClick("item1"); // เมื่อกดปุ่ม "ถัดไป" ให้ตั้ง currentPage เป็น "item1"
     };
@@ -149,6 +102,7 @@ function addrecipe() {
         img: null,        // Provide a default or leave it as null
         pd_unit: ''
     });
+
     const handleProductInputChange = (e) => {
         const { name, value } = e.target;
         setProduct((prevProduct) => ({
@@ -157,6 +111,112 @@ function addrecipe() {
         }));
     };
 
+    const handleNextClick = async () => {
+        if (currentPage !== "item2") {
+            handleItemClick("item2");
+        }
+        else {
+            // const productData = {
+            //     pd_name: product.name,
+            //     pd_qtyminimum: product.qtymin,
+            //     status: product.status,
+            //     picture: product.img,
+            //     pdc_id: product.pd_unit // Assuming pd_unit is the correct property, adjust as needed
+            // };
+
+            // const recipeData = {
+            //     qtyLifetime: recipe.qtyLifetime,
+            //     produced_qty: recipe.produced_qty,
+            //     ingredients: addedIngredients.map((ingredient) => ({
+            //         name: parseInt(ingredient.id),
+            //         quantity: ingredient.quantity,
+            //         unit: parseInt(ingredient.unit) // Use the unit ID instead of the unit name
+            //     }))
+            // };
+            const productData = {
+                pd_name: product.name,
+                pd_qtyminimum: product.qtymin,
+                status: product.status,
+                picture: product.img,
+                pdc_id: product.pd_unit, // Assuming pd_unit is the correct property, adjust as needed,
+                recipe: {
+                    qtyLifetime: recipe.qtyLifetime,
+                    produced_qty: recipe.produced_qty,
+                    un_id: product.pd_unit
+                },
+                recipedetail: addedIngredients.map((ingredient) => (
+                    {
+                        ind_id: parseInt(ingredient.id),
+                        ingredients_qty: ingredient.quantity,
+                        un_id: parseInt(ingredient.unit)
+                    }
+                ))
+            };
+            console.log("Product Data:", productData);
+
+
+            try {
+                const response = await fetch('http://localhost:8080/product/addProductWithRecipe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(productData),
+                });
+
+                if (!response.ok) {
+                    throw new Error('ไม่สามารถเพิ่ม');
+                }
+
+                console.log('success');
+            } catch (error) {
+                console.error('เกิดข้อผิดพลาด:', error.message);
+                // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
+            }
+        }
+
+        // try {
+        //     const response = await fetch('http://localhost:8080/production/addProductionOrder', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(postData),
+        //     });
+
+        //     if (!response.ok) {
+        //         throw new Error('ไม่สามารถเพิ่มใบสั่งผลิตได้');
+        //     }
+
+
+
+        // } catch (error) {
+        //     console.error('เกิดข้อผิดพลาดในการเพิ่มใบสั่งผลิต:', error.message);
+        //     // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
+        // }
+
+
+    };
+    const router = useRouter();
+    const { id } = router.query;
+    const [unitOptions, setUnitOptions] = useState([]);
+    interface UnitType {
+        un_id: string;
+        un_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        
+        fetch(`http://localhost:8080/ingredient/unit`)
+            .then(response => response.json())
+            .then(data => {
+                setUnitOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
 
     return (
 
@@ -180,11 +240,11 @@ function addrecipe() {
                                     name="unit"
                                     onChange={handleProductInputChange}
                                 >
-                                    <option disabled selected value="">
-                                        เลือกประเภทสินค้า
-                                    </option>
-                                    <option>โดนัท</option>
-                                    <option>ดิป</option>
+                                    {unitOptions.map((unit: UnitType) => (
+                                        <option key={unit.un_id} value={unit.un_id}>
+                                            {unit.un_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="flex w-1/2 items-center">
@@ -231,11 +291,11 @@ function addrecipe() {
                                 className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 ml-7"
                                 name="pd_unit"
                             >
-                                <option disabled selected value="">
-                                    เลือกหน่วย
-                                </option>
-                                <option>กล่อง</option>
-                                <option>ถ้วย</option>
+                                {unitOptions.map((unit: UnitType) => (
+                                        <option key={unit.un_id} value={unit.un_id}>
+                                            {unit.un_name}
+                                        </option>
+                                    ))}
                             </select>
                         </div>
                     </div>

@@ -100,6 +100,46 @@ function all() {
         }
         console.log("เพิ่มประเภทวัตถุดิบ : ", newProductName); //ข้อมูลที่เพิ่ม
     };
+    const router = useRouter();
+    const { id } = router.query;
+    const [SaleMenu, setSaleMenu] = useState([]);
+    interface SaleMenu {
+        smt_id: string;
+        smt_name: string;
+        un_name: string;
+        qty_per_unit: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        fetch(`http://localhost:8080/salesmenu/readsmt`)
+            .then(response => response.json())
+            .then(data => {
+                setSaleMenu(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
+
+    const [unitOptions, setUnitOptions] = useState([]);
+    interface UnitType {
+        un_id: string;
+        un_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+
+        fetch(`http://localhost:8080/ingredient/unit`)
+            .then(response => response.json())
+            .then(data => {
+                setUnitOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
 
 
 
@@ -281,20 +321,19 @@ function all() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {dataMenu.map((ingredients) => (
-                                                <tr key={ingredients.id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                            {SaleMenu.map((menu, index) => (
+                                                <tr key={menu.smt_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                     <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
-                                                        {ingredients.id}
+                                                        {index + 1}
                                                     </td>
                                                     <td className="px-6 py-1 text-left text-[#73664B]">
-                                                        {ingredients.typeforsell}
+                                                        {menu.smt_name}
                                                     </td>
                                                     <td className="px-6 py-1 text-[#73664B]">
-                                                        {ingredients.unit}
+                                                        {unitOptions.find(unit => unit.un_id === menu.un_id)?.un_name || ''}
                                                     </td>
-
                                                     <td className="px-6 py-1 text-[#73664B]">
-                                                        {ingredients.q}
+                                                        {menu.qty_per_unit}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center  text-[#73664B]">
                                                         <button type="button">
