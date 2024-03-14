@@ -23,7 +23,7 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/ingredients/edit.js"
-, "pages/api/hello.js"  ],
+, "pages/api/hello.js", "pages/api/uploadimage.ts"  ],
   "exclude": [
     "node_modules"
   ]

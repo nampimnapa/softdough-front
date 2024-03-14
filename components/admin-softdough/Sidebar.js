@@ -81,7 +81,7 @@ const Sidebar = ({ children, className }) => {
   return (
     // nav ส่วนบน
 
-    <div className={`flex flex-row items-start ${className} `}>
+    <div className={`flex flex-row items-start overflow-x-hidden ${className} `}>
       {/* เริ่มต้น Sidebar */}
       <nav nav="true" className="flex flex-col gap-4 py-4 bg-white h-screen max-w-md min-w-[240px]  border border-r-[#C5B182] border-r-1  " >
         <SoftDoughLogo />
@@ -246,7 +246,7 @@ const Sidebar = ({ children, className }) => {
         </div>
       </nav>
 
-      <div className="flex flex-col w-screen ">
+      <div className="flex flex-col w-screen">
         {/* nav ส่วนบน */}
         <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
