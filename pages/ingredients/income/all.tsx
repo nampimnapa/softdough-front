@@ -201,7 +201,6 @@ function ingreincome() {
     const [indid, setIngredientlotID] = useState({ /* ตัวแปรที่คุณต้องการใช้ เช่น indl_id, ind_id และอื่นๆ */ });
     const [loading, setLoading] = useState(false);
     const [ind, setIngredientLot] = useState<any[]>([]);
-
     const [pendingIngredientLot, setPendingIngredientLot] = useState<any[]>([]);
 
     useEffect(() => {
@@ -267,39 +266,32 @@ function ingreincome() {
                         </tr>
                     </thead>
                     <tbody>
-                        {ind.map((lot, idx) => (
-                            <tr key={lot.indl_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                        {Array.isArray(ind) && ind.map((lot, idx) => (
+                            <tr key={lot.indl_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10 items-center">
                                 <td scope="row" className="px-1 py-1 text-[#73664B] whitespace-nowrap dark:text-white">
                                     {lot.created_at}                            </td>
                                 <td className="px-6 py-1  text-[#73664B] text-center">
                                     {lot.indl_id_name}
-
                                 </td>
                                 <td className="px-1 py-3  items-center justify-center  ">
                                     <button >
-                                        <Link href={`./ingredientlot/${lot.indl_id}`} className="w-full flex justify-center items-center">
+                                        <Link href={`./detail/${lot.indl_id}`} className="w-full flex justify-center items-center">
                                             <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
                                         </Link>
                                     </button>
                                 </td>
                                 <td className="px-1 py-3  items-center justify-center  ">
                                     <button >
-                                        <Link href={`./ingredientlot/edit/${lot.indl_id}`} className="w-full flex justify-center items-center">
+                                        <Link href={`./edit/${lot.indl_id}`} className="w-full flex justify-center items-center">
                                             <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-
                                         </Link>
                                     </button>
                                 </td>
                             </tr>
                         ))}
-
                     </tbody>
                 </table>
             </div>
-
-
-
-
         </div>
 
     )

@@ -142,7 +142,7 @@ function detail() {
                     วัตถุดิบเข้าร้าน
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>รายละเอียดวัตถุดิบเข้าร้าน</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>รายละเอียดวัตถุดิบเข้าร้าน</p>
             {ind !== null ? (
                 <div>
                     <p className="text-sm px-6 py-2 text-[#73664B]">เลขล็อตวัตถุดิบ : {ind.indl_id_name}</p>
@@ -162,9 +162,9 @@ function detail() {
             ) : (
                 <p>Loading...</p>
             )}
-            <div className="flex justify-end  mt-5" >
+            <div className="mx-5 justify-start  mt-5" >
                 <button type="button" className="mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
-                    <Link href="./">
+                    <Link href="/ingredients/income/all">
                         เสร็จสิ้น</Link></button>
             </div>
         </div>

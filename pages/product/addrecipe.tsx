@@ -116,23 +116,7 @@ function addrecipe() {
             handleItemClick("item2");
         }
         else {
-            // const productData = {
-            //     pd_name: product.name,
-            //     pd_qtyminimum: product.qtymin,
-            //     status: product.status,
-            //     picture: product.img,
-            //     pdc_id: product.pd_unit // Assuming pd_unit is the correct property, adjust as needed
-            // };
 
-            // const recipeData = {
-            //     qtyLifetime: recipe.qtyLifetime,
-            //     produced_qty: recipe.produced_qty,
-            //     ingredients: addedIngredients.map((ingredient) => ({
-            //         name: parseInt(ingredient.id),
-            //         quantity: ingredient.quantity,
-            //         unit: parseInt(ingredient.unit) // Use the unit ID instead of the unit name
-            //     }))
-            // };
             const productData = {
                 pd_name: product.name,
                 pd_qtyminimum: product.qtymin,
@@ -175,25 +159,7 @@ function addrecipe() {
             }
         }
 
-        // try {
-        //     const response = await fetch('http://localhost:8080/production/addProductionOrder', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify(postData),
-        //     });
 
-        //     if (!response.ok) {
-        //         throw new Error('ไม่สามารถเพิ่มใบสั่งผลิตได้');
-        //     }
-
-
-
-        // } catch (error) {
-        //     console.error('เกิดข้อผิดพลาดในการเพิ่มใบสั่งผลิต:', error.message);
-        //     // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
-        // }
 
 
     };
@@ -201,18 +167,20 @@ function addrecipe() {
     const { id } = router.query;
     const [unitOptions, setUnitOptions] = useState([]);
     const [productCat, setProductCat] = useState([]);
+    const [Ingredientall, setIngredientall] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
     interface UnitType {
         un_id: string;
         un_name: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
-
     interface ProductCat {
         pdc_id: string;
         pdc_name: string;
     }
     useEffect(() => {
-        
+
         fetch(`http://localhost:8080/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
@@ -223,7 +191,7 @@ function addrecipe() {
             });
 
         fetch('http://localhost:8080/product/readcat')
-        .then(response => response.json())
+            .then(response => response.json())
             .then(data => {
                 setProductCat(data);
             })
@@ -231,7 +199,20 @@ function addrecipe() {
                 console.error('Error fetching unit data:', error);
             });
 
+        fetch('http://localhost:8080/ingredient/read')
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setIngredientall(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
+
     }, [id]);
+    
 
     return (
 
@@ -255,9 +236,9 @@ function addrecipe() {
                                     name="unit"
                                     onChange={handleProductInputChange}
                                 >
-                                    {productCat.map((unit: ProductCat) => (
-                                        <option key={unit.pdc_id} value={unit.pdc_id}>
-                                            {unit.pdc_name}
+                                    {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
+                                        <option key={ind.ind_id} value={ind.ind_name}>
+                                            {ind.ind_name}
                                         </option>
                                     ))}
                                 </select>
@@ -307,10 +288,10 @@ function addrecipe() {
                                 name="pd_unit"
                             >
                                 {unitOptions.map((unit: UnitType) => (
-                                        <option key={unit.un_id} value={unit.un_id}>
-                                            {unit.un_name}
-                                        </option>
-                                    ))}
+                                    <option key={unit.un_id} value={unit.un_id}>
+                                        {unit.un_name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>

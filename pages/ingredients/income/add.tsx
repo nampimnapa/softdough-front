@@ -28,13 +28,7 @@ function add() {
     const openModal = () => {
         setIsOpen(true);
     };
-    const ingredients = {
-        name: [
-            "แป้ง",
-            "น้ำตาล",
-            "นม",
-            "เนย"]
-    }
+
     const [value, setValue] = useState({
         startDate: null,
         endDate: null
@@ -44,8 +38,8 @@ function add() {
         setValue(newValue);
     }
     const [addedIngredients, setAddedIngredients] = useState([]);
-
-    const handleSubmit = (e) => {
+    const [message, setMessage] = useState('Loading');
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // ตรวจสอบว่า e.target และ e.target.price มีค่าหรือไม่
@@ -58,8 +52,8 @@ function add() {
             exp: value.startDate,  // ใช้ค่าจาก datepicker
             price: priceValue,  // ใช้ค่าจากตรวจสอบ e.target.price
         };
-
         setAddedIngredients((prevIngredients) => [...prevIngredients, ingredientData]);
+
     };
     const handleDeleteIngredient = (index) => {
         setAddedIngredients((prevIngredients) => {
@@ -68,6 +62,54 @@ function add() {
             return updatedIngredients;
         });
     };
+    const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
+    interface Ingredients {
+        ind_id: string;
+        ind_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        // Fetch unit data from the server and set the options
+        fetch('http://localhost:8080/ingredient/read')
+            .then(response => response.json())
+            .then(data => {
+                setIngredientsOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }, []); // Run only once on component mount
+
+    const handleSubmit2 = async () => {
+        const ingredientLotDetail = addedIngredients.map((ingredient) => ({
+            ind_id: ingredientsOptions.findIndex(option => option.ind_name === ingredient.name) + 1,
+            qtypurchased: parseInt(ingredient.quantity), // แปลงเป็นตัวเลข
+            date_exp: value.startDate, // ใช้ค่าจาก datepicker
+            price: parseInt(ingredient.price) // แปลงเป็นตัวเลข
+        }));
+        
+        const requestData = {
+            ingredient_lot: {}, // ข้อมูล ingredient_lot ว่างไว้เนื่องจากไม่ได้ระบุข้อมูลในคำถาม
+            ingredient_lot_detail: ingredientLotDetail
+        };
+
+        const response = await fetch('http://localhost:8080/ingredient/addLotIngrediantnew', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        });
+        const responseData = await response.json();
+        if (responseData.message === 'success') {
+            setMessage('Data added successfully');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+
+    };
+
+
 
     return (
         <div className="h-screen">
@@ -81,18 +123,19 @@ function add() {
             <p className="text-m px-6 py-2 text-[#73664B]">รายละเอียดวัตถุดิบที่เพิ่ม</p>
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-6">
-
                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:
                         <select id="ingredients"
                             className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
-                            {ingredients.name.map((ingredient, index) => (
-                                <option key={index}>{ingredient}</option>
+                            {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
+                                <option key={ind.ind_id} value={ind.ind_name}>
+                                    {ind.ind_name}
+                                </option>
                             ))}
                         </select>
                     </p>
                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">จำนวน :
                         <input
-                            min="0"
+                            min="1"
                             // onChange={handleCancelClick}
                             type="number"
                             name="count"
@@ -109,7 +152,7 @@ function add() {
                             onChange={handleValueChange}
                         /></div>
                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">ราคา :  <input
-                        min="0"
+                        min="1"
                         // onChange={handleCancelClick}
                         type="number"
                         pattern="[0-9]+([.,][0-9]+)?"
@@ -121,7 +164,8 @@ function add() {
                         <button
                             type="submit"
                             value="เพิ่มวัตถุดิบ"
-                            className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 py-2 px-2">เพิ่มวัตถุดิบ</button></div>
+                            className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 py-2 px-2">เพิ่มวัตถุดิบ</button>
+                    </div>
                 </div >
             </form>
 
@@ -176,11 +220,11 @@ function add() {
                                                     as="h3"
                                                     className="text-lg font-medium leading-6 text-[73664B]"
                                                 >
-                                                    ยืนยันการเพิ่มวัตถุดิบ
+                                                    ยืนยันการเพิ่มวัตถุดิบเข้าร้าน
                                                 </Dialog.Title>
                                                 <div className="mt-2">
                                                     <p className="text-sm text-[#73664B]">
-                                                        คุณต้องการเพิ่มวัตถุดิบหรือไม่
+                                                        คุณต้องการเพิ่มวัตถุดิบเข้าร้านหรือไม่
                                                     </p>
                                                 </div>
                                                 {/*  choose */}
@@ -197,7 +241,7 @@ function add() {
                                                         <button
                                                             type="button"
                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                        // onClick={closeModal}
+                                                            onClick={handleSubmit2}
                                                         ><Link href="/ingredients/income/all">
                                                                 ยืนยัน
                                                             </Link></button>

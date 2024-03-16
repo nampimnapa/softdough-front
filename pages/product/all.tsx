@@ -14,92 +14,6 @@ function classNames(...classes) {
 let dataSet = null;
 
 function all() {
-    // ตัวแปรแก็บข้อมูลจาก API
-    const productsAPI = [
-        { id: 1, name: 'โดนัท' },
-        { id: 2, name: 'ดิป' },
-    ];
-
-    // API สำหรับข้อมูลเมนู
-    const menuAPI = [
-        {
-            id: 1,
-            typeforsell: "กล่อง M",
-            unit: "กล่อง",
-            q: 4,
-        },
-        {
-            id: 2,
-            typeforsell: "กล่อง L",
-            unit: "กล่อง",
-            q: 6,
-        },
-    ]
-
-    // เอาจากตัวแปรที่ได้จาก API มาทำเป็น State
-    const [dataProduct, setDataProduct] = useState(productsAPI);
-    const [dataMenu, setDataMenu] = useState(menuAPI);
-    const [isEditing, setIsEditing] = useState(false);
-    const [openInput, setOpenInput] = useState(0);
-
-    const changeInput = (id: any) => {
-        setOpenInput(id);
-        setIsEditing(true);
-    }
-    // อันนี้เช็คเผื่อเปลี่ยนไอคอนเมื่อมีการกดแก้ไข
-    const handleSaveChanges = () => {
-        setOpenInput(0);
-        setIsEditing(false);
-    };
-
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
-        const newValue = event.target.value;
-        // ใช้ setDataProduct เพื่ออัปเดต State
-        setDataProduct(prevProducts => {
-            return prevProducts.map(product => {
-                if (product.id === id) {
-                    // อัปเดตข้อมูลเฉพาะของสินค้าที่ต้องการ
-                    return { ...product, name: newValue };
-                }
-                return product;
-            });
-        });
-        console.log("แก้ไขประเภทวัตถุดิบ : ", newValue);
-
-    };
-
-    const handleCancelEdit = () => {
-        setDataProduct(productsAPI)
-        // ยกเลิกการแก้ไข
-        setOpenInput(0);
-        setAdding(false);
-        setIsEditing(false);
-    };
-
-    // stateข้อมูล ที่ add
-    const [newProductName, setNewProductName] = useState('');
-
-    const [isAdding, setAdding] = useState(false);
-
-    // กดปุ่มเพิ่ม
-    const handleAddProduct = () => {
-        setAdding(true); // ตั้งค่า isAdding เป็น true เมื่อคลิกปุ่ม "เพิ่ม"
-        // ต่อไปคุณสามารถทำอย่างที่คุณทำกับ handleAddChanges ต่อไป
-    };
-    // กำหนด selectedTab ในส่วนที่ใช้ React useState
-
-    const handleAddChanges = () => {
-        if (newProductName.trim() !== '') {
-            setDataProduct((prevDataProduct) => [
-                ...prevDataProduct,
-                { id: prevDataProduct.length + 1, name: newProductName },
-            ]);
-            setNewProductName('');
-            setOpenInput(0);
-            setAdding(false); // ตั้งค่า isAdding เป็น false เมื่อเพิ่มข้อมูลเสร็จสิ้น
-        }
-        console.log("เพิ่มประเภทวัตถุดิบ : ", newProductName); //ข้อมูลที่เพิ่ม
-    };
     const router = useRouter();
     const { id } = router.query;
     const [SaleMenu, setSaleMenu] = useState([]);
@@ -140,6 +54,131 @@ function all() {
             });
 
     }, [id]);
+
+    const [TypeProduct, setTypeProduct] = useState([]);
+    interface TypeProduct {
+        pdc_id: string;
+        pdc_name: string;
+
+    }
+    useEffect(() => {
+        fetch(`http://localhost:8080/product/readcat`)
+            .then(response => response.json())
+            .then(data => {
+                setTypeProduct(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
+
+    // เอาจากตัวแปรที่ได้จาก API มาทำเป็น State
+    const [dataProduct, setDataProduct] = useState(TypeProduct);
+    const [dataMenu, setDataMenu] = useState(SaleMenu);
+    const [isEditing, setIsEditing] = useState(false);
+    const [openInput, setOpenInput] = useState(0);
+
+    const changeInput = (id: any) => {
+        setOpenInput(id);
+        setIsEditing(true);
+    }
+
+    const [newValue, setNewValue] = useState('');
+
+    const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
+        const newValue = event.target.value;
+        // ใช้ setDataProduct เพื่ออัปเดต State
+        setDataProduct(prevProducts => {
+            return prevProducts.map(product => {
+                if (product.id === id) {
+                    // อัปเดตข้อมูลเฉพาะของสินค้าที่ต้องการ
+                    return { ...product, name: newValue };
+                }
+                return product;
+            });
+        });
+        console.log("แก้ไขประเภทวัตถุดิบ : ", newValue);
+    };
+
+    const handleCancelEdit = () => {
+        setDataProduct(TypeProduct)
+        // ยกเลิกการแก้ไข
+        setOpenInput(0);
+        setAdding(false);
+        setIsEditing(false);
+    };
+
+    // อันนี้เช็คเผื่อเปลี่ยนไอคอนเมื่อมีการกดแก้ไข
+    const handleSaveChanges = async () => {
+        setOpenInput(0);
+        setIsEditing(false);
+
+        const requestData = {
+            newValue: newValue, // ข้อมูลที่ต้องการอัปเดต
+            // ข้อมูลอื่น ๆ ที่ต้องการส่งไปด้วย request
+        };
+
+        const response = await fetch(`http://localhost:8080/product/updatecat/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
+        });
+        const responseData = await response.json();
+        if (responseData.message === 'success') {
+            setMessage('Data updated successfully');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+
+
+
+    };
+    // stateข้อมูล ที่ add
+    const [newProductName, setNewProductName] = useState('');
+
+    const [isAdding, setAdding] = useState(false);
+
+    // กดปุ่มเพิ่ม
+    const handleAddProduct = () => {
+        setAdding(true); // ตั้งค่า isAdding เป็น true เมื่อคลิกปุ่ม "เพิ่ม"
+        // ต่อไปคุณสามารถทำอย่างที่คุณทำกับ handleAddChanges ต่อไป
+    };
+    // กำหนด selectedTab ในส่วนที่ใช้ React useState
+    const [message, setMessage] = useState('Loading');
+
+    const handleAddChanges = async () => {
+        if (newProductName.trim() !== '') {
+            setDataProduct((prevDataProduct) => [
+                ...prevDataProduct,
+                { id: prevDataProduct.length + 1, name: newProductName },
+            ]);
+            setNewProductName('');
+            setOpenInput(0);
+            setAdding(false); // ตั้งค่า isAdding เป็น false เมื่อเพิ่มข้อมูลเสร็จสิ้น
+        }
+        console.log("เพิ่มประเภทวัตถุดิบ : ", newProductName); //ข้อมูลที่เพิ่ม
+
+        const response = await fetch('http://localhost:8080/product/addcat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ pdc_name: newProductName }),
+        });
+        const responseData = await response.json();
+
+        if (responseData.message === 'success') {
+            setMessage('Data added successfully');
+
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+    };
+
+
 
 
 
@@ -209,27 +248,27 @@ function all() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {dataProduct.map((ingredient) => (
-                                            <tr key={ingredient.id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                        {TypeProduct.map((type, index) => (
+                                            <tr key={type.pdc_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                 <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
-                                                    {ingredient.id}
+                                                    {index + 1}
                                                 </td>
-                                                {openInput === ingredient.id ? (
+                                                {openInput === type.pdc_id ? (
                                                     <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
                                                         <input
                                                             className="w-full h-9 focus:outline-none border"
                                                             type="text"
-                                                            defaultValue={ingredient.name}
-                                                            onChange={(event) => handleInputChange(event, ingredient.id)}
+                                                            defaultValue={type.pdc_name}
+                                                            onChange={(event) => handleInputChange(event, type.pdc_id)}
 
                                                         />
                                                     </td>
                                                 ) : (
                                                     <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                        {ingredient.name}
+                                                        {type.pdc_name}
                                                     </td>
                                                 )}
-                                                {isEditing && openInput === ingredient.id ? (
+                                                {isEditing && openInput === type.pdc_id ? (
                                                     <>
                                                         <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem]  flex items-center justify-end">
                                                             <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก
@@ -240,7 +279,7 @@ function all() {
                                                     </>
                                                 ) : (
                                                     <td className="me-2 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
-                                                        <button type="button" onClick={() => changeInput(ingredient.id)}>
+                                                        <button type="button" onClick={() => changeInput(type.pdc_id)}>
                                                             <a href="#" className="w-full flex justify-center items-center">
                                                                 <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
                                                             </a>

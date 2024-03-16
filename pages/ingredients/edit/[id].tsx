@@ -423,7 +423,7 @@ function edit() {
 
             if (response.ok) {
                 console.log(responseData.message);
-                router.push('../');
+                // router.push('../');
             } else {
                 console.error('Update failed:', responseData);
             }
@@ -448,7 +448,7 @@ function edit() {
                 </Link>
             </button>
 
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>แก้ไขวัตถุดิบ</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>แก้ไขวัตถุดิบ</p>
             <form className="mt-5 w-1/2 key={index} ">
                 <div className="grid grid-cols-3 items-center ">
                     <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
@@ -543,15 +543,15 @@ function edit() {
                 </div>
             </form>
 
-            < div className="flex justify-between  mt-5 " >
-                <button>
-                    <Link href="/ingredients/edit"
+            < div className="  mt-10 " >
+                <button className="mr-2">
+                    <Link href={`/ingredients/${id}`}
                         type="button"
                         className="mx-auto text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
                         ยกเลิก</Link></button>
                 <>
                     {isOpen && (
-                        <Transition appear show={isOpen} as={Fragment} >
+                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
                             <Dialog as="div" className="relative z-10" onClose={closeModal}>
                                 <Transition.Child
                                     as={Fragment}
@@ -603,7 +603,7 @@ function edit() {
                                                             type="button"
                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                             onClick={handleUpdateClick}
-                                                        ><Link href={`./${id}`}>
+                                                        ><Link href={`/ingredients/${id}`}>
                                                                 ยืนยัน
                                                             </Link></button>
                                                     </div>
@@ -617,7 +617,7 @@ function edit() {
                     )
                     }
                 </>
-                <button onClick={openModal} type="button" className="mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
+                <button onClick={openModal} type="button" className="mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">บันทึก</button>
             </div >
 
         </div >
