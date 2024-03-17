@@ -21,7 +21,7 @@ function Index() {
     const ingreunit = {
         "แป้ง": 1,
         "น้ำตาล": 2,
-        "นม":  3,
+        "นม": 3,
         "เนย": 4
     };
 
@@ -32,17 +32,17 @@ function Index() {
             ingre: [
                 {
                     ind_id: 1,
-                    count:2,
+                    count: 2,
                     exp: "10/10/2556",
                     price: 500
                 },
                 {
                     ind_id: 2,
-                    count:2,
+                    count: 2,
                     exp: "10/10/2556",
                     price: 500
                 },
-               
+
             ],
         }
     ]
@@ -68,7 +68,7 @@ function Index() {
             }
             console.log(prevIngrelot);
             return prevIngrelot;
-            
+
         });
     };
 
@@ -81,7 +81,7 @@ function Index() {
     const openModal = () => {
         setIsOpen(true);
     };
-    
+
     const ingredients = {
         name: [
             "แป้ง",

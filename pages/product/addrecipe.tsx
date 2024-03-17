@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import {
     ChevronLeftIcon,
@@ -11,6 +11,8 @@ import { Kanit } from "next/font/google";
 import { useRouter } from "next/router";
 import { Input } from "@nextui-org/react";
 import { Dialog, Transition } from '@headlessui/react';
+import { Button, Card, Image, CardFooter, Spinner } from "@nextui-org/react";
+
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -18,158 +20,20 @@ const kanit = Kanit({
 });
 
 function addrecipe() {
-    const ind =
-        [{ ind_id: 1, ind_name: "แป้ง" },
-        { ind_id: 2, ind_name: "นม" },
-        { ind_id: 3, ind_name: "น้ำตาล" }
-        ];
-    const unit =
-        [{ un_id: 1, un_name: "กรัม" },
-        { un_id: 2, un_name: "ลิตร" },
-        { un_id: 3, un_name: "สอบปุ๋ย" }
-        ];
-
-
-    const [currentPage, setCurrentPage] = useState("item1");
-
-    const handleItemClick = (itemId) => {
-        setCurrentPage(itemId); // อัพเดท state เมื่อมีการคลิกที่ลิงก์
-    };
-
-
-    const handleBackClick = () => {
-        handleItemClick("item1"); // เมื่อกดปุ่ม "ถัดไป" ให้ตั้ง currentPage เป็น "item1"
-    };
-
-    const [addedIngredients, setAddedIngredients] = useState([]);
-    // รับข้อมูลจากฟอร์ม: รับค่าที่ผู้ใช้กรอกในฟอร์มเช่น วัตถุดิบที่เลือก (ingredientId), ปริมาณ (ingredientQty), และหน่วย (unitId) จากนั้นนำไปใช้ในการสร้างวัตถุดิบใหม่.
-    // ตรวจสอบว่าวัตถุดิบมีอยู่แล้วหรือไม่: ในกรณีที่มีวัตถุดิบที่เลือกและหน่วยที่เลือกอยู่ในรายการวัตถุดิบที่เพิ่มแล้ว โปรแกรมจะตรวจสอบและดำเนินการดังนี้:
-    // หากพบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว โปรแกรมจะอัพเดทปริมาณของวัตถุดิบนั้นๆในรายการโดยเพิ่มปริมาณใหม่ที่ผู้ใช้ระบุเข้าไป.
-    // หากไม่พบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว โปรแกรมจะเพิ่มวัตถุดิบใหม่เข้าไปในรายการ.
-    // ล้างข้อมูลในฟอร์ม: หลังจากที่ทำการเพิ่มวัตถุดิบลงในรายการเรียบร้อยแล้ว โปรแกรมจะล้างค่าที่ผู้ใช้กรอกในฟอร์มเพื่อเตรียมรับข้อมูลวัตถุดิบใหม่
-    // รับข้อมูลจากฟอร์ม: รับค่าที่ผู้ใช้กรอกในฟอร์มเช่น วัตถุดิบที่เลือก (ingredientId), ปริมาณ (ingredientQty), และหน่วย (unitId) จากนั้นนำไปใช้ในการสร้างวัตถุดิบใหม่.
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const ingredientId = parseInt((document.getElementById("ingredients") as HTMLSelectElement).value);
-        const ingredientName = ind.find((ingredient) => ingredient.ind_id === ingredientId).ind_name;
-        const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value);
-        const unitId = parseInt((document.getElementById("unit") as HTMLSelectElement).value);
-        const unitName = unit.find((unit) => unit.un_id === unitId).un_name; // ค้นหาชื่อของหน่วยวัดจาก ID
-        const existingIngredient = addedIngredients.find((ingredient) => ingredient.id === ingredientId && ingredient.unit === unitId);
-
-        if (existingIngredient) {
-            // If the ingredient already exists, update the quantity
-            setAddedIngredients((prevIngredients) => (
-                prevIngredients.map((ingredient) =>
-                    ingredient.id === ingredientId && ingredient.unit === unitId
-                        ? { ...ingredient, quantity: ingredient.quantity + ingredientQty }
-                        : ingredient
-                )
-            ));
-        } else {
-            // If the ingredient doesn't exist, add it to the list
-            setAddedIngredients((prevIngredients) => [
-                ...prevIngredients,
-                { id: ingredientId, quantity: ingredientQty, unit: unitId }
-            ]);
-        }
-        // Clear the input fields
-        (document.getElementById("count") as HTMLInputElement).value = "";
-    };
-
-
-    const handleDeleteIngredient = (id) => {
-        setAddedIngredients((prevIngredients) => {
-            const updatedIngredients = prevIngredients.filter((ingredient) => ingredient.id !== id);
-            return updatedIngredients;
-        });
-    };
-    const [recipe, setRecipe] = useState({
-        qtyLifetime: 0,
-        produced_qty: 0
-    });
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setRecipe((prevRecipe) => ({
-            ...prevRecipe,
-            [name]: value
-        }));
-    };
-    const [product, setProduct] = useState({
-        name: '',         // Provide a default or leave it as an empty string
-        qtymin: 0,        // Provide a default or leave it as 0
-        status: 'active', // Provide a default or leave it as a default status
-        img: null,        // Provide a default or leave it as null
-        pd_unit: ''
-    });
-
-    const handleProductInputChange = (e) => {
-        const { name, value } = e.target;
-        setProduct((prevProduct) => ({
-            ...prevProduct,
-            [name]: value
-        }));
-    };
-
-    const handleNextClick = async () => {
-        if (currentPage !== "item2") {
-            handleItemClick("item2");
-        }
-        else {
-
-            const productData = {
-                pd_name: product.name,
-                pd_qtyminimum: product.qtymin,
-                status: product.status,
-                picture: product.img,
-                pdc_id: product.pd_unit, // Assuming pd_unit is the correct property, adjust as needed,
-                recipe: {
-                    qtyLifetime: recipe.qtyLifetime,
-                    produced_qty: recipe.produced_qty,
-                    un_id: product.pd_unit
-                },
-                recipedetail: addedIngredients.map((ingredient) => (
-                    {
-                        ind_id: parseInt(ingredient.id),
-                        ingredients_qty: ingredient.quantity,
-                        un_id: parseInt(ingredient.unit)
-                    }
-                ))
-            };
-            console.log("Product Data:", productData);
-
-
-            try {
-                const response = await fetch('http://localhost:8080/product/addProductWithRecipe', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(productData),
-                });
-
-                if (!response.ok) {
-                    throw new Error('ไม่สามารถเพิ่ม');
-                }
-
-                console.log('success');
-            } catch (error) {
-                console.error('เกิดข้อผิดพลาด:', error.message);
-                // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
-            }
-        }
-
-
-
-
-    };
     const router = useRouter();
     const { id } = router.query;
     const [unitOptions, setUnitOptions] = useState([]);
     const [productCat, setProductCat] = useState([]);
     const [Ingredientall, setIngredientall] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
 
+
+    interface Ingredients {
+        ind_id: string;
+        ind_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
     interface UnitType {
         un_id: string;
         un_name: string;
@@ -200,19 +64,220 @@ function addrecipe() {
             });
 
         fetch('http://localhost:8080/ingredient/read')
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data);
-                setIngredientall(data); // Assuming the response is an array of staff objects
-                setLoading(false);
+            .then(response => response.json())
+            .then(data => {
+                setIngredientsOptions(data);
             })
-            .catch((error) => {
-                console.error('Error:', error);
-                setLoading(false);
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
             });
 
     }, [id]);
-    
+
+
+    const [currentPage, setCurrentPage] = useState("item1");
+
+
+    const handleItemClick = (itemId) => {
+        setCurrentPage(itemId); // อัพเดท state เมื่อมีการคลิกที่ลิงก์
+    };
+
+
+    const handleBackClick = () => {
+        handleItemClick("item1"); // เมื่อกดปุ่ม "ถัดไป" ให้ตั้ง currentPage เป็น "item1"
+    };
+
+    const [addedIngredients, setAddedIngredients] = useState([]);
+    // รับข้อมูลจากฟอร์ม: รับค่าที่ผู้ใช้กรอกในฟอร์มเช่น วัตถุดิบที่เลือก (ingredientId), ปริมาณ (ingredientQty), และหน่วย (unitId) จากนั้นนำไปใช้ในการสร้างวัตถุดิบใหม่.
+    // ตรวจสอบว่าวัตถุดิบมีอยู่แล้วหรือไม่: ในกรณีที่มีวัตถุดิบที่เลือกและหน่วยที่เลือกอยู่ในรายการวัตถุดิบที่เพิ่มแล้ว โปรแกรมจะตรวจสอบและดำเนินการดังนี้:
+    // หากพบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว โปรแกรมจะอัพเดทปริมาณของวัตถุดิบนั้นๆในรายการโดยเพิ่มปริมาณใหม่ที่ผู้ใช้ระบุเข้าไป.
+    // หากไม่พบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว โปรแกรมจะเพิ่มวัตถุดิบใหม่เข้าไปในรายการ.
+    // ล้างข้อมูลในฟอร์ม: หลังจากที่ทำการเพิ่มวัตถุดิบลงในรายการเรียบร้อยแล้ว โปรแกรมจะล้างค่าที่ผู้ใช้กรอกในฟอร์มเพื่อเตรียมรับข้อมูลวัตถุดิบใหม่
+    // รับข้อมูลจากฟอร์ม: รับค่าที่ผู้ใช้กรอกในฟอร์มเช่น วัตถุดิบที่เลือก (ingredientId), ปริมาณ (ingredientQty), และหน่วย (unitId) จากนั้นนำไปใช้ในการสร้างวัตถุดิบใหม่.
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const ingredientId = parseInt((document.getElementById("ingredients") as HTMLSelectElement).value);
+        const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value);
+        const unitId = parseInt((document.getElementById("unit") as HTMLSelectElement).value);
+        const existingIngredient = addedIngredients.find((ingredient) => ingredient.id === ingredientId && parseInt(ingredient.unit) === unitId);
+
+
+        if (existingIngredient) {
+            // If the ingredient already exists, update the quantity
+            setAddedIngredients((prevIngredients) => (
+                prevIngredients.map((ingredient) =>
+                    ingredient.id === ingredientId && ingredient.unit === unitId
+                        ? { ...ingredient, quantity: ingredient.quantity + ingredientQty }
+                        : ingredient
+                )
+            ));
+        } else {
+            // If the ingredient doesn't exist, add it to the list
+            setAddedIngredients((prevIngredients) => [
+                ...prevIngredients,
+                { id: ingredientId, quantity: ingredientQty, unit: unitId }
+            ]);
+        }
+        // Clear the input fields
+        (document.getElementById("count") as HTMLInputElement).value = "";
+    };
+
+
+    const handleDeleteIngredient = (id) => {
+        setAddedIngredients((prevIngredients) => {
+            const updatedIngredients = prevIngredients.filter((ingredient) => ingredient.id !== id);
+            return updatedIngredients;
+        });
+    };
+    const [recipe, setRecipe] = useState({
+        qtyLifetime: "0",
+        produced_qty: "0"
+    });
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setRecipe((prevRecipe) => ({
+            ...prevRecipe,
+            [name]: value
+        }));
+    };
+    const [product, setProduct] = useState({
+        name: '',         // Provide a default or leave it as an empty string
+        qtymin: 0,        // Provide a default or leave it as 0
+        status: 'A', // Provide a default or leave it as a default status
+        img: "/images/logo.svg",        // Provide a default or leave it as null
+        pd_unit: '1',
+        pdc_id: 1
+    });
+
+    const handleClickDelete = () => {
+        setProduct(prevState => ({
+            ...prevState,
+            img: '/images/logo.svg'
+        }));
+        setUploadedImage(null);
+    }
+
+    const handleProductInputChange = (e) => {
+        const { name, value } = e.target;
+        setProduct((prevProduct) => ({
+            ...prevProduct,
+            [name]: value
+        }));
+    };
+    const [uploadedImage, setUploadedImage] = useState(null);
+    const [isLoanding, setIsLoading] = useState(false);
+
+
+    const handleFileChange = (event) => {
+        const fileObj = event.target.files && event.target.files[0];
+        if (!fileObj) {
+            return;
+        }
+        console.log("Oringinal => ", fileObj)
+        console.log("Uploade => ", URL.createObjectURL(fileObj))
+        setUploadedImage(URL.createObjectURL(fileObj));
+
+
+        event.target.value = null;
+
+        const formData = new FormData();
+        formData.append("file", fileObj);
+
+        fetch("/api/uploadimage", {
+            method: "POST",
+            body: formData,
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setProduct((prevProduct) => ({
+                    ...prevProduct,
+                    "img": data.pathFile
+                }));
+            })
+            .catch(error => console.error(error));
+
+
+    };
+
+    const inputRef = useRef(null);
+
+
+    const handleClick = () => {
+        inputRef.current.click();
+    };
+
+    const [message, setMessage] = useState('Loading');
+
+    const handleNextClick = async () => {
+        if (currentPage !== "item2") {
+            handleItemClick("item2");
+        }
+        else {
+            const productData = {
+                pd_name: product.name,
+                pd_qtyminimum: typeof product.qtymin === 'string' ? parseInt(product.qtymin) : product.qtymin,
+                status: product.status,
+                picture: product.img,
+                pdc_id: product.pdc_id,
+                recipe: {
+                    qtylifetime: typeof recipe.qtyLifetime === 'string' ? parseInt(recipe.qtyLifetime) : recipe.qtyLifetime,
+                    produced_qty: typeof recipe.produced_qty === 'string' ? parseInt(recipe.produced_qty) : recipe.produced_qty,
+                    un_id: parseInt(product.pd_unit)
+                },
+                recipedetail: addedIngredients.map((ingredient) => ({
+                    ind_id: parseInt(ingredient.id),
+                    ingredients_qty: ingredient.quantity,
+                    un_id: parseInt(ingredient.unit)
+                }))
+            };
+            console.log("Product Data:", productData);
+
+            // const formData = new FormData();
+            // formData.append('pd_name', product.name);
+            // const qtymin = typeof product.qtymin === 'string' ? parseInt(product.qtymin, 10) : product.qtymin;
+            // formData.append('pd_qtyminimum', qtymin.toString());
+            // formData.append('status', product.status);
+            // formData.append('pdc_id', product.pdc_id.toString());
+            // formData.append('picture', product.img);
+            // formData.append('recipe', JSON.stringify(productData.recipe));
+            // formData.append('recipedetail', JSON.stringify(addedIngredients.map((ingredient) => ({
+            //     ind_id: ingredient.id,
+            //     ingredients_qty: ingredient.quantity,
+            //     un_id: ingredient.unit
+            // }))));
+
+
+            const response = await fetch('http://localhost:8080/product/addProductWithRecipe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(productData),
+
+            });
+            const responseData = await response.json();
+            console.log(responseData)
+
+            if (responseData.status === 200) {
+
+                setMessage('Data added successfully');
+                router.push('/product/recipeall');
+            } else {
+                setMessage(responseData.message || 'Error occurred');
+            }
+        }
+
+
+
+
+    };
+
+    console.log(recipe);
 
     return (
 
@@ -226,27 +291,109 @@ function addrecipe() {
             <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>เพิ่มสินค้า</p>
             <div className="carousel w-full">
                 <div id="item1" className="carousel-item w-full">
-                    <div className="w-full">
-                        <div className="flex justify-between w-full my-2">
-                            <div className="w-1/4 flex h-min items-center">
-                                <p className="text-sm pl-6 text-[#73664B] mr-4 w-full ">ประเภทสินค้า :</p>
-                                <select
-                                    id="product"
-                                    className=" bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
-                                    name="unit"
+                    <div className="flex w-full">
+                        <div className="w-1/2">
+                            <div className="flex justify-between w-full my-2">
+                                <div className=" flex h-min items-center">
+                                    <p className="text-sm pl-6 text-[#73664B] mr-4 ">ประเภทสินค้า :</p>
+                                    <select
+                                        onChange={handleProductInputChange}
+                                        id="pdc_id"
+                                        className=" bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
+                                        name="pdc_id"
+
+                                    >
+                                        {productCat.map((pd: ProductCat) => (
+                                            <option key={pd.pdc_id} value={pd.pdc_id}>
+                                                {pd.pdc_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div className="grid grid-cols-3 w-2/3 my-2 h-min">
+                                <p className="text-sm px-6 py-2 text-[#73664B] w-full">ชื่อสินค้า :</p>
+                                <input
                                     onChange={handleProductInputChange}
+                                    placeholder="ชื่อสินค้า"
+                                    type="text"
+                                    name="name"
+                                    id="name"
+                                    autoComplete="off"
+                                    className="col-span-2 px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm placeholder:text-[#C5B182] sm:text-sm sm:leading-6 focus:outline-none"
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 w-2/3 my-2">
+                                <p className="text-sm px-6 py-2 text-[#73664B]">จำนวนสินค้าชั้นต่ำ :</p>
+                                <input
+                                    onChange={handleProductInputChange}
+                                    placeholder="จำนวนสินค้าขั้นต่ำ"
+                                    type="number"
+                                    name="qtymin"
+                                    id="qtymin"
+                                    autoComplete="off"
+                                    className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm placeholder:text-[#C5B182] sm:text-sm sm:leading-6 focus:outline-none"
+                                />
+                            </div>
+                            <div className="flex items-center w-3/4">
+                                <p className="text-sm pl-6 text-[#73664B]">หน่วยสินค้า :</p>
+                                <select
+                                    onChange={handleProductInputChange}
+                                    id="pd_unit"
+                                    className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 ml-7"
+                                    name="pd_unit"
                                 >
-                                    {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
-                                        <option key={ind.ind_id} value={ind.ind_name}>
-                                            {ind.ind_name}
+                                    {unitOptions.map((unit: UnitType) => (
+                                        <option key={unit.un_id} value={unit.un_id}>
+                                            {unit.un_name}
                                         </option>
                                     ))}
                                 </select>
                             </div>
-                            <div className="flex w-1/2 items-center">
+                        </div>
+                        <div className="w-1/2">
+                            <div className="flex w-full mt-3">
                                 <label className="text-sm mr-4 text-[#73664B]">รูปภาพ :</label>
+                                <Card isFooterBlurred radius="lg" className="border-none max-w-[200px] max-h-[200px]">
+                                    <Image
+                                        alt="Woman listing to music"
+                                        className="w-[200px] object-cover h-[200px]"
+                                        height={200}
+                                        sizes={`(max-width: 768px) ${200}px, ${200}px`}
+                                        src={uploadedImage || "/images/logo.svg"}
+                                        // src="/images/logo.svg"
+                                        width={200}
+                                    />
+                                    <CardFooter className="flex justify-center before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10">
+                                        <Button
+                                            className="text-tiny text-white bg-[#73664B]"
+                                            color="danger"
+                                            radius="lg"
+                                            size="sm"
+                                            onClick={handleClick}
+                                        >
+                                            เพิ่ม
+                                        </Button>
+
+                                        {uploadedImage != null && (
+                                            <Button
+                                                className="text-tiny text-white bg-[#73664B] ml-3"
+                                                color="danger"
+                                                radius="lg"
+                                                size="sm"
+                                                onClick={handleClickDelete}
+                                            >
+                                                นำออก
+                                            </Button>
+                                        )}
+                                    </CardFooter>
+
+                                </Card>
                                 <input
-                                    onChange={handleProductInputChange}
+                                    onChange={handleFileChange}
+                                    style={{ display: 'none' }}
+                                    ref={inputRef}
                                     name="img"
                                     id="img"
                                     type="file"
@@ -254,45 +401,6 @@ function addrecipe() {
                                     accept="image/*"
                                 />
                             </div>
-                        </div>
-                        <div className="grid grid-cols-3 w-1/3 my-2 h-min">
-                            <p className="text-sm px-6 py-2 text-[#73664B] w-full">ชื่อสินค้า :</p>
-                            <input
-                                onChange={handleProductInputChange}
-                                placeholder="ชื่อสินค้า"
-                                type="text"
-                                name="name"
-                                id="name"
-                                autoComplete="off"
-                                className="col-span-2 px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm placeholder:text-[#C5B182] sm:text-sm sm:leading-6 focus:outline-none"
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 w-1/3 my-2">
-                            <p className="text-sm px-6 py-2 text-[#73664B]">จำนวนสินค้าชั้นต่ำ :</p>
-                            <input
-                                onChange={handleProductInputChange}
-                                placeholder="จำนวนสินค้าขั้นต่ำ"
-                                type="text"
-                                name="qtymin"
-                                id="qtymin"
-                                autoComplete="off"
-                                className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm placeholder:text-[#C5B182] sm:text-sm sm:leading-6 focus:outline-none"
-                            />
-                        </div>
-                        <div className="flex items-center w-1/4">
-                            <p className="text-sm pl-6 text-[#73664B]">หน่วยสินค้า :</p>
-                            <select
-                                onChange={handleProductInputChange}
-                                id="pd_unit"
-                                className="bg-[#E3D9C0] block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2 ml-7"
-                                name="pd_unit"
-                            >
-                                {unitOptions.map((unit: UnitType) => (
-                                    <option key={unit.un_id} value={unit.un_id}>
-                                        {unit.un_name}
-                                    </option>
-                                ))}
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -306,7 +414,7 @@ function addrecipe() {
                                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:</p>
                                     <select id="ingredients"
                                         className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6">
-                                        {ind.map((ind) => (
+                                        {ingredientsOptions.map((ind: Ingredients) => (
                                             <option key={ind.ind_id} value={ind.ind_id}>
                                                 {ind.ind_name}
                                             </option>
@@ -327,7 +435,7 @@ function addrecipe() {
                                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center ">หน่วย:</p>
                                     <select id="unit"
                                         className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6">
-                                        {unit.map((unit) => (
+                                        {unitOptions.map((unit: UnitType) => (
                                             <option key={unit.un_id} value={unit.un_id}>
                                                 {unit.un_name}
                                             </option>
@@ -355,9 +463,9 @@ function addrecipe() {
                                         <tbody className="w-full">
                                             {addedIngredients.slice().reverse().map((ingredient) => (
                                                 <tr key={ingredient.id} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                                    <td scope="col" className="flex-1 text-center">{ind.find((i) => i.ind_id === parseInt(ingredient.id)).ind_name}</td>
+                                                    <td scope="col" className="flex-1 text-center">{ingredientsOptions.find((i) => parseInt(i.ind_id) === ingredient.id)?.ind_name}</td>
                                                     <td scope="col" className="flex-1 text-center">{ingredient.quantity}</td>
-                                                    <td scope="col" className="flex-1 text-center">{unit.find((u) => u.un_id === parseInt(ingredient.unit)).un_name}</td>
+                                                    <td scope="col" className="flex-1 text-center">{unitOptions.find((u) => parseInt(u.un_id) === ingredient.unit)?.un_name}</td>
                                                     <td scope="col" className="flex-1 text-center">
                                                         <div className="flex items-center justify-center">
                                                             <button onClick={() => handleDeleteIngredient(ingredient.id)}>
@@ -434,7 +542,9 @@ function addrecipe() {
                             className={`ml-2 text-white bg-[#73664B] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ${currentPage === "item2" ? "bg-[#73664B]" : "bg-[#73664B]"
                                 }`}
                         >
-                            {currentPage === "item2" ? "บันทึก" : "ถัดไป"}
+                            {currentPage === "item2" ? (
+                                isLoanding ? (<><Spinner size="sm" className='text-white' color="default" /> กำลังบันทึก</>) : "บันทึก"
+                            ) : "ถัดไป"}
                         </Link>
                     </button>
                 </div>

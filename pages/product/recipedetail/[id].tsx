@@ -33,6 +33,114 @@ function recipe_detail() {
 
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
+    const [loading, setLoading] = useState(true);
+
+    const router = useRouter();
+    const { id } = router.query;
+    const [recipe, setRecipe] = useState({
+
+        "product": {
+            "pd_id": 0,
+            "pd_name": "",
+            "pd_qtyminimum": 0,
+            "picture": null,
+            "pdc_id": 0,
+            "status": "",
+            "created_at": "",
+            "updated_at": ""
+        }
+
+    });
+    const [recipeDetail, setRecipeDetail] = useState({
+        "pd_id": 0,
+        "pd_name": "",
+        "pd_qtyminimum": 0,
+        "pdc_name": "",
+        "status": "",
+        "picture": null,
+        "created_at": "",
+        "updated_at": "",
+        "rc_id": 0,
+        "qtylifetime": 0,
+        "produced_qty": 0,
+        "recipedetail": [
+
+        ]
+    });
+
+    // interface Recipe {
+    //     pd_name: String,
+    //     pd_qtyminimum: number,
+    //     status: String,
+    //     picture: String,
+    //     pdc_id: number,
+    //     qtylifetime: number,
+    //     produced_qty: number,
+    //     un_id: number,
+    //     ind_id: number,
+    //     ingredients_qty: number,
+    // }
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await fetch(`http://localhost:8080/product/products/${id}`);
+    //             const data = await response.json();
+    //             console.log("data:", data);
+    //             setRecipe(data);
+    //             setLoading(false);
+    //             console.log("data:", recipe);
+    //         } catch (error) {
+    //             console.error('Error:', error);
+    //             setLoading(false);
+    //         }
+    //     };
+    //     if (id) { // ตรวจสอบว่า id มีค่าหรือไม่
+    //         fetch(`http://localhost:8080/product/pdset/${id}`)
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 setRecipeDetail(data.data);
+    //             })
+    //             .catch(error => {
+    //                 console.error('Error fetching ingredient details:', error);
+    //             });
+    //     }
+    //     fetchData();
+
+    // }, [id]);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/product/products/${id}`);
+                const data = await response.json();
+                console.log("data  fatch:", data);
+                setRecipe(data);
+                console.log("data ลงstate:", recipe);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error:', error);
+                setLoading(false);
+            }
+        };
+
+        const fetchRecipeDetail = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/product/pdset/${id}`);
+                const data = await response.json();
+                setRecipeDetail(data);
+            } catch (error) {
+                console.error('Error fetching ingredient details:', error);
+            }
+        };
+
+        if (id) { // ตรวจสอบว่า id มีค่าหรือไม่
+            fetchData();
+            fetchRecipeDetail();
+        }
+    }, [id]);
+
+    console.log("data ลงstate:", recipe);
+    console.log('recipeDetail:', recipeDetail);
+
     return (
         <div>
             <button className='my-3 mx-5 '>
@@ -51,19 +159,28 @@ function recipe_detail() {
                     </button>
                 </div>
                 <div className="border-l border-[#E3D8BF] ml-8 mt-2 text-[#73664B] ">
-                    <div className="flex">
-                        <div className="w-full">
-                            <p className="ml-3 w-full">ประเภทสินค้า :</p>
-                            <p className="ml-3">ชื่อสินค้า :</p>
-                            <p className="ml-3">จำนวนขั้นต่ำ :</p>
-                            <p className="ml-3">หน่วยสินค้า :</p>
+                    {recipe !== null ? (
+
+                        <div className="flex">
+                            <div className="w-full">
+                                <p className="ml-3 w-full">ประเภทสินค้า : {recipe.product.pdc_id}</p>
+                                <p className="ml-3">ชื่อสินค้า : {recipe.product.pd_name}</p>
+                                <p className="ml-3">จำนวนขั้นต่ำ : {recipe.product.pd_qtyminimum}</p>
+                                <p className="ml-3">หน่วยสินค้า : </p>
+                            </div>
+                            <div className="w-full flex">
+                                <p className="ml-3">รูปภาพ :</p>
+                                <img src={recipe.product.picture} alt="Product Image" className="w-24 h-24" />
+                            </div>
                         </div>
-                        <div className="w-full flex">
-                            <p className="ml-3">รูปภาพ :</p>
-                            <img src="/images/logo.svg" alt="imgdonut" className="w-24 h-24" />
-                        </div>
-                    </div>
+                    ) : (
+                        <p>Loading...</p>
+                    )}
+
+
+
                 </div>
+
             </div>
             <div>
                 <div className="flex items-center  mx-6 mt-3 ">
@@ -74,13 +191,19 @@ function recipe_detail() {
                     </button>
                 </div>
                 <div className="border-l border-[#E3D8BF] ml-8 mt-2 text-[#73664B]">
-                    {/* วนลูปเอาสูตรมาแสดง */}
-                    <div className="flex">
-                        <p className="ml-3">วัตถุดิบ :</p>
-                        <p className="ml-5">ปริมาณ :</p>
-                        <p className="ml-5">หน่วย :</p>
-                    </div>
-                    <p className="ml-3 mt-3">สูตรอาหารที่ผลิตได้ :</p>
+
+
+                    {recipeDetail && recipeDetail.recipedetail.map((item) => (
+                        <div className="flex" key={item.ind_id}>
+                            <p className="ml-3">วัตถุดิบ : {item.ind_name}</p>
+                            <p className="ml-5">ปริมาณ : {item.ingredients_qty}</p>
+                            <p className="ml-5">หน่วย : {item.un_id}</p>
+                        </div>
+                    ))}
+
+
+
+                    <p className="ml-3 mt-3">สูตรอาหารที่ผลิตได้ : {recipeDetail && (recipeDetail.qtylifetime)}</p>
                 </div>
             </div>
             <div>
@@ -91,13 +214,13 @@ function recipe_detail() {
                     <div className="mt-2 col-span-3 flex ml-3">
                         <div className="form-control">
                             <label className="label cursor-pointer ">
-                                <input type="radio" name="depart" className="radio checked:bg-[#C5B182] " />
+                                <input type="radio" name="depart" {...(recipeDetail && recipeDetail.status === "A" ? { checked: true} : {})} className="radio checked:bg-[#C5B182] " />
                                 <span className=" text-[#73664B] px-3 ">ใช้งานอยู่</span>
                             </label>
                         </div>
                         <div className="form-control ml-4">
                             <label className="label cursor-pointer">
-                                <input type="radio" name="depart" className="radio checked:bg-[#C5B182]" />
+                                <input type="radio" name="depart" {...(recipeDetail && recipeDetail.status === "N" ? { checked: true} : {})}  className="radio checked:bg-[#C5B182]" />
                                 <span className="text-[#73664B] px-3">ยกเลิกรายการ</span>
                             </label>
                         </div>

@@ -9,6 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
 import { Dialog, Transition } from '@headlessui/react';
+import { useRouter } from "next/router";
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -17,27 +18,83 @@ const kanit = Kanit({
 
 
 function add() {
-    const product_type =
-        [{ id: 1, name: "โดนัท" },
-        { id: 2, name: "ดิป" },
-        { id: 3, name: "เดี่ยว" }
-        ];
-    const pd =
-        [{ id: 1, name: "เรดเวลเวด", type: 1 },
-        { id: 2, name: "ใบเตย", type: 1 },
-        { id: 3, name: "ออริจินอล", type: 1 },
-        { id: 4, name: "นมฮอกไกโด", type: 2 },
-        { id: 5, name: "ชาเขียว", type: 2 },
-        { id: 6, name: "ช็อค", type: 2 },
-        { id: 7, name: "บอมโบโลนี", type: 3 },
-        { id: 8, name: "บานอฟฟี่", type: 3 },
-        ];
+    const router = useRouter();
+    const { id } = router.query;
+    const [unitOptions, setUnitOptions] = useState([]);
+    const [productCat, setProductCat] = useState([]);
+    const [Ingredientall, setIngredientall] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
+
+    interface Ingredients {
+        ind_id: string;
+        ind_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    interface UnitType {
+        un_id: string;
+        un_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    interface ProductCat {
+        pdc_id: string;
+        pdc_name: string;
+    }
+    useEffect(() => {
+
+        fetch('http://localhost:8080/product/readcat')
+            .then(response => response.json())
+            .then(data => {
+                setProductCat(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+
+
+    }, [id]);
+
+    const [Recipe, setRecipe] = useState([]);
+    interface Recipe {
+        pd_name: String,
+        pd_qtyminimum: number,
+        status: String,
+        picture: String,
+        pdc_id: number,
+        qtylifetime: number,
+        produced_qty: number,
+        un_id: number,
+        ind_id: number,
+        ingredients_qty: number,
+
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        fetch(`http://localhost:8080/product/productsall`)
+            .then(response => response.json())
+            .then(data => {
+                setRecipe(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+    }, [id]);
+
+    // 
     const [selectedProductType, setSelectedProductType] = useState(1); // ประเภทสินค้าที่ถูกเลือก
+    const [selectedProductId, setSelectedProductId] = useState(1); // ประเภทสินค้าที่ถูกเลือก
+
 
     // กรองสินค้าตามประเภทที่ถูกเลือก
-    const filteredProducts = pd.filter(product => product.type === selectedProductType);
+    const filteredProducts = Recipe.filter(product => product.pdc_id === selectedProductType);
 
+    const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
 
+    const handleCheckboxChange = () => {
+        setIsChecked(!isChecked); // Toggle checkbox status
+    };
     const [addedDetail, setAddedDetail] = useState([]);
 
     // รายละเอียดใบสั่งผลิต
@@ -47,13 +104,19 @@ function add() {
         num: 1,
         status: 1
     });
-    
+
     const handleAddDetail = () => {
         event.preventDefault();
+        // const selectedProductType = parseInt((document.getElementById("productType") as HTMLSelectElement).value);
+        // const selectedProductId = parseInt((document.getElementById("product") as HTMLSelectElement).value);
+        // const selectedProduct = filteredProducts.find(product => product.id === selectedProductId);
+        // const typepd = product_type.find(type => type.id === selectedProductType)?.name;
+
         const selectedProductType = parseInt((document.getElementById("productType") as HTMLSelectElement).value);
         const selectedProductId = parseInt((document.getElementById("product") as HTMLSelectElement).value);
-        const selectedProduct = filteredProducts.find(product => product.id === selectedProductId);
-        const typepd = product_type.find(type => type.id === selectedProductType)?.name;
+        const selectedProduct = filteredProducts.find(product => product.pd_id === selectedProductId);
+        const typepd = productCat.find(type => type.pdc_id === selectedProductType)?.pdc_name;
+
 
         if (!selectedProduct) {
             alert("กรุณาเลือกสินค้า");
@@ -86,7 +149,7 @@ function add() {
             // Product does not exist, add a new detail
             const newDetail = {
                 type: typepd || '',
-                pd_id: selectedProduct?.id || '',
+                pd_id: selectedProduct?.pd_id || '',
                 num: enteredQuantity,
             };
 
@@ -113,20 +176,13 @@ function add() {
         setIsOpen(true);
     };
 
-
-
-    const [postData, setpostData] = useState({
-        type: '',
-        pd: '',
-        num: 1,
-        pdo_status: 1
-    });
-
+   
     const handleConfirm = async () => {
-        console.log("รายละเอียดสินค้าทั้งหมด:", addedDetail);
+        
         closeModal();
-
-        const productionOrder = [{ pdo_status: 1 }];
+        const pdo_status = isChecked ? 2 : 1;
+        
+        const productionOrder = {pdo_status};
         const productionOrderdetail = addedDetail.map(detail => ({ qty: detail.num, pd_id: detail.pd_id }));
 
         const postData = {
@@ -153,6 +209,7 @@ function add() {
             console.error('เกิดข้อผิดพลาดในการเพิ่มใบสั่งผลิต:', error.message);
             // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
         }
+        console.log("รายละเอียดสินค้าทั้งหมด:", postData);
     };
 
 
@@ -160,8 +217,8 @@ function add() {
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
     const getProductNameById = (productId) => {
-        const product = pd.find((item) => item.id === productId);
-        return product ? product.name : '';
+        const product = Recipe.find((item) => item.pd_id === productId);
+        return product ? product.pd_name : '';
     };
 
 
@@ -182,9 +239,9 @@ function add() {
                                 onChange={(e) => setSelectedProductType(parseInt(e.target.value))}
                                 className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6"
                             >
-                                {product_type.map((type) => (
-                                    <option key={type.id} value={type.id}>
-                                        {type.name}
+                                {productCat.map((pd: ProductCat) => (
+                                    <option key={pd.pdc_id} value={pd.pdc_id}>
+                                        {pd.pdc_name}
                                     </option>
                                 ))}
                             </select>
@@ -192,12 +249,13 @@ function add() {
                         <div className=" flex items-center justify-center">
                             <p className="text-sm px-5 py-2 text-[#73664B] flex justify-center w-full">สินค้า :</p>
                             <select
+                                onChange={(e) => setSelectedProductId(parseInt(e.target.value))}
                                 id="product"
                                 className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6"
                             >
                                 {filteredProducts.map((product) => (
-                                    <option key={product.id} value={product.id}>
-                                        {product.name}
+                                    <option key={product.pd_id} value={product.pd_id}>
+                                        {product.pd_name}
                                     </option>
                                 ))}
                             </select>
@@ -257,7 +315,7 @@ function add() {
                 </div>
             </div>
             <div className="ml-6 ">
-                <Checkbox radius="sm" color="warning">
+                <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange}>
                     ยืนยันการดำเนินการผลิต
                 </Checkbox>
             </div>

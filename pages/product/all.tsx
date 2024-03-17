@@ -87,19 +87,21 @@ function all() {
     const [newValue, setNewValue] = useState('');
 
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
-        const newValue = event.target.value;
+        const newValueData = event.target.value;
         // ใช้ setDataProduct เพื่ออัปเดต State
-        setDataProduct(prevProducts => {
+        setTypeProduct(prevProducts => {
             return prevProducts.map(product => {
-                if (product.id === id) {
+                if (product.pdc_id === id) {
                     // อัปเดตข้อมูลเฉพาะของสินค้าที่ต้องการ
-                    return { ...product, name: newValue };
+                    return { ...product, pdc_name: newValueData };
                 }
                 return product;
             });
         });
-        console.log("แก้ไขประเภทวัตถุดิบ : ", newValue);
+        console.log("แก้ไขประเภทวัตถุดิบ : ", newValueData);
     };
+
+    console.log(TypeProduct);
 
     const handleCancelEdit = () => {
         setDataProduct(TypeProduct)
@@ -110,16 +112,23 @@ function all() {
     };
 
     // อันนี้เช็คเผื่อเปลี่ยนไอคอนเมื่อมีการกดแก้ไข
-    const handleSaveChanges = async () => {
+    const handleSaveChanges = async (idData) => {
         setOpenInput(0);
         setIsEditing(false);
 
+
+
+        // console.log(dataProduct.find(idData))
+
+        const fountItem = TypeProduct.find(item => item.pdc_id == idData);
+        console.log(fountItem);
+
         const requestData = {
-            newValue: newValue, // ข้อมูลที่ต้องการอัปเดต
+            pdc_name: fountItem.pdc_name, // ข้อมูลที่ต้องการอัปเดต
             // ข้อมูลอื่น ๆ ที่ต้องการส่งไปด้วย request
         };
 
-        const response = await fetch(`http://localhost:8080/product/updatecat/${id}`, {
+        const response = await fetch(`http://localhost:8080/product/updatecat/${idData}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -127,7 +136,7 @@ function all() {
             body: JSON.stringify(requestData), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
         });
         const responseData = await response.json();
-        if (responseData.message === 'success') {
+        if (responseData.message === 'update success') {
             setMessage('Data updated successfully');
         } else {
             setMessage(responseData.message || 'Error occurred');
@@ -273,7 +282,7 @@ function all() {
                                                         <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem]  flex items-center justify-end">
                                                             <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก
                                                             </button>
-                                                            <button type="button" onClick={handleSaveChanges} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก
+                                                            <button type="button" onClick={() => handleSaveChanges(type.pdc_id)} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก
                                                             </button>
                                                         </td>
                                                     </>
@@ -374,11 +383,11 @@ function all() {
                                                     <td className="px-6 py-1 text-[#73664B]">
                                                         {menu.qty_per_unit}
                                                     </td>
-                                                    <td className="px-6 py-4 flex items-center justify-center  text-[#73664B]">
+                                                    <td className="me-2 py-4 flex items-center justify-end text-[#73664B]">
                                                         <button type="button">
-                                                            <a href="/product/editmenuforsell" className="w-full flex justify-center items-center">
+                                                            <Link href={`./editsmt/${menu.smt_id}`} className="w-full flex justify-center items-center">
                                                                 <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                                            </a>
+                                                            </Link>
                                                         </button>
 
                                                     </td>

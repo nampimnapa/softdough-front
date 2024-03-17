@@ -12,60 +12,6 @@ const kanit = Kanit({
 });
 
 function editmenuforsell() {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const closeModal = () => {
-        setIsOpen(false);
-    };
-
-    const openModal = () => {
-        setIsOpen(true);
-    };
-
-    const data = [
-        { name: 'กล่อง XS', unit: 2, count: 30 },
-    ];
-    // เก็บจำนวน
-    const [formData, setFormData] = useState({
-        name: data[0].name,
-        unit: data[0].unit.toString(), // แปลงเป็น string เนื่องจาก value ของ select เป็น string
-        count: data[0].count
-    });
-
-    const handleChange = (event) => {
-        setFormData({
-            ...formData,
-            [event.target.name]: event.target.value
-        });
-    };
-    const handleIncrement = () => {
-        setFormData({
-            ...formData,
-            count: formData.count + 1
-        });
-    };
-
-    const handleDecrement = () => {
-        if (formData.count > 1) {
-            setFormData({
-                ...formData,
-                count: formData.count - 1
-            });
-        }
-    };
-    const handleConfirm = () => {
-        console.log("Name:", formData.name, "Unit:", formData.unit, "Count:", formData.count);
-        closeModal();
-    };
-    // cancel
-    const handleCancel = () => {
-        setFormData({
-            name: data[0].name,
-            unit: data[0].unit.toString(),
-            count: data[0].count
-        });
-        closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
-    };
     const router = useRouter();
     const { id } = router.query;
     const [SaleMenu, setSaleMenu] = useState([]);
@@ -80,7 +26,16 @@ function editmenuforsell() {
         fetch(`http://localhost:8080/salesmenu/readsmt`)
             .then(response => response.json())
             .then(data => {
-                setSaleMenu(data);
+                if (data.length > 0) { // ตรวจสอบว่ามีข้อมูล SaleMenu หรือไม่ก่อนกำหนดค่า FormData
+                    setSaleMenu(data);
+                    setFormData({
+                        name: data[0].smt_name,
+                        unit: data[0].un_id,
+                        count: data[0].qty_per_unit,
+                    });
+                } else {
+                    console.error('No SaleMenu found'); // แสดงข้อความผิดพลาดถ้าไม่มีข้อมูล SaleMenu
+                }
             })
             .catch(error => {
                 console.error('Error fetching unit data:', error);
@@ -106,6 +61,92 @@ function editmenuforsell() {
             });
 
     }, [id]);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const closeModal = () => {
+        setIsOpen(false);
+    };
+
+    const openModal = () => {
+        setIsOpen(true);
+    };
+
+
+
+    // เก็บจำนวน
+    const [formData, setFormData] = useState({
+        name: '',
+        unit: 0,
+        count: 1,
+    });
+
+    const handleChange = (event) => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value
+        });
+
+    };
+
+    const handleIncrement = () => {
+        setFormData({
+            ...formData,
+            count: formData.count + 1
+        });
+    };
+
+    const handleDecrement = () => {
+        if (formData.count > 1) {
+            setFormData({
+                ...formData,
+                count: formData.count - 1
+            });
+        }
+    };
+    const [message, setMessage] = useState('Loading');
+
+    const handleConfirm = async (id) => {
+        
+        const findItem = SaleMenu.find(item => item.smt_id == id);
+
+        console.log(formData);
+        closeModal();
+        const response = await fetch(`http://localhost:8080/salesmenu/updatesmt/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                // Send the updated formData values
+                smt_id: id,
+                smt_name: formData.name,
+                un_id: formData.unit,
+                qty_per_unit: formData.count
+                // Add other properties if needed
+            }),
+
+        });
+        const responseData = await response.json();
+        console.log(responseData)
+
+        if (responseData.status === 200) {
+            setMessage('Data added successfully');
+            router.push('/product/recipeall');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+
+    };
+    // cancel
+    const handleCancel = () => {
+        setFormData({
+            name: '',
+            unit: 0,
+            count: 1,
+        });
+        closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
+    };
+
 
 
     return (
@@ -122,7 +163,7 @@ function editmenuforsell() {
                     <p className="text-sm px-6 py-2 text-[#73664B]">ชื่อประเภทเมนูสำหรับขาย :</p>
                     <input
                         // ต้องเป็น defult สำหรับแก้ไข
-                        value={SaleMenu.length > 0 ? SaleMenu[0].smt_name : ''} // ใช้ smt_name จาก SaleMenu ที่ index 0
+                        value={formData.name} // ใช้ข้อมูลจาก formData ที่เก็บไว
                         onChange={handleChange}
                         type="text"
                         name="name"
@@ -136,7 +177,7 @@ function editmenuforsell() {
                     <select id="countries"
                         className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
                         name="unit"
-                        value={SaleMenu.length > 0 ? SaleMenu[0].un_id : ''} // Set the value to un_id
+                        value={formData.unit} // ใช้ข้อมูลจาก formData ที่เก็บไว
                         onChange={handleChange}>
                         {unitOptions.map((unit: UnitType) => (
                             <option key={unit.un_id} value={unit.un_id}>
@@ -152,7 +193,7 @@ function editmenuforsell() {
                             <svg className="text-[#73664B]"
                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" /></svg>
                         </button>
-                        <span className="w-1/6 text-center">{SaleMenu.length > 0 ? SaleMenu[0].un_id : ''}</span>
+                        <span className="w-1/6 text-center">{formData.count}</span>
                         <button className="btn btn-square bg-[#D9CAA7] btn-sm" onClick={handleIncrement}>
                             <svg className="text-[#73664B]"
                                 xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 256 256"><path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" /></svg>
@@ -220,7 +261,7 @@ function editmenuforsell() {
                                                                 <button
                                                                     type="button"
                                                                     className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                    onClick={handleConfirm}
+                                                                    onClick={() => handleConfirm(id)}
                                                                 ><Link href="/product/all">
                                                                         ยืนยัน
                                                                     </Link></button>

@@ -11,185 +11,31 @@ import { Card, CardBody, CardHeader } from "@nextui-org/react";
 
 function listorder() {
 
-    const product_type =
-        [{ id: 1, name: "โดนัท" },
-        { id: 2, name: "ดิป" },
-        { id: 3, name: "เดี่ยว" }
-        ];
-    const pd =
-        [{ id: 1, name: "เรดเวลเวด", type: 1 },
-        { id: 2, name: "ใบเตย", type: 1 },
-        { id: 3, name: "ออริจินอล", type: 1 },
-        { id: 4, name: "นมฮอกไกโด", type: 2 },
-        { id: 5, name: "ชาเขียว", type: 2 },
-        { id: 6, name: "ช็อค", type: 2 },
-        { id: 7, name: "บอมโบโลนี", type: 3 },
-        { id: 8, name: "บานอฟฟี่", type: 3 },
-        ];
-    const productionorder = [
-        {
-            pdo_id: "PD013",
-            status: "สั่งผลิตแล้ว",
-            date: "12/03/2567",
-            // cost_pricesum ผลรวม sum
-            cost_pricesum: [
-                {
-                    type_id: 1,
-                    pd_id: 2,
-                    sum: 100
-                },
-                {
-                    type_id: 2,
-                    pd_id: 5,
-                    sum: 200
-                },
-                {
-                    type_id: 2,
-                    pd_id: 6,
-                    sum: 100
-                },
-                {
-                    type_id: 1,
-                    pd_id: 3,
-                    sum: 100
-                },
-                {
-                    type: 3,
-                    pd_id: 7,
-                    sum: 100
-                },
-            ]
-        },
-        {
-            pdo_id: "PD010",
-            status: "กำลังดำเนินการ",
-            date: "11/03/2567",
-            cost_pricesum: [
-                {
-                    type_id: 1,
-                    pd_id: 2,
-                    sum: 100
-                },
-                {
-                    type_id: 2,
-                    pd_id: 5,
-                    sum: 200
-                },
-                {
-                    type_id: 2,
-                    pd_id: 6,
-                    sum: 100
-                },
-                {
-                    type_id: 1,
-                    pd_id: 3,
-                    sum: 100
-                },
-                {
-                    type: 3,
-                    pd_id: 7,
-                    sum: 100
-                },
-            ]
-        },
-        {
-            pdo_id: "PD000",
-            status: "ยกเลิกแล้ว",
-            date: "01/03/2567",
-            cost_pricesum: [
-                {
-                    type_id: 1,
-                    pd_id: 2,
-                    sum: 100
-                },
-                {
-                    type_id: 2,
-                    pd_id: 5,
-                    sum: 200
-                },
-                {
-                    type_id: 2,
-                    pd_id: 6,
-                    sum: 100
-                },
-                {
-                    type_id: 1,
-                    pd_id: 3,
-                    sum: 100
-                },
-                {
-                    type: 3,
-                    pd_id: 7,
-                    sum: 100
-                },
-            ]
-        },
-        {
-            pdo_id: "PD001",
-            status: "เสร็จสิ้น",
-            date: "01/03/2567",
-            cost_pricesum: [
-                {
-                    type_id: 1,
-                    pd_id: 2,
-                    sum: 100
-                },
-                {
-                    type_id: 2,
-                    pd_id: 5,
-                    sum: 200
-                },
-                {
-                    type_id: 2,
-                    pd_id: 6,
-                    sum: 100
-                },
-                {
-                    type_id: 1,
-                    pd_id: 3,
-                    sum: 100
-                },
-                {
-                    type: 3,
-                    pd_id: 7,
-                    sum: 100
-                },
-            ]
-        },
-        {
-            pdo_id: "PD002",
-            status: "เสร็จสิ้น",
-            date: "01/03/2567",
-            cost_pricesum: [
-                {
-                    type_id: 1,
-                    pd_id: 2,
-                    sum: 100
-                },
-                {
-                    type_id: 2,
-                    pd_id: 5,
-                    sum: 200
-                },
-                {
-                    type_id: 2,
-                    pd_id: 6,
-                    sum: 100
-                },
-                {
-                    type_id: 1,
-                    pd_id: 3,
-                    sum: 100
-                },
-                {
-                    type: 3,
-                    pd_id: 7,
-                    sum: 100
-                },
-            ]
-        },
-    ];
-    // const StatusTabs = ["ทั้งหมด", "สั่งผลิตแล้ว", "กำลังดำเนินการ", "ยกเลิกแล้ว", "ยกเลิกแล้ว"];
+
+    const [loading, setLoading] = useState(true);
+    const [Production, setProduction] = useState([]);
+    interface Production {
+
+        pdo_id_name: string;
+        updated_at: string;
+        pdo_status: number;
+
+    }
+    useEffect(() => {
+        // Fetch staff data on component mount
+        fetch('http://localhost:8080/production/readall')
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setProduction(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
+    }, []);
+
     const StatusTabs =
         [{ id: 1, name: "ทั้งหมด" },
         { id: 2, name: "สั่งผลิตแล้ว" },
@@ -242,31 +88,32 @@ function listorder() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {productionorder
+                                        {Production
                                             .filter((order) => selectedTab.name === "ทั้งหมด" ? true : order.status === selectedTab.name)
                                             .map((order) => (
                                                 <tr
                                                     key={order.pdo_id}
-
                                                 >
                                                     <td
                                                         scope="row"
                                                         className="px-6 py-1 text-gray-900 whitespace-nowrap dark:text-white"
                                                     >
-                                                        {order.date}
+                                                        {order.updated_at}
                                                     </td>
-                                                    <td className="px-6 py-1">{order.pdo_id}</td>
-                                                    <td className={`h-10 ${order.status === 'เสร็จสิ้น' ? ' text-green-600' :
-                                                            order.status === 'ยกเลิกแล้ว' ? ' text-red-600' :
-                                                                order.status === 'กำลังดำเนินการ' ? ' text-yellow-500' :
-                                                                    order.status === 'สั่งผลิตแล้ว' ? 'text-[#73664B]' : ''
+                                                    <td className="px-6 py-1">{order.pdo_id_name}</td>
+                                                    {/* // order.status === 'ยกเลิกแล้ว' ? ' text-red-600' : */}
+                                                    {/* order.pdo_status === 'เสร็จสิ้น' ? ' text-green-600' : */}
+                                                    <td className={`h-10 
+                                                    ${order.pdo_status === '2' ? ' text-yellow-500' :
+                                                            order.pdo_status === '1' ? 'text-[#73664B]' : ''
                                                         }`}>
-                                                        {order.status}
+
+                                                        {order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center">
                                                         <button type="submit">
                                                             <Link
-                                                                href="#"
+                                                                href={`./detail/${order.pdo_id}`}
                                                                 className="w-full flex justify-center items-center">
                                                                 <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182]" />
                                                             </Link>

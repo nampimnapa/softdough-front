@@ -11,6 +11,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import Datepicker from "react-tailwindcss-datepicker";
 import { useRouter } from "next/router";
+import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
+
 const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -20,6 +22,10 @@ const kanit = Kanit({
 function add() {
 
     const [isOpen, setIsOpen] = useState(false);
+    const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
+    const handleCheckboxChange = () => {
+        setIsChecked(!isChecked); // Toggle checkbox status
+    };
 
     const closeModal = () => {
         setIsOpen(false);
@@ -82,14 +88,15 @@ function add() {
 
     const handleSubmit2 = async () => {
         const ingredientLotDetail = addedIngredients.map((ingredient) => ({
+
             ind_id: ingredientsOptions.findIndex(option => option.ind_name === ingredient.name) + 1,
             qtypurchased: parseInt(ingredient.quantity), // แปลงเป็นตัวเลข
             date_exp: value.startDate, // ใช้ค่าจาก datepicker
             price: parseInt(ingredient.price) // แปลงเป็นตัวเลข
         }));
-        
+
         const requestData = {
-            ingredient_lot: {}, // ข้อมูล ingredient_lot ว่างไว้เนื่องจากไม่ได้ระบุข้อมูลในคำถาม
+            ingredient_lot: { status: isChecked ? 2 : 1, }, // ข้อมูล ingredient_lot ว่างไว้เนื่องจากไม่ได้ระบุข้อมูลในคำถาม
             ingredient_lot_detail: ingredientLotDetail
         };
 
@@ -181,6 +188,12 @@ function add() {
                     </p>
                 </div>
             ))}
+            <div className="ml-6 ">
+                {/* เช็คคือยืนยันการใช้งาน */}
+                <Checkbox radius="sm" color="warning" checked={isChecked} onChange={handleCheckboxChange}>
+                    ยืนยันการใช้งาน
+                </Checkbox>
+            </div>
 
             < div className="flex justify-between  mt-8 " >
                 <button>

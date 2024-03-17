@@ -217,6 +217,9 @@ function ingreincome() {
                 setLoading(false);
             });
     }, []);
+    const getStatusText = (status) => {
+        return status === 2 ? 'ยืนยัน' : 'ไม่ยืนยัน';
+    };
 
     return (
         <div className='h-screen'>
@@ -256,6 +259,9 @@ function ingreincome() {
                             </td>
 
                             <td scope="col" className="px-1 py-3 ">
+                                สถานะ
+                            </td>
+                            <td scope="col" className="px-1 py-3 ">
 
                             </td>
                             <td scope="col" className="px-1 py-3 ">
@@ -273,6 +279,25 @@ function ingreincome() {
                                 <td className="px-6 py-1  text-[#73664B] text-center">
                                     {lot.indl_id_name}
                                 </td>
+                                <td
+                                    className={`px-6 py-1 
+                                ${lot.status === '2' ? 'text-green-500'
+                                            : lot.status === '1' ? 'text-red-500'
+                                                : ''}`}
+
+                                >
+                                    {lot.status === '2' ? 'ยืนยัน' : lot.status === '1' ? 'ไม่ยืนยัน' : lot.status}
+                                </td>
+                                <td className="px-1 py-3  items-center justify-center  ">
+                                    {lot.status === '1' && (
+                                        <button >
+                                            <Link href={`./edit/${lot.indl_id}`} className="w-full flex justify-center items-center">
+                                                <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                            </Link>
+                                        </button>
+                                    )}
+
+                                </td>
                                 <td className="px-1 py-3  items-center justify-center  ">
                                     <button >
                                         <Link href={`./detail/${lot.indl_id}`} className="w-full flex justify-center items-center">
@@ -280,13 +305,7 @@ function ingreincome() {
                                         </Link>
                                     </button>
                                 </td>
-                                <td className="px-1 py-3  items-center justify-center  ">
-                                    <button >
-                                        <Link href={`./edit/${lot.indl_id}`} className="w-full flex justify-center items-center">
-                                            <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                        </Link>
-                                    </button>
-                                </td>
+                                
                             </tr>
                         ))}
                     </tbody>
