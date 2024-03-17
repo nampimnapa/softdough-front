@@ -38,7 +38,6 @@ function recipe_detail() {
     const router = useRouter();
     const { id } = router.query;
     const [recipe, setRecipe] = useState({
-
         "product": {
             "pd_id": 0,
             "pd_name": "",
@@ -61,6 +60,7 @@ function recipe_detail() {
         "created_at": "",
         "updated_at": "",
         "rc_id": 0,
+        "un_name": "",
         "qtylifetime": 0,
         "produced_qty": 0,
         "recipedetail": [
@@ -110,7 +110,7 @@ function recipe_detail() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/product/products/${id}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/products/${id}`);
                 const data = await response.json();
                 console.log("data  fatch:", data);
                 setRecipe(data);
@@ -124,7 +124,7 @@ function recipe_detail() {
 
         const fetchRecipeDetail = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/product/pdset/${id}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/pdset/${id}`);
                 const data = await response.json();
                 setRecipeDetail(data);
             } catch (error) {
@@ -160,13 +160,12 @@ function recipe_detail() {
                 </div>
                 <div className="border-l border-[#E3D8BF] ml-8 mt-2 text-[#73664B] ">
                     {recipe !== null ? (
-
                         <div className="flex">
                             <div className="w-full">
                                 <p className="ml-3 w-full">ประเภทสินค้า : {recipe.product.pdc_id}</p>
                                 <p className="ml-3">ชื่อสินค้า : {recipe.product.pd_name}</p>
                                 <p className="ml-3">จำนวนขั้นต่ำ : {recipe.product.pd_qtyminimum}</p>
-                                <p className="ml-3">หน่วยสินค้า : </p>
+                                <p className="ml-3">หน่วยสินค้า : {recipeDetail.un_name}</p>
                             </div>
                             <div className="w-full flex">
                                 <p className="ml-3">รูปภาพ :</p>
@@ -214,13 +213,13 @@ function recipe_detail() {
                     <div className="mt-2 col-span-3 flex ml-3">
                         <div className="form-control">
                             <label className="label cursor-pointer ">
-                                <input type="radio" name="depart" {...(recipeDetail && recipeDetail.status === "A" ? { checked: true} : {})} className="radio checked:bg-[#C5B182] " />
+                                <input type="radio" name="depart" {...(recipeDetail && recipeDetail.status === "A" ? { checked: true } : {})} className="radio checked:bg-[#C5B182] " />
                                 <span className=" text-[#73664B] px-3 ">ใช้งานอยู่</span>
                             </label>
                         </div>
                         <div className="form-control ml-4">
                             <label className="label cursor-pointer">
-                                <input type="radio" name="depart" {...(recipeDetail && recipeDetail.status === "N" ? { checked: true} : {})}  className="radio checked:bg-[#C5B182]" />
+                                <input type="radio" name="depart" {...(recipeDetail && recipeDetail.status === "N" ? { checked: true } : {})} className="radio checked:bg-[#C5B182]" />
                                 <span className="text-[#73664B] px-3">ยกเลิกรายการ</span>
                             </label>
                         </div>

@@ -73,6 +73,7 @@ import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
+import ingreincome from "../all";
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -80,28 +81,7 @@ const kanit = Kanit({
 });
 
 function detail() {
-    // const [ingrelot, setIngrelot] = useState([
-    //     {
-    //         lotno: "LOT01",
-    //         date: '10/10/2555',
-    //         ingre: [
-    //             {
-    //                 name: 'แป้ง',
-    //                 count: "2",
-    //                 unit: "ถุง",
-    //                 exp: "10/10/2556",
-    //                 price: '500'
-    //             },
-    //             {
-    //                 name: 'น้ำตาล',
-    //                 count: "2",
-    //                 unit: "ถุง",
-    //                 exp: "10/10/2556",
-    //                 price: '100'
-    //             }
-    //         ],
-    //     },
-    // ]);
+   
     const [ind, setIngredientLot] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [indde, setIngredientsde] = useState<any[]>([]);
@@ -111,7 +91,7 @@ function detail() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/ingredient/readlot/${id}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlot/${id}`);
                 const data = await response.json();
                 setIngredientLot(data);  // ตั้งค่า ind ใหม่ทุกครั้งที่ fetchData ถูกเรียก
                 setLoading(false);
@@ -121,7 +101,7 @@ function detail() {
             }
         };
         if (id) { // ตรวจสอบว่า id มีค่าหรือไม่
-            fetch(`http://localhost:8080/ingredient/ingredientLotDetails/${id}`)
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/ingredientLotDetails/${id}`)
                 .then(response => response.json())
                 .then(data => {
                     setIngredientsde(data.data);
@@ -133,6 +113,7 @@ function detail() {
         fetchData();
     }, [id]);
 
+    console.log(indde);
 
     return (
         <div className='h-screen'>

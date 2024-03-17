@@ -25,7 +25,7 @@ function all() {
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     useEffect(() => {
-        fetch(`http://localhost:8080/salesmenu/readsmt`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
             .then(response => response.json())
             .then(data => {
                 setSaleMenu(data);
@@ -44,7 +44,7 @@ function all() {
     }
     useEffect(() => {
 
-        fetch(`http://localhost:8080/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -62,7 +62,7 @@ function all() {
 
     }
     useEffect(() => {
-        fetch(`http://localhost:8080/product/readcat`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
             .then(response => response.json())
             .then(data => {
                 setTypeProduct(data);
@@ -128,7 +128,7 @@ function all() {
             // ข้อมูลอื่น ๆ ที่ต้องการส่งไปด้วย request
         };
 
-        const response = await fetch(`http://localhost:8080/product/updatecat/${idData}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/updatecat/${idData}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ function all() {
         }
         console.log("เพิ่มประเภทวัตถุดิบ : ", newProductName); //ข้อมูลที่เพิ่ม
 
-        const response = await fetch('http://localhost:8080/product/addcat', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/addcat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

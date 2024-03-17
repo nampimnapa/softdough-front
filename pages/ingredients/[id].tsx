@@ -98,7 +98,7 @@ function detailall() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/ingredient/read/${id}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read/${id}`);
                 const data = await response.json();
                 setIngredientall(data);  // ตั้งค่า ind ใหม่ทุกครั้งที่ fetchData ถูกเรียก
                 setLoading(false);

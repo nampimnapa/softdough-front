@@ -205,7 +205,7 @@ function ingreincome() {
 
     useEffect(() => {
         // Fetch staff data on component mount
-        fetch('http://localhost:8080/ingredient/readlot')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlot`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);

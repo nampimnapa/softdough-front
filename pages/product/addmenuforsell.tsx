@@ -55,7 +55,7 @@ function addmenuforsell() {
         console.log("Name: ", formData.smt_name, " Unit : ", formData.un_id, " Count : ", formData.qty_per_unit);
         closeModal();
         try {
-            const response = await fetch('http://localhost:8080/salesmenu/addtype', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/addtype`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ function addmenuforsell() {
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     useEffect(() => {
-        fetch(`http://localhost:8080/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);

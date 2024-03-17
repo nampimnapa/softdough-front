@@ -371,7 +371,7 @@ function edit() {
 
     useEffect(() => {
         // Fetch staff data based on st_id
-        fetch(`http://localhost:8080/ingredient/read/${id}`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read/${id}`)
             .then((response) => response.json())
             .then((data) => {
                 setInd(data);
@@ -384,7 +384,7 @@ function edit() {
                 console.error('Error:', error);
                 setLoading(false);
             });
-        fetch(`http://localhost:8080/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -411,7 +411,7 @@ function edit() {
     // };
     const handleUpdateClick = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/ingredient/update/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/update/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

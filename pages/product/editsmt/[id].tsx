@@ -15,6 +15,7 @@ function editmenuforsell() {
     const router = useRouter();
     const { id } = router.query;
     const [SaleMenu, setSaleMenu] = useState([]);
+   
     interface SaleMenu {
         smt_id: string;
         smt_name: string;
@@ -23,7 +24,7 @@ function editmenuforsell() {
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     useEffect(() => {
-        fetch(`http://localhost:8080/salesmenu/readsmt`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/smt/${id}`)
             .then(response => response.json())
             .then(data => {
                 if (data.length > 0) { // ตรวจสอบว่ามีข้อมูล SaleMenu หรือไม่ก่อนกำหนดค่า FormData
@@ -51,7 +52,7 @@ function editmenuforsell() {
     }
     useEffect(() => {
 
-        fetch(`http://localhost:8080/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -106,12 +107,9 @@ function editmenuforsell() {
     const [message, setMessage] = useState('Loading');
 
     const handleConfirm = async (id) => {
-        
-        const findItem = SaleMenu.find(item => item.smt_id == id);
-
-        console.log(formData);
+        // console.log(formData);
         closeModal();
-        const response = await fetch(`http://localhost:8080/salesmenu/updatesmt/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/updatesmt/${id}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,8 +128,8 @@ function editmenuforsell() {
         console.log(responseData)
 
         if (responseData.status === 200) {
-            setMessage('Data added successfully');
-            router.push('/product/recipeall');
+            setMessage('Data update successfully');
+            router.push('/product/all');
         } else {
             setMessage(responseData.message || 'Error occurred');
         }

@@ -42,7 +42,7 @@ function add() {
     }
     useEffect(() => {
 
-        fetch('http://localhost:8080/product/readcat')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
             .then(response => response.json())
             .then(data => {
                 setProductCat(data);
@@ -71,7 +71,7 @@ function add() {
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     useEffect(() => {
-        fetch(`http://localhost:8080/product/productsall`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`)
             .then(response => response.json())
             .then(data => {
                 setRecipe(data);
@@ -191,7 +191,7 @@ function add() {
         };
 
         try {
-            const response = await fetch('http://localhost:8080/production/addProductionOrder', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/addProductionOrder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

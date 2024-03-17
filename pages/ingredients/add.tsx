@@ -43,7 +43,7 @@ function add() {
     }
     useEffect(() => {
         // Fetch unit data from the server and set the options
-        fetch('http://localhost:8080/ingredient/unit')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -64,7 +64,7 @@ function add() {
     const handleSubmit = async () => {
         // event.preventDefault();
 
-        const response = await fetch('http://localhost:8080/ingredient/add', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/add`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -18,51 +18,26 @@ const kanit = Kanit({
 function Index() {
     const router = useRouter();
     const { id } = router.query;
-    const ingredients = [
-        {
-            id: "1",
-            name: "แป้ง",
-            type: "ถุง"
-        },
-        {
-            id: "2",
-            name: "น้ำตาล",
-            type: "ถุง"
-        },
-        {
-            id: "3",
-            name: "นม",
-            type: "กล่อง"
-        },
-        {
-            id: "4",
-            name: "เนย",
-            type: "ถุง"
-        }]
 
-    const ingrelotData = [
-        {
-            lotno: "LOT01",
-            date: '10/10/2555',
-            ingre: [
-                {
-                    ind_id: "1",
-                    qtypurchased: 2,
-                    date_exp: "10/10/2556",
-                    price: 500
-                },
-                {
-                    ind_id: "2",
-                    qtypurchased: 2,
-                    date_exp: "10/10/2556",
-                    price: 500
-                },
+    const [Ind, setInd] = useState({
+        ind_name: '',
+        un_purchased: '',
+        un_purchased_name: '',
+        un_ind: 0,
+        un_ind_name: 0,
+        qtyminimum: 0,
+        qty_per_unit: 0,
+    });
+    const [message, setMessage] = useState('Loading');
+    const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
+    const [ind, setIngredientLot] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [indde, setIngredientsde] = useState<any[]>([]);
 
-            ],
-        }
-    ]
 
-    const [ingrelot, setIngrelot] = useState(ingrelotData);
+    const [additionalIngredients, setAdditionalIngredients] = useState([]);
+
+    const [ingrelot, setIngrelot] = useState(indde);
     const [isOpen, setIsOpen] = useState(false);
     const [isModified, setIsModified] = useState(false);
     const [dataForm, setDataForm] = useState(null);
@@ -72,7 +47,7 @@ function Index() {
     };
 
     const openModal = () => {
-        setDataForm({ dataaToEdit: ingrelot[0].ingre })
+        setDataForm({ dataaToEdit: ingrelot[0].indde })
         setIsOpen(true);
     };
 
@@ -85,59 +60,78 @@ function Index() {
         setValue(newValue);
     }
 
-    const handleSubmit = (e, lotIndex) => {
+    // const handleSubmit = (e, lotIndex) => {
+    //     e.preventDefault();
+    //     const priceValue = e.target.price ? parseInt(e.target.price.value) : null;
+    //     const countInt = parseInt(e.target.count.value, 10);
+    //     const newIngredientData = {
+    //         ind_id: e.target.ingredients.value,
+    //         qtypurchased: countInt,
+    //         date_exp: value.startDate,
+    //         price: priceValue,
+    //     };
+
+    //     const updatedIngrelot = [...ingrelot];
+    //     if (lotIndex >= 0 && lotIndex < updatedIngrelot.length) {
+    //         const existingLot = updatedIngrelot[lotIndex];
+    //         if (existingLot) {
+    //             existingLot.ingre.push(newIngredientData);
+    //         }
+    //     }
+
+    //     setIngrelot(updatedIngrelot);
+    //     e.target.reset();
+    //     setIsModified(true);
+    //     setValue({
+    //         startDate: null,
+    //         endDate: null
+    //     })
+    //     console.log("Data submit: ", updatedIngrelot);
+    // };
+
+
+    // const handleDeleteIngredient = (lotIndex, ingreIndex) => {
+    //     const updatedIngrelot = [...ingrelot];
+    //     if (
+    //         lotIndex >= 0 && lotIndex < updatedIngrelot.length &&
+    //         ingreIndex >= 0 && ingreIndex < updatedIngrelot[lotIndex].ingre.length
+    //     ) {
+    //         const isAddingOrModifying = isModified || updatedIngrelot[lotIndex].ingre.length > 0;
+    //         updatedIngrelot[lotIndex].ingre.splice(ingreIndex, 1);
+    //         setIngrelot(updatedIngrelot);
+
+
+    //         if (isAddingOrModifying) {
+    //             setIsModified(true);
+    //         }
+    //     }
+    // };
+    const handleSubmit = async (e) => {
         e.preventDefault();
+
         const priceValue = e.target.price ? parseInt(e.target.price.value) : null;
         const countInt = parseInt(e.target.count.value, 10);
         const newIngredientData = {
-            ind_id: e.target.ingredients.value,
-            qtypurchased: countInt,
-            date_exp: value.startDate,
+            name: e.target.ingredients.value,
+            quantity: countInt,
+            exp: value.startDate,
             price: priceValue,
         };
 
-        const updatedIngrelot = [...ingrelot];
-        if (lotIndex >= 0 && lotIndex < updatedIngrelot.length) {
-            const existingLot = updatedIngrelot[lotIndex];
-            if (existingLot) {
-                existingLot.ingre.push(newIngredientData);
-            }
-        }
-
-        setIngrelot(updatedIngrelot);
+        setAdditionalIngredients([...additionalIngredients, newIngredientData]);
         e.target.reset();
-        setIsModified(true);
         setValue({
             startDate: null,
             endDate: null
-        })
-        console.log("Data submit: ", updatedIngrelot);
+        });
     };
 
-
-    const handleDeleteIngredient = (lotIndex, ingreIndex) => {
-
-        const updatedIngrelot = [...ingrelot];
-        if (
-            lotIndex >= 0 && lotIndex < updatedIngrelot.length &&
-            ingreIndex >= 0 && ingreIndex < updatedIngrelot[lotIndex].ingre.length
-        ) {
-            const isAddingOrModifying = isModified || updatedIngrelot[lotIndex].ingre.length > 0;
-            updatedIngrelot[lotIndex].ingre.splice(ingreIndex, 1);
-            setIngrelot(updatedIngrelot);
-
-
-            if (isAddingOrModifying) {
-                setIsModified(true);
-            }
-        }
+    const handleDeleteIngredient = (index) => {
+        const updatedIngredients = [...indde];
+        updatedIngredients.splice(index, 1);
+        setIngredientsde(updatedIngredients);
     };
 
-    const [message, setMessage] = useState('Loading');
-    const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
-    const [ind, setIngredientLot] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [indde, setIngredientsde] = useState<any[]>([]);
     interface Ingredients {
         ind_id: string;
         ind_name: string;
@@ -145,7 +139,7 @@ function Index() {
     }
     useEffect(() => {
         // Fetch unit data from the server and set the options
-        fetch('http://localhost:8080/ingredient/read')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
             .then(response => response.json())
             .then(data => {
                 setIngredientsOptions(data);
@@ -158,7 +152,7 @@ function Index() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/ingredient/readlot/${id}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlot/${id}`);
                 const data = await response.json();
                 setIngredientLot(data);  // ตั้งค่า ind ใหม่ทุกครั้งที่ fetchData ถูกเรียก
                 setLoading(false);
@@ -168,7 +162,7 @@ function Index() {
             }
         };
         if (id) { // ตรวจสอบว่า id มีค่าหรือไม่
-            fetch(`http://localhost:8080/ingredient/ingredientLotDetails/${id}`)
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/ingredientLotDetails/${id}`)
                 .then(response => response.json())
                 .then(data => {
                     setIngredientsde(data.data);
@@ -180,20 +174,18 @@ function Index() {
         fetchData();
     }, [id]);
 
-
     const handleEditWork = async () => {
-
+        setIsOpen(false);
+        const requestData = {
+            ingreLotData: indde, // ใช้ข้อมูล indde ที่เก็บข้อมูลวัตถุดิบที่แก้ไขแล้ว
+            // ข้อมูลอื่น ๆ ที่คุณต้องการส่งไปด้วย request
+        };
         setIsOpen(false);
         console.log("handleEditWork", dataForm);
         const updatedIngrelot = [...ingrelot];
 
-        const requestData = {
-            ingreLotData: updatedIngrelot, // ข้อมูลที่ต้องการอัปเดต
-            // ข้อมูลอื่น ๆ ที่ต้องการส่งไปด้วย request
-        };
-
-        const response = await fetch(`http://localhost:8080/ingredient/editData/${id}`, {
-            method: 'PUT',
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/editData/${id}`, {
+            method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -205,6 +197,15 @@ function Index() {
         } else {
             setMessage(responseData.message || 'Error occurred');
         }
+        setIsModified(true);
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setInd((prevFormIn) => ({
+            ...prevFormIn,
+            [name]: value,
+        }));
     };
 
     return (
@@ -220,7 +221,7 @@ function Index() {
                 <div>
                     <p className="text-sm px-6 py-2 text-[#73664B]">เลขล็อตวัตถุดิบ : {ind.indl_id_name}</p>
                     <p className="text-sm px-6 py-2 text-[#73664B]">วันที่ : {ind.created_at}</p>
-                    <form onSubmit={(e) => handleSubmit(e, ind)}>
+                    <form onSubmit={handleSubmit}>
                         {/* <input type="hidden" name="lotno" id="lotno" value={lot.lotno} /> */}
                         <div className="grid grid-cols-6">
                             <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:
@@ -267,30 +268,37 @@ function Index() {
                                 className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 scale-75 w-1/2" />
                         </div >
                     </form>
+                    {additionalIngredients.map((addedIngredient, index) => (
+                        <div key={index} className="grid grid-cols-8">
+                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">วัตถุดิบ:  {addedIngredient.name}</p>
+                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">จำนวน:  {addedIngredient.quantity}</p>
+                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2 ">วันหมดอายุ:  {addedIngredient.exp}</p>
+                            <p className="text-sm px-6 py-2 text-[#73664B]" >ราคา:  {addedIngredient.price}</p>
+                            <p className="px-6 py-2">
+                                <button onClick={() => handleDeleteIngredient(index)}>
+                                    <TrashIcon className="h-5 w-5 text-red-500" /></button>
+                            </p>
+                        </div>
+                    ))}
                     {indde.map((ingredient, Idx) => (
                         <Fragment key={Idx}>
                             <div className="grid grid-cols-8">
-                                {ingredients.map((ingred) => (
-                                    ingred.id === ingredient.ind_id ? (
-                                        <React.Fragment key={Idx}>
-                                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">
-                                                วัตถุดิบ: {ingredient.ind_name}
-                                            </p>
-                                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">
-                                                จำนวน: {ingredient.qtypurchased}
-                                            </p>
-                                        </React.Fragment>
-                                     ) : null
-                                ))} 
+                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">
+                                    วัตถุดิบ: {ingredient.ind_name}
+                                </p>
+                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">
+                                    จำนวน: {ingredient.qtypurchased}
+                                </p>
                                 <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">วันหมดอายุ : {ingredient.date_exp}</p>
                                 <p className="text-sm px-6 py-2 text-[#73664B]">ราคา : {ingredient.price}</p>
                                 <p className="px-6 py-2">
-                                    <button onClick={() => handleDeleteIngredient(ind, Idx)}>
+                                    <button onClick={() => handleDeleteIngredient(Idx)}>
                                         <TrashIcon className="h-5 w-5 text-red-500" /></button>
                                 </p>
                             </div>
                         </Fragment>
                     ))}
+
                     <div className="flex justify-end mt-5">
                         <button
                             onClick={openModal}
@@ -367,8 +375,9 @@ function Index() {
                         )}
                     </>
                 </div>
-            ) : null}
-        </div>
+            ) : null
+            }
+        </div >
     );
 }
 export default Index

@@ -7,7 +7,7 @@ import { Icon } from '@iconify/react';
 import { Switch, CheckboxGroup, Tabs, Chip, User, Tab, cn, Input, Avatar, Card, CardHeader, CardBody, Divider, ScrollShadow, Button, Select, SelectItem, CardFooter, Spinner, Image, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Textarea, RadioGroup, Radio, Breadcrumbs, BreadcrumbItem, image } from "@nextui-org/react";
 import { CiTrash } from "react-icons/ci";
 import { FaTrash } from 'react-icons/fa';
-
+import { useRouter } from "next/router";
 
 import menusell from '../../data/menusell';
 import AddSell from '../../components/addSell';
@@ -15,6 +15,7 @@ import AddSell from '../../components/addSell';
 
 
 function sell_all() {
+
 
     const [menuSellData, setMenuSellData] = useState(menusell);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
@@ -118,121 +119,51 @@ function sell_all() {
         }
     ]
 
-    const [sellMenuFix, setSellMenuFix] = useState({
-        name: "",
-        price: 0,
-        type: 0,
-        image: '',
-        status: 'Close',
-        product: [
 
-        ]
-    });
-
-    const [sellSelectMix, setSellSelectMix] = React.useState([]);
-
-    const [switchStatus, setSwitchStatus] = useState(false);
-
-    const changeStatus = () => {
-        setSwitchStatus(!switchStatus);
-        if (switchStatus) {
-            setSellMenuFix((prevProduct) => ({
-                ...prevProduct,
-                status: "Close"
-            }));
-        } else {
-            setSellMenuFix((prevProduct) => ({
-                ...prevProduct,
-                status: "Open"
-            }));
-        }
+    const router = useRouter();
+    const { id } = router.query;
+    const [sm, setSm] = useState([]);
+    const [smt, setSmt] = useState([]);
+    interface smt {
+        smt_id: Number,
+        smt_name: String
     }
 
+    interface sm {
+        sm_id: Number,
+        sm_name: String
+        smt_name: String,
+        sm_price: Number
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/small`)
+            .then(response => response.json())
+            .then(data => {
+                setSm(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
 
-    const handleAddProduct = () => {
-        setSellMenuFix(prevState => ({
-            ...prevState,
-            product: [...prevState.product, { id: '', quantity: 1 }]
-        }));
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
+            .then(response => response.json())
+            .then(data => {
+                setSmt(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+
+    }, [id]);
+
+    // Function to find smt_name by smt_id
+    const findSmtNameById = (smt_id) => {
+        const foundSmt = smt.find(item => item.smt_id === smt_id);
+        return foundSmt ? foundSmt.smt_name : "";
     };
 
-    const handleSelechTypeTwo = () => {
-        setSellMenuFix(prevState => ({
-            ...prevState,
-            product: [...prevState.product, { id: '0' }]
-        }));
-    };
-
-    const handleSelechTypeOne = () => {
-        setSellMenuFix(prevState => ({
-            ...prevState,
-            product: []
-        }));
-    };
-
-    const handleProductChange = (index, value) => {
-        setSellMenuFix(prevState => {
-            const updatedProducts = [...prevState.product];
-            updatedProducts[index].id = value;
-            return {
-                ...prevState,
-                product: updatedProducts
-            };
-        });
-    };
-
-
-    const handleQuantityChange = (index, delta) => {
-        setSellMenuFix(prevState => {
-            const updatedProducts = [...prevState.product];
-            updatedProducts[index].quantity = Math.max(0, updatedProducts[index].quantity + delta);
-            console.log("Q => ", delta);
-            console.log("QT => ", updatedProducts[index].quantity);
-
-            return {
-                ...prevState,
-                product: updatedProducts
-            };
-        });
-    };
-
-    const handleDelete = (index) => {
-        setSellMenuFix(prevState => {
-            const updatedProducts = [...prevState.product];
-            updatedProducts.splice(index, 1);
-            return {
-                ...prevState,
-                product: updatedProducts
-            };
-        });
-    };
-
-    const handleProductInputChangeFix = (e) => {
-        const { name, value } = e.target;
-        setSellMenuFix(prevState => ({
-            ...prevState,
-            [name]: value,
-            product: []
-        }));
-        setSellSelectMix([])
-    };
-
-    const handSelectedChange = (e) => {
-        const { value } = e.target;
-        setSellMenuFix((prevSellMenuFix) => ({
-            ...prevSellMenuFix,
-            product: [{ id: value }]
-        }));
-    };
-
-
-
-
-
-    // console.log(sellMenuFix);
-    // console.log(sellMenuFix.product);
-
-    const [groupSelected, setGroupSelected] = React.useState([]);
 
     return (
         <div className="overflow-x-auto h-[calc(100vh-58px)]">
@@ -277,92 +208,56 @@ function sell_all() {
                     <option>ดิป</option>
                 </select>
             </div>
-            <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">โดนัท</p>
-            {/* card */}
-            <div className="flex flex-wrap ">
-                {menuSellData.map((menu) => (
-                    menu.type !== "4" ? (
-                        <div key={menu.id} className="card w-52 h-52 bg-base-100 shadow-sm mx-2 ml-5 mb-5">
-                            <div className="flex justify-end mt-1">
-                                <Link href="/product/sell_edit">
-                                    <PencilSquareIcon className="h-5 w-5 text-[#73664B] mr-2" />
-                                </Link>
-                                <Link href="/product/sell_detail">
-                                    <InformationCircleIcon className="h-5 w-5 text-[#73664B] mr-2" />
-                                </Link>
-                            </div>
-                            {/* <figure className="">
-                                <img src={menu.image} alt={menu.name} className="w-32 h-32" />
-                            </figure> */}
-                            <div className="flex justify-center w-full">
-                                <Image
-                                    alt={menu.name}
-                                    className="w-36 object-cover h-32 justify-center items-center"
-                                    height={200}
-                                    sizes={`(max-width: 768px) ${32}px, ${32}px`}
-                                    src={menu.image}
-                                    // src="/images/logo.svg"
-                                    width={200}
-                                />
-                            </div>
-                            <div className="card-body p-0">
-                                <div className="text-center">
-                                    <p className="text-mediem text-[#73664B]">
-                                        {menu.name}
-                                    </p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-[#F2B461]">{menu.price} บาท</p>
-                                </div>
-                            </div>
-                        </div>
-                    ) : null
-                ))}
+            {sm.map((smtItem) => (
+                <div key={smtItem.smt_id}>
+                    <div>
+                        <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">{smtItem.smt_name}</p>
+                    </div>
+                    <div className="flex flex-wrap">
+                        {sm.map((menu) => {
+                            const foundSmt = smt.find(item => item.smt_id === smtItem.smt_id);
+                            if (foundSmt && menu.smt_name === foundSmt.smt_name) {
+                                return (
+                                    <div key={menu.id} className="card w-52 h-52 bg-base-100 shadow-sm mx-2 ml-5 mb-5">
+                                        <div className="flex justify-end mt-1">
+                                            <Link href="/product/sell_edit">
+                                                <PencilSquareIcon className="h-5 w-5 text-[#73664B] mr-2" />
+                                            </Link>
+                                            <Link href="/product/sell_detail">
+                                                <InformationCircleIcon className="h-5 w-5 text-[#73664B] mr-2" />
+                                            </Link>
+                                        </div>
+                                        <div className="flex justify-center w-full">
+                                            <Image
+                                                alt={menu.name}
+                                                className="w-36 object-cover h-32 justify-center items-center"
+                                                height={200}
+                                                sizes={`(max-width: 768px) ${32}px, ${32}px`}
+                                                src={menu.image}
+                                                width={200}
+                                            />
+                                        </div>
+                                        <div className="card-body p-0">
+                                            <div className="text-center">
+                                                <p className="text-mediem text-[#73664B]">
+                                                    {menu.sm_name}, {findSmtNameById(menu.smt_id)}
+                                                </p>
+                                            </div>
+                                            <div className="text-center">
+                                                <p className="text-[#F2B461]">{menu.sm_price} บาท</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            } else {
+                                return null;
+                            }
+                        })}
+                    </div>
+                </div>
+            ))}
 
-            </div>
-            <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182]">ดิป</p>
-            <div className="flex flex-wrap ">
-                {menuSellData.map((menu) => (
-                    menu.type === "4" ? (
-                        <div key={menu.id} className="card w-52 h-52 bg-base-100 shadow-sm mx-2 ml-5 mb-5">
-                            <div className="flex justify-end mt-1">
-                                <Link href="/product/sell_edit">
-                                    <PencilSquareIcon className="h-5 w-5 text-[#73664B] mr-2" />
-                                </Link>
-                                <Link href="/product/sell_detail">
-                                    <InformationCircleIcon className="h-5 w-5 text-[#73664B] mr-2" />
-                                </Link>
-                            </div>
-                            {/* <figure className="">
-                                <img src={menu.image} alt={menu.name} className="w-32 h-32" />
-                            </figure> */}
 
-                            <div className="flex justify-center w-full">
-                                <Image
-                                    alt={menu.name}
-                                    className="w-36 object-cover h-32 justify-center items-center"
-                                    height={200}
-                                    sizes={`(max-width: 768px) ${32}px, ${32}px`}
-                                    src={menu.image}
-                                    // src="/images/logo.svg"
-                                    width={200}
-                                />
-                            </div>
-
-                            <div className="card-body p-0">
-                                <div className="text-center">
-                                    <p className="text-mediem text-[#73664B]">
-                                        {menu.name}
-                                    </p>
-                                </div>
-                                <div className="text-center">
-                                    <p className="text-[#F2B461]">{menu.price} บาท</p>
-                                </div>
-                            </div>
-                        </div>
-                    ) : null
-                ))}
-            </div>
 
             {/* Show Model Add Sell */}
             <AddSell

@@ -76,7 +76,7 @@ function add() {
     }
     useEffect(() => {
         // Fetch unit data from the server and set the options
-        fetch('http://localhost:8080/ingredient/read')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
             .then(response => response.json())
             .then(data => {
                 setIngredientsOptions(data);
@@ -100,7 +100,7 @@ function add() {
             ingredient_lot_detail: ingredientLotDetail
         };
 
-        const response = await fetch('http://localhost:8080/ingredient/addLotIngrediantnew', {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/addLotIngrediantnew`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

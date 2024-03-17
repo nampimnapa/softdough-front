@@ -45,7 +45,7 @@ function addrecipe() {
     }
     useEffect(() => {
 
-        fetch(`http://localhost:8080/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -54,7 +54,7 @@ function addrecipe() {
                 console.error('Error fetching unit data:', error);
             });
 
-        fetch('http://localhost:8080/product/readcat')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
             .then(response => response.json())
             .then(data => {
                 setProductCat(data);
@@ -63,7 +63,7 @@ function addrecipe() {
                 console.error('Error fetching unit data:', error);
             });
 
-        fetch('http://localhost:8080/ingredient/read')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
             .then(response => response.json())
             .then(data => {
                 setIngredientsOptions(data);
@@ -140,6 +140,7 @@ function addrecipe() {
             [name]: value
         }));
     };
+
     const [product, setProduct] = useState({
         name: '',         // Provide a default or leave it as an empty string
         qtymin: 0,        // Provide a default or leave it as 0
@@ -212,8 +213,53 @@ function addrecipe() {
     };
 
     const [message, setMessage] = useState('Loading');
+    // const convertToBase64 = (file) => {
+    //     return new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.readAsDataURL(file);
+    //         reader.onload = () => {
+    //             resolve(reader.result);
+    //         };
+    //         reader.onerror = (error) => {
+    //             reject(error);
+    //         };
+    //     });
+    // };
+    // const convertToBase64 = (file) => {
+    //     if (!(file instanceof Blob)) {
+    //         throw new Error("File parameter must be a Blob object");
+    //     }
+    //     return new Promise((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.readAsDataURL(file);
+    //         reader.onload = () => {
+    //             resolve(reader.result);
+    //         };
+    //         reader.onerror = (error) => {
+    //             reject(error);
+    //         };
+    //     });
+    // };
+    // const convertToBase64 = (file) => {
+    //     return new Promise((resolve, reject) => {
+    //         if (!(file instanceof Blob)) {
+    //             reject(new Error('Parameter is not of type Blob'));
+    //         }
+
+    //         const reader = new FileReader();
+    //         reader.readAsDataURL(file);
+    //         reader.onload = () => {
+    //             resolve(reader.result);
+    //         };
+    //         reader.onerror = (error) => {
+    //             reject(error);
+    //         };
+    //     });
+    // };
 
     const handleNextClick = async () => {
+
+
         if (currentPage !== "item2") {
             handleItemClick("item2");
         }
@@ -222,6 +268,7 @@ function addrecipe() {
                 pd_name: product.name,
                 pd_qtyminimum: typeof product.qtymin === 'string' ? parseInt(product.qtymin) : product.qtymin,
                 status: product.status,
+                // picture: product.img ? product.img.toString('base64') : null, // แปลงรูปภาพเป็น base64 ก่อนส่ง                pdc_id: product.pdc_id,
                 picture: product.img,
                 pdc_id: product.pdc_id,
                 recipe: {
@@ -252,7 +299,7 @@ function addrecipe() {
             // }))));
 
 
-            const response = await fetch('http://localhost:8080/product/addProductWithRecipe', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/addProductWithRecipe`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

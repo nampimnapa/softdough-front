@@ -23,7 +23,7 @@ function listorder() {
     }
     useEffect(() => {
         // Fetch staff data on component mount
-        fetch('http://localhost:8080/production/readall')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/readall`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);

@@ -13,15 +13,28 @@ function all() {
     const allCategories = ['ทั้งหมด', 'ตามล็อต'];
 
     const [ind, setIngredientall] = useState<any[]>([]);
+    const [indlot, setIngredientLot] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // Fetch staff data on component mount
-        fetch('http://localhost:8080/ingredient/read')
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
                 setIngredientall(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlotdetail`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setIngredientLot(data); // Assuming the response is an array of staff objects
                 setLoading(false);
             })
             .catch((error) => {
@@ -178,21 +191,21 @@ function all() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {Array.isArray(ind) && ind.map((ingredients, idx) => (
+                                            {Array.isArray(indlot) && indlot.map((ingredients, idx) => (
                                                 <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                     <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
-                                                    </td>
+                                                    {ingredients.indl_id_name}</td>
                                                     <td className="px-6 py-1 text-left">{ingredients.ind_name}
                                                     </td>
-                                                    <td className="px-6 py-1">{ingredients.ind_stock}
+                                                    <td className="px-6 py-1">{ingredients.qty_stock}
                                                     </td>
 
-                                                    <td className="px-6 py-1">
+                                                    <td className="px-6 py-1">{ingredients.date_exp}
                                                     </td>
 
                                                     <td className="px-6 py-4 flex items-center justify-center  ">
                                                         <button type="submit" >
-                                                            <Link href={`./${ingredients.ind_id}`} className="w-full flex justify-center items-center">
+                                                            <Link href='#' className="w-full flex justify-center items-center">
                                                                 <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
                                                             </Link>
                                                         </button>
