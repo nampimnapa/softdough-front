@@ -37,7 +37,7 @@ const productDropdown = [
 const manufactureDropdown = [
   { title: "เพิ่มใบสั่งผลิต", href: "/manufacture/add" },
   { title: "รายการสั่งผลิต", href: "/manufacture/listorder" },
-  { title: "รออนุมัติ", href: "/manufacture/pending" },
+  { title: "รออนุมัติ", href: "/manufacture/approve" },
 ];
 // รายการขาย
 const sellDropdown = [

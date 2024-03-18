@@ -62,10 +62,31 @@ function detailproduction() {
     }, [id]);
 
     const [message, setMessage] = useState('Loading');
-    const handleCheckboxChange = async (id) => {
+
+    // ทำการสร้าง state ใหม่เพื่อเก็บสถานะการเลือกของ Checkbox สำหรับแต่ละรายการใน pdodetail
+    const [checkedItems, setCheckedItems] = useState({});
+
+    const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
         console.log(isChecked)
+
+        // สร้างอาร์เรย์ใหม่เพื่อเก็บสถานะของ Checkbox แต่ละอันในตาราง
+        const newCheckedItems = {};
+        detail.pdodetail.forEach(pdodetail => {
+            newCheckedItems[pdodetail.id] = !isChecked;
+        });
+        setCheckedItems(newCheckedItems);
     };
+
+    const handleCheckboxChangeDetail = (id) => {
+        // เปลี่ยนสถานะของ Checkbox แต่ละอันในตาราง
+        const newCheckedItems = { ...checkedItems, [id]: !checkedItems[id] };
+        setCheckedItems(newCheckedItems);
+    };
+    const isCheckedForDetail = (id) => {
+        return detail.pdo_status === '2' && checkedItems[id];
+    };
+
 
     const handleStatusChange = async (id) => {
 
@@ -93,11 +114,6 @@ function detailproduction() {
     };
 
 
-
-
-
-
-
     return (
         <div>
             <button className='my-3 mx-5 '>
@@ -118,7 +134,9 @@ function detailproduction() {
                         </p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">ใบสั่งผลิต : {detail.pdo_id_name}</p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">วันที่สั่งผลิต : {detail.updated_at}</p>
+                        
                         <div className="relative overflow-x-auto mx-6 mt-2">
+
                             <table className="w-full text-sm text-center text-gray-500 ">
                                 <thead >
                                     <tr className="text-white  font-normal  bg-[#908362] ">
@@ -150,16 +168,21 @@ function detailproduction() {
                                             <td className="px-6 py-1 h-10 ">
                                                 {pdodetail.qty}
                                             </td>
-                                            {/* <td className="px-6 py-4 flex items-center justify-center">
-                                        {pdodetail.status}
-                                        </td> */}
+
                                             <td className={`text-sm px-6 py-2 
-    ${detail.pdo_status === '2' ? 'text-green-500' :
+    ${detail.pdo_status === '3' ? 'text-green-500' :
                                                     detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
                                                 }`}>
-                                                {/* {pdodetail.status} */}
-                                                {pdodetail.status === '2' ? 'เสร็จสิ้นแล้ว' : pdodetail.status === '1' ? 'รอยืนยันดำเนินการ' : detail.pdo_status}
+                                                {pdodetail.status === '3' ? 'เสร็จสิ้นแล้ว' : pdodetail.status === '1' ? 'รอยืนยันดำเนินการ' : ''}
+                                                {pdodetail.status === '2' && (
+                                                    <Checkbox color="success"
+                                                        onChange={() => handleCheckboxChangeDetail(pdodetail.id)}
+                                                        checked={isCheckedForDetail(pdodetail.id)}
+                                                    >
+                                                    </Checkbox>
+                                                )}
                                             </td>
+
                                         </tr>
 
                                     ))}
@@ -171,210 +194,221 @@ function detailproduction() {
                     <p>Loading...</p>
                 )}
             </div>
-            {detail !== null ? (
-                <div>
-                    {/* Render checkbox based on pdo_status */}
-                    {detail.pdo_status === '1' && (
-                        <div className="ml-6 mt-5">
-                            <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange} checked={isChecked}>
-                                ยืนยันการดำเนินการผลิต
-                            </Checkbox>
-                        </div>
-                    )}
-                    {detail.pdo_status === '2' && (
-                        <div className="ml-6 mt-5">
-                            <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange} checked={isChecked}>
-                                ยืนยันการผลิตสำเร็จ
-                            </Checkbox>
-                        </div>
-                    )}
-
-                    {/* Rest of your component */}
-                </div>
-            ) : (
-                <p>Loading...</p>
-            )}
-
-            {detail !== null ? (
-                <div className="flex justify-start">
-                    <div className="w-1/2  mt-10  flex justify-start " >
-
-                        <Button
-                            // href="/manufacture/listorder"
-                            onClick={() => {
-                                if (isChecked) {
-                                    // If isChecked is true, navigate without showing modal
-                                    router.push('/manufacture/listorder');
-                                } else {
-                                    // If isChecked is false, open modal
-                                    openModal();
-                                }
-                            }}
-                            type="button"
-                            className=" text-white bg-[#73664B]  focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-5">
-                            เสร็จสิ้น</Button>
-
-
-                        {detail !== null && detail.pdo_status === '1' && (
-                            <div className="w-full flex justify-start">
-                                <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
-                                    แก้ไขใบสั่งผลิต
-                                </Button>
+            {
+                detail !== null ? (
+                    <div>
+                        {/* Render checkbox based on pdo_status */}
+                        {detail.pdo_status === '1' && (
+                            <div className="ml-6 mt-5">
+                                <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange} checked={isChecked}>
+                                    ยืนยันการดำเนินการผลิต
+                                </Checkbox>
+                            </div>
+                        )}
+                        {/* {detail.pdo_status === '2' && (
+                            <div className="ml-6 mt-5">
+                                <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange} checked={isChecked}>
+                                    ยืนยันการผลิตสำเร็จ
+                                </Checkbox>
+                            </div>
+                        )} */}
+                        {detail.pdo_status === '2' && (
+                            <div className="ml-6 mt-5">
+                                <Checkbox radius="sm" color="warning" onClick={handleCheckboxChange} checked={isChecked}>
+                                    Select All
+                                </Checkbox>
                             </div>
                         )}
 
+                        {/* Rest of your component */}
+                    </div>
+                ) : (
+                    <p>Loading...</p>
+                )
+            }
 
-                        {!isChecked && detail && detail.pdo_status === '1' && (
-                            // Modal แสดงเมื่อ isChecked เป็น true และ detail.pdo_status เท่ากับ '2'
-                            <div className="flex justify-start">
-                                <div className="w-1/2 mt-10 flex justify-start">
-                                    <>
-                                        {isOpen && (
-                                            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                                <Dialog as="div" className="relative z-10" onClose={closeModal}>
-                                                    <Transition.Child
-                                                        as={Fragment}
-                                                        enter="ease-out duration-300"
-                                                        enterFrom="opacity-0"
-                                                        enterTo="opacity-100"
-                                                        leave="ease-in duration-200"
-                                                        leaveFrom="opacity-100"
-                                                        leaveTo="opacity-0"
-                                                    >
-                                                        <div className="fixed inset-0 bg-black/25" />
-                                                    </Transition.Child>
+            {
+                detail !== null ? (
+                    <div className="flex justify-start">
+                        <div className="w-1/2  mt-10  flex justify-start " >
 
-                                                    <div className="fixed inset-0 overflow-y-auto">
-                                                        <div className="flex min-h-full items-center justify-center p-4 text-center">
-                                                            <Transition.Child
-                                                                as={Fragment}
-                                                                enter="ease-out duration-300"
-                                                                enterFrom="opacity-0 scale-95"
-                                                                enterTo="opacity-100 scale-100"
-                                                                leave="ease-in duration-200"
-                                                                leaveFrom="opacity-100 scale-100"
-                                                                leaveTo="opacity-0 scale-95"
-                                                            >
-                                                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                                                    <Dialog.Title
-                                                                        as="h3"
-                                                                        className="text-lg font-medium leading-6 text-[73664B]"
-                                                                    >
-                                                                        ยืนยันการดำเนินการ
-                                                                    </Dialog.Title>
-                                                                    <div className="mt-2">
-                                                                        <p className="text-sm text-[#73664B]">
-                                                                            คุณต้องการยืนยันการดำเนินการใช่หรือไม่?
-                                                                        </p>
-                                                                    </div>
-                                                                    <div className="flex justify-end">
-                                                                        <div className="inline-flex justify-end">
-                                                                            <button
-                                                                                type="button"
-                                                                                className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                                onClick={closeModal}
-                                                                            >
-                                                                                ยกเลิก
-                                                                            </button>
-                                                                            <button
-                                                                                onClick={() => handleStatusChange(id)}
-                                                                                type="button"
-                                                                                className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                            >
-                                                                                <Link href={`/manufacture/listorder`}>
-                                                                                    ยืนยัน
-                                                                                </Link>
-                                                                            </button>
-                                                                        </div>
-                                                                    </div>
-                                                                </Dialog.Panel>
-                                                            </Transition.Child>
-                                                        </div>
-                                                    </div>
-                                                </Dialog>
-                                            </Transition>
-                                        )}
-                                    </>
+                            <Button
+                                // href="/manufacture/listorder"
+                                onClick={() => {
+                                    if (isChecked) {
+                                        // If isChecked is true, navigate without showing modal
+                                        router.push('/manufacture/listorder');
+                                    } else {
+                                        // If isChecked is false, open modal
+                                        openModal();
+                                    }
+                                }}
+                                type="button"
+                                className=" text-white bg-[#73664B]  focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-5">
+                                เสร็จสิ้น</Button>
+
+
+                            {detail !== null && detail.pdo_status === '1' && (
+                                <div className="w-full flex justify-start">
+                                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
+                                        แก้ไขใบสั่งผลิต
+                                    </Button>
                                 </div>
-                            </div>
-                        )}
-                        {isChecked && detail && detail.pdo_status === '1' && (
-                            // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
-                            <>
-                                {isOpen && (
-                                    <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                        <Dialog as="div" className="relative z-10" onClose={closeModal}  >
-                                            <Transition.Child
-                                                as={Fragment}
-                                                enter="ease-out duration-300"
-                                                enterFrom="opacity-0"
-                                                enterTo="opacity-100"
-                                                leave="ease-in duration-200"
-                                                leaveFrom="opacity-100"
-                                                leaveTo="opacity-0"
-                                            >
-                                                <div className="fixed inset-0 bg-black/25" />
-                                            </Transition.Child>
+                            )}
 
-                                            <div className="fixed inset-0 overflow-y-auto">
-                                                <div className="flex min-h-full items-center justify-center p-4 text-center">
-                                                    <Transition.Child
-                                                        as={Fragment}
-                                                        enter="ease-out duration-300"
-                                                        enterFrom="opacity-0 scale-95"
-                                                        enterTo="opacity-100 scale-100"
-                                                        leave="ease-in duration-200"
-                                                        leaveFrom="opacity-100 scale-100"
-                                                        leaveTo="opacity-0 scale-95"
-                                                    >
-                                                        <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                                            <Dialog.Title
-                                                                as="h3"
-                                                                className="text-lg font-medium leading-6 text-[73664B]"
-                                                            >
-                                                                ไปที่หน้าแก้ไขใบสั่งผลิต
-                                                            </Dialog.Title>
-                                                            <div className="mt-2">
-                                                                <p className="text-sm text-[#73664B]">
-                                                                    คุณต้องการไปที่หน้าแก้ไขใบสั่งผลิตหรือไม่
-                                                                </p>
+
+                            {!isChecked && detail && detail.pdo_status === '1' && (
+                                // Modal แสดงเมื่อ isChecked เป็น true และ detail.pdo_status เท่ากับ '2'
+                                <div className="flex justify-start">
+                                    <div className="w-1/2 mt-10 flex justify-start">
+                                        <>
+                                            {isOpen && (
+                                                <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                                                    <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0"
+                                                            enterTo="opacity-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100"
+                                                            leaveTo="opacity-0"
+                                                        >
+                                                            <div className="fixed inset-0 bg-black/25" />
+                                                        </Transition.Child>
+
+                                                        <div className="fixed inset-0 overflow-y-auto">
+                                                            <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                                <Transition.Child
+                                                                    as={Fragment}
+                                                                    enter="ease-out duration-300"
+                                                                    enterFrom="opacity-0 scale-95"
+                                                                    enterTo="opacity-100 scale-100"
+                                                                    leave="ease-in duration-200"
+                                                                    leaveFrom="opacity-100 scale-100"
+                                                                    leaveTo="opacity-0 scale-95"
+                                                                >
+                                                                    <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                        <Dialog.Title
+                                                                            as="h3"
+                                                                            className="text-lg font-medium leading-6 text-[73664B]"
+                                                                        >
+                                                                            ยืนยันการดำเนินการ
+                                                                        </Dialog.Title>
+                                                                        <div className="mt-2">
+                                                                            <p className="text-sm text-[#73664B]">
+                                                                                คุณต้องการยืนยันการดำเนินการใช่หรือไม่?
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className="flex justify-end">
+                                                                            <div className="inline-flex justify-end">
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                                    onClick={closeModal}
+                                                                                >
+                                                                                    ยกเลิก
+                                                                                </button>
+                                                                                <button
+                                                                                    onClick={() => handleStatusChange(id)}
+                                                                                    type="button"
+                                                                                    className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                                >
+                                                                                    <Link href={`/manufacture/listorder`}>
+                                                                                        ยืนยัน
+                                                                                    </Link>
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </Dialog.Panel>
+                                                                </Transition.Child>
                                                             </div>
-                                                            {/*  choose */}
-                                                            <div className="flex justify-end">
-                                                                <div className="inline-flex justify-end">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                        onClick={closeModal}
-                                                                    >
-                                                                        ยกเลิก
-                                                                    </button>
+                                                        </div>
+                                                    </Dialog>
+                                                </Transition>
+                                            )}
+                                        </>
+                                    </div>
+                                </div>
+                            )}
+                            {isChecked && detail && detail.pdo_status === '1' && (
+                                // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
+                                <>
+                                    {isOpen && (
+                                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0 bg-black/25" />
+                                                </Transition.Child>
 
-                                                                    <button
-                                                                        type="button"
-                                                                        className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                    // onClick={handleConfirm}
-                                                                    ><Link href={`../editpdod/${id}`}>
-                                                                            ยืนยัน
-                                                                        </Link></button>
+                                                <div className="fixed inset-0 overflow-y-auto">
+                                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                <Dialog.Title
+                                                                    as="h3"
+                                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                                >
+                                                                    ไปที่หน้าแก้ไขใบสั่งผลิต
+                                                                </Dialog.Title>
+                                                                <div className="mt-2">
+                                                                    <p className="text-sm text-[#73664B]">
+                                                                        คุณต้องการไปที่หน้าแก้ไขใบสั่งผลิตหรือไม่
+                                                                    </p>
                                                                 </div>
-                                                            </div>
-                                                        </Dialog.Panel>
-                                                    </Transition.Child>
+                                                                {/*  choose */}
+                                                                <div className="flex justify-end">
+                                                                    <div className="inline-flex justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                            onClick={closeModal}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                        // onClick={handleConfirm}
+                                                                        ><Link href={`../editpdod/${id}`}>
+                                                                                ยืนยัน
+                                                                            </Link></button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </Dialog>
-                                    </Transition>
-                                )
-                                }
-                            </>
-                        )}
-                    </div >
-                </div>
-            ) : (
-                <p>Loading...</p>
-            )}
-        </div>
+                                            </Dialog>
+                                        </Transition>
+                                    )
+                                    }
+                                </>
+                            )}
+                        </div >
+                    </div>
+                ) : (
+                    <p>Loading...</p>
+                )
+            }
+        </div >
     );
 }
 
