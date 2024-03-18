@@ -183,7 +183,7 @@ function detailproduction() {
                     )}
                     {detail.pdo_status === '2' && (
                         <div className="ml-6 mt-5">
-                            <Checkbox radius="sm" color="success" onChange={handleCheckboxChange} checked={isChecked}>
+                            <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange} checked={isChecked}>
                                 ยืนยันการผลิตสำเร็จ
                             </Checkbox>
                         </div>
@@ -354,7 +354,7 @@ function detailproduction() {
                                                                         type="button"
                                                                         className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                                     // onClick={handleConfirm}
-                                                                    ><Link href={`../editpdod/${detail.pdo_id}`}>
+                                                                    ><Link href={`../editpdod/${id}`}>
                                                                             ยืนยัน
                                                                         </Link></button>
                                                                 </div>
