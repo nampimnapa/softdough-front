@@ -314,7 +314,7 @@ function add() {
                     </div>
                 </div>
             </div>
-            <div className="ml-6 ">
+            <div className="ml-6 mt-5 ">
                 <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange}>
                     ยืนยันการดำเนินการผลิต
                 </Checkbox>
@@ -382,7 +382,7 @@ function add() {
                                                                 type="button"
                                                                 className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                                 onClick={handleConfirm}
-                                                            ><Link href="#">
+                                                            ><Link href="/menufacture/listorder">
                                                                     ยืนยัน
                                                                 </Link></button>
                                                         </div>

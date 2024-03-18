@@ -15,7 +15,7 @@ function listorder() {
     const [loading, setLoading] = useState(true);
     const [Production, setProduction] = useState([]);
     interface Production {
-
+        pdo_id: string;
         pdo_id_name: string;
         updated_at: string;
         pdo_status: number;
@@ -37,11 +37,11 @@ function listorder() {
     }, []);
 
     const StatusTabs =
-        [{ id: 1, name: "ทั้งหมด" },
-        { id: 2, name: "สั่งผลิตแล้ว" },
-        { id: 3, name: "กำลังดำเนินการ" },
-        { id: 4, name: "ยกเลิกแล้ว" },
-        { id: 5, name: "เสร็จสิ้น" }
+        [{ id: 0, name: "ทั้งหมด" },
+        { id: 1, name: "สั่งผลิตแล้ว" },
+        { id: 2, name: "กำลังดำเนินการ" },
+        { id: 3, name: "ยกเลิกแล้ว" },
+        { id: 4, name: "เสร็จสิ้น" }
         ];
 
 
@@ -89,10 +89,16 @@ function listorder() {
                                     </thead>
                                     <tbody>
                                         {Production
-                                            .filter((order) => selectedTab.name === "ทั้งหมด" ? true : order.status === selectedTab.name)
+                                            .filter((order) => {
+                                                if (selectedTab.name === "ทั้งหมด") {
+                                                    return true; // แสดงทุก pdo_status เมื่อเลือกแท็บ "ทั้งหมด"
+                                                } else {
+                                                    return order.pdo_status.toString() === selectedTab.id.toString();
+                                                }
+                                            })
                                             .map((order) => (
                                                 <tr
-                                                    key={order.pdo_id}
+                                                    key={order.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10"
                                                 >
                                                     <td
                                                         scope="row"
@@ -105,19 +111,20 @@ function listorder() {
                                                     {/* order.pdo_status === 'เสร็จสิ้น' ? ' text-green-600' : */}
                                                     <td className={`h-10 
                                                     ${order.pdo_status === '2' ? ' text-yellow-500' :
-                                                            order.pdo_status === '1' ? 'text-[#73664B]' : ''
+                                                            order.pdo_status === '1' ? 'text-[#C5B182]' : ''
                                                         }`}>
 
                                                         {order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center">
-                                                        <button type="submit">
-                                                            <Link
-                                                                href={`./detail/${order.pdo_id}`}
-                                                                className="w-full flex justify-center items-center">
-                                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182]" />
-                                                            </Link>
-                                                        </button>
+
+                                                        <Link
+                                                            href={`./detail/${order.pdo_id}`}
+                                                            className="w-full flex justify-center items-center">
+                                                            <button type="submit">
+                                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182]" /></button>
+                                                        </Link>
+
                                                     </td>
                                                 </tr>
                                             ))}
