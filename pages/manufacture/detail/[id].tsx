@@ -134,7 +134,7 @@ function detailproduction() {
                         </p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">ใบสั่งผลิต : {detail.pdo_id_name}</p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">วันที่สั่งผลิต : {detail.updated_at}</p>
-                        
+
                         <div className="relative overflow-x-auto mx-6 mt-2">
 
                             <table className="w-full text-sm text-center text-gray-500 ">

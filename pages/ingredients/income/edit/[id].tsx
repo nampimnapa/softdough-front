@@ -262,7 +262,7 @@ function Index() {
                         {/* <input type="hidden" name="lotno" id="lotno" value={lot.lotno} /> */}
                         <div className="grid grid-cols-6">
                             <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:
-                                <select id="ingredients"
+                                <select id="ingredients" required
                                     className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
                                     {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
                                         <option key={ind.ind_id} value={ind.ind_id}>
@@ -274,6 +274,7 @@ function Index() {
                             <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">
                                 จำนวน :
                                 <input
+                                required
                                     min="1"
                                     type="number"
                                     name="count"
@@ -292,7 +293,7 @@ function Index() {
                                 /></div>
                             <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">ราคา :
                                 <input
-                                req
+                                required
                                     min="0"
                                     type="number"
                                     pattern="[0-9]+([.,][0-9]+)?"
