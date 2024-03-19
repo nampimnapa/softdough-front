@@ -286,7 +286,7 @@ function ingreincome() {
                                                 : ''}`}
 
                                 >
-                                    {lot.status === '2' ? 'ยืนยัน' : lot.status === '1' ? 'ไม่ยืนยัน' : lot.status}
+                                    {lot.status === '2' ? 'ใช้งาน' : lot.status === '1' ? 'ไม่ถูกใช้งาน' : lot.status}
                                 </td>
                                 <td className="px-1 py-3  items-center justify-center  ">
                                     {lot.status === '1' && (
@@ -305,7 +305,7 @@ function ingreincome() {
                                         </Link>
                                     </button>
                                 </td>
-                                
+
                             </tr>
                         ))}
                     </tbody>

@@ -119,7 +119,7 @@ function add() {
 
 
     return (
-        <div className="h-screen">
+        <div className="">
             <button className='my-3 mx-5 '>
                 <Link href="/ingredients/income/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
@@ -130,7 +130,8 @@ function add() {
             <p className="text-m px-6 py-2 text-[#73664B]">รายละเอียดวัตถุดิบที่เพิ่ม</p>
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-6">
-                    <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:
+                    <div className="flex items-center justify-center">
+                        <p className="text-sm ml-6 mr-3 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ: </p>
                         <select id="ingredients"
                             className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
                             {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
@@ -139,63 +140,89 @@ function add() {
                                 </option>
                             ))}
                         </select>
-                    </p>
-                    <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">จำนวน :
+                    </div>
+                    <div className="flex items-center justify-center mr-5">
+                        <p className="text-sm  text-[#73664B] flex justify-center items-center w-full">จำนวน : </p>
                         <input
                             min="1"
                             // onChange={handleCancelClick}
                             type="number"
                             name="count"
                             id="count"
-                            className="px-3 bg-[#FFFFDD] w-1/2 block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
-                        /></p>
-                    <div className="text-sm px-6 py-2 text-[#73664B] flex  col-span-2 justify-center items-center">
-                        <p>วันหมดอายุ: </p>
-
+                            className="px-3 bg-[#FFFFDD] w-full block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                        />
+                    </div>
+                    <div className="text-sm  py-2 text-[#73664B] flex  col-span-2 justify-center items-center">
+                        <p className="w-1/3">วันหมดอายุ: </p>
                         <Datepicker
                             useRange={false}
                             asSingle={true}
                             value={value}
                             onChange={handleValueChange}
-                        /></div>
-                    <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">ราคา :  <input
-                        min="1"
-                        // onChange={handleCancelClick}
-                        type="number"
-                        pattern="[0-9]+([.,][0-9]+)?"
-                        name="price"
-                        id="price"
-                        className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
-                    /></p>
-                    <div className="scale-75 w-full my-2">
-                        <button
+                        />
+                    </div>
+                    <div className="flex items-center justify-center">
+                        <p className="text-sm  py-2 text-[#73664B] flex justify-center items-center mr-3">ราคา : </p>
+                        <input
+                            min="1"
+                            // onChange={handleCancelClick}
+                            type="number"
+                            pattern="[0-9]+([.,][0-9]+)?"
+                            name="price"
+                            id="price"
+                            className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                        />
+                    </div>
+                    <div className="scale-75 w-full my-2 flex justify-end">
+                        <Button
                             type="submit"
                             value="เพิ่มวัตถุดิบ"
-                            className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 py-2 px-2">เพิ่มวัตถุดิบ</button>
+                            className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 py-2 px-2">เพิ่มวัตถุดิบ</Button>
                     </div>
                 </div >
             </form>
 
-            {addedIngredients.map((addedIngredient, index) => (
-                <div key={index} className="grid grid-cols-6 text-sm px-6 py-2 text-[#73664B]">
-                    <p className="">วัตถุดิบ:  {addedIngredient.name}</p>
-                    <p className="px-2 ">จำนวน:  {addedIngredient.quantity}</p>
-                    <p className="col-span-2 px-2 ">วันหมดอายุ:  {addedIngredient.exp}</p>
-                    <p className="px-2 " >ราคา:  {addedIngredient.price}</p>
-                    <p className="px-2 ">
-                        <button onClick={() => handleDeleteIngredient(index)}>
-                            <TrashIcon className="h-5 w-5 text-red-500" /></button>
-                    </p>
+            <div className="mx-6 mt-3 h-1/2">
+                <div className="flex flex-col">
+                    <div className="bg-[#908362] text-white text-sm flex">
+                        <div className="flex-1 py-3 text-center">วัตถุดิบ</div>
+                        <div className="flex-1 py-3 text-center">จำนวน</div>
+                        <div className="flex-1 py-3 text-center">วันหมดอายุ</div>
+                        <div className="flex-1 py-3 text-center">ราคา</div>
+                    </div>
+                    <div className="max-h-40 overflow-y-auto mb-5">
+                        <table className="w-full">
+                            <tbody className="w-full">
+                                {addedIngredients.map((addedIngredient, index) => (
+                                    <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                        <td scope="col" className="flex-1 text-center">{addedIngredient.name}</td>
+                                        <td scope="col" className="flex-1 text-center">{addedIngredient.quantity}</td>
+                                        <td scope="col" className="flex-1 text-center">{addedIngredient.price}</td>
+                                        <td scope="col" className="flex-1 text-center">
+                                            <div className="flex items-center justify-center">
+                                                <button onClick={() => handleDeleteIngredient(index)}>
+                                                    <TrashIcon className="h-5 w-5 text-red-500" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            ))}
+            </div>
+
+
+
             <div className="ml-6 ">
                 {/* เช็คคือยืนยันการใช้งาน */}
-                <Checkbox radius="sm" color="warning" checked={isChecked} onChange={handleCheckboxChange}>
+                <Checkbox radius="sm" color="warning" checked={isChecked} onChange={handleCheckboxChange} className="text-sm text-[#73664B]">
                     ยืนยันการใช้งาน
                 </Checkbox>
             </div>
 
-            < div className="flex justify-between  mt-8 " >
+            < div className="mt-8 " >
                 <button>
                     <Link href="/ingredients/income/all"
                         type="button"
@@ -269,7 +296,7 @@ function add() {
                     )
                     }
                 </>
-                <button onClick={openModal} type="button" className="mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</button>
+                <button onClick={openModal} type="button" className="ml-2 mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">บันทึก</button>
             </div >
 
         </div>

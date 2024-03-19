@@ -11,6 +11,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import Datepicker from "react-tailwindcss-datepicker";
 import { useRouter } from "next/router";
+import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
 const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -108,6 +109,14 @@ function Index() {
     //         }
     //     }
     // };
+    const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
+    // const handleCheckboxChange = () => {
+    //     setIsChecked(!isChecked); // Toggle checkbox status
+    //     console.log(isChecked)
+    // };
+    const handleCheckboxChange = (newValue) => {
+        setIsChecked(!isChecked); // Set checkbox status
+    };
 
     // เพิ่มข้อมูลที่กรอกเข้ามา เพื่อเติมเพิ่มวัตถุดิบเพิ่มเติม
     const handleSubmit = async (e) => {
@@ -194,7 +203,7 @@ function Index() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "dataaToEdit": additionalIngredients }), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
+            body: JSON.stringify({ "dataaToEdit": additionalIngredients, "status": (isChecked ? 2 : 1) }), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
         });
         const responseData = await response.json();
         if (responseData.message === 'test เงื่อนไข') {
@@ -220,7 +229,7 @@ function Index() {
     }
     function areArraysEqual(array1, array2) {
         if (array1.length !== array2.length) return false;
-    
+
         for (let i = 0; i < array1.length; i++) {
             if (!areObjectsEqual(array1[i], array2[i])) {
                 return false;
@@ -231,22 +240,24 @@ function Index() {
 
     // เช็คการกดย้อนกลับ ว่าค่าเหมือนเดิมมั้ย ถ้าไม่จะขึ้นแจ้งว่า จะบันทึกก่อนไปมั้ย
     const checkCencel = () => {
-        if(areArraysEqual(indde, additionalIngredients)){ // ถ้าค่าไม่เปลี่ยน จะกลับได้เลย
+        if (areArraysEqual(indde, additionalIngredients) || isChecked) { // ถ้าค่าไม่เปลี่ยน จะกลับได้เลย
             router.push('/ingredients/income/all');
-        }else{ // ถ้าเปลี่ยน จะขึ้น Modal
+        } else { // ถ้าเปลี่ยน จะขึ้น Modal
             setIsOpenCencel(true);
         }
     };
-
     const noSave = () => {
         router.push('/ingredients/income/all');
     }
-    console.log("handleInputChange", indde);
-    console.log("additionalIngredients", additionalIngredients);
+    // console.log("handleInputChange", indde);
+    // console.log("additionalIngredients", additionalIngredients);
     console.log(areArraysEqual(indde, additionalIngredients))
+    // console.log("ind",ind);
+    console.log("isChecked", isChecked);
+
 
     return (
-        <div className='h-screen'>
+        <div className=''>
             <button className='my-3 mx-5 ' onClick={checkCencel}>
                 <div className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
@@ -259,9 +270,9 @@ function Index() {
                     <p className="text-sm px-6 py-2 text-[#73664B]">เลขล็อตวัตถุดิบ : {ind.indl_id_name}</p>
                     <p className="text-sm px-6 py-2 text-[#73664B]">วันที่ : {ind.created_at}</p>
                     <form onSubmit={handleSubmit}>
-                        {/* <input type="hidden" name="lotno" id="lotno" value={lot.lotno} /> */}
                         <div className="grid grid-cols-6">
-                            <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:
+                            <div className="flex items-center justify-center">
+                                <p className="text-sm ml-6 mr-3 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ: </p>
                                 <select id="ingredients" required
                                     className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
                                     {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
@@ -270,78 +281,98 @@ function Index() {
                                         </option>
                                     ))}
                                 </select>
-                            </p>
-                            <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">
-                                จำนวน :
+                            </div>
+                            <div className="flex items-center justify-center mr-5">
+                                <p className="text-sm  text-[#73664B] flex justify-center items-center w-full">จำนวน : </p>
                                 <input
                                 required
                                     min="1"
+                                    // onChange={handleCancelClick}
                                     type="number"
                                     name="count"
                                     id="count"
-                                    className="px-3 bg-[#FFFFDD] w-1/2 block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                                    className="px-3 bg-[#FFFFDD] w-full block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                                 />
-                                {/* ใส่หน่วยวัตถุดิบตรง span */}
-                            </p>
-                            <div className="text-sm px-6 py-2 text-[#73664B] flex  col-span-2 justify-center items-center">
-                                <p>วันหมดอายุ: </p>
+                            </div>
+                            <div className="text-sm  py-2 text-[#73664B] flex  col-span-2 justify-center items-center">
+                                <p className="w-1/3">วันหมดอายุ: </p>
                                 <Datepicker
                                     useRange={false}
                                     asSingle={true}
                                     value={value}
                                     onChange={handleValueChange}
-                                /></div>
-                            <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">ราคา :
+                                />
+                            </div>
+                            <div className="flex items-center justify-center">
+                                <p className="text-sm  py-2 text-[#73664B] flex justify-center items-center mr-3">ราคา : </p>
                                 <input
                                 required
-                                    min="0"
+                                    min="1"
+                                    // onChange={handleCancelClick}
                                     type="number"
                                     pattern="[0-9]+([.,][0-9]+)?"
                                     name="price"
                                     id="price"
                                     className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
-                                /></p>
-                            <input
-                                type="submit"
-                                value="เพิ่มวัตถุดิบ"
-                                className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 scale-75 w-1/2" />
+                                />
+                            </div>
+                            <div className="scale-75 w-full my-2 flex justify-end">
+                                <Button
+                                    type="submit"
+                                    value="เพิ่มวัตถุดิบ"
+                                    className="text-lg text-white border  bg-[#F2B461] rounded-full mr-6 py-2 px-2">เพิ่มวัตถุดิบ</Button>
+                            </div>
                         </div >
                     </form>
-                    {/* {additionalIngredients.map((addedIngredient, index) => (
-                        <div key={index} className="grid grid-cols-8">
-                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">วัตถุดิบ:  {addedIngredient.name}</p>
-                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">จำนวน:  {addedIngredient.quantity}</p>
-                            <p className="text-sm px-6 py-2 text-[#73664B] col-span-2 ">วันหมดอายุ:  {addedIngredient.exp}</p>
-                            <p className="text-sm px-6 py-2 text-[#73664B]" >ราคา:  {addedIngredient.price}</p>
-                            <p className="px-6 py-2">
-                                <button onClick={() => handleDeleteIngredient(index)}>
-                                    <TrashIcon className="h-5 w-5 text-red-500" /></button>
-                            </p>
-                        </div>
-                    ))} */}
-                    {additionalIngredients.map((ingredient, Idx) => (
-                        <Fragment key={Idx}>
-                            <div className="grid grid-cols-8">
-                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">
-                                    วัตถุดิบ: {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
-                                        ind.ind_id === ingredient.ind_id ? (ind.ind_name) : ""
-                                    ))}
-                                </p>
-                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">
-                                    จำนวน: {ingredient.qtypurchased}
-                                </p>
-                                <p className="text-sm px-6 py-2 text-[#73664B] col-span-2">วันหมดอายุ : {ingredient.date_exp}</p>
-                                <p className="text-sm px-6 py-2 text-[#73664B]">ราคา : {ingredient.price}</p>
-                                <p className="px-6 py-2">
-                                    <button onClick={() => handleDeleteIngredient(Idx)}>
-                                        <TrashIcon className="h-5 w-5 text-red-500" /></button>
-                                </p>
+                    <div className="mx-6 mt-3 h-1/2">
+                        <div className="flex flex-col">
+                            <div className="bg-[#908362] text-white text-sm flex">
+                                <div className="flex-1 py-3 text-center">วัตถุดิบ</div>
+                                <div className="flex-1 py-3 text-center">จำนวน</div>
+                                <div className="flex-1 py-3 text-center">วันหมดอายุ</div>
+                                <div className="flex-1 py-3 text-center">ราคา</div>
+                                <div className="flex-1 py-3 text-center"></div>
                             </div>
-                        </Fragment>
-                    ))}
+                            <div className="max-h-40 overflow-y-auto mb-5">
+                                <table className="w-full">
+                                    <tbody className="w-full">
+                                        {additionalIngredients.filter(ingredient => !ingredient.deleted_at).map((ingredient, Idx) => (
+                                            <tr key={Idx} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                                <td scope="col" className="flex-1 text-center">{Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
+                                                    ind.ind_id === ingredient.ind_id ? (ind.ind_name) : ""
+                                                ))}</td>
+                                                <td scope="col" className="flex-1 text-center"> {ingredient.qtypurchased}</td>
+                                                <td scope="col" className="flex-1 text-center"> {ingredient.date_exp}</td>
+                                                <td scope="col" className="flex-1 text-center">{ingredient.price}</td>
+                                                <td scope="col" className="flex-1 text-center">
+                                                    <div className="flex items-center justify-center">
+                                                        <button onClick={() => handleDeleteIngredient(Idx)}>
+                                                            <TrashIcon className="h-5 w-5 text-red-500" /></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
+
+                    <div className="ml-6 mt-5">
+                        <Checkbox
+                            className="text-sm text-[#73664B]"
+                            radius="sm"
+                            color="warning"
+                            onChange={handleCheckboxChange}
+                            isSelected={isChecked ? true : false} // หรืออาจใช้ (isChecked === 2)
+                        // isSelected={ind.status == "2" ? true : false}
+                        >
+                            ยืนยันการใช้งาน
+                        </Checkbox>
+                    </div>
                     <div className="flex justify-end mt-5">
-                    <button
+                        <button
                             onClick={checkCencel}
                             type="button"
                             className={`mr-5 text-white ${!isModified ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#C5B182]'
@@ -351,9 +382,9 @@ function Index() {
                         </button>
                         <button
                             onClick={openModal}
-                            disabled={areArraysEqual(indde, additionalIngredients)}
+                            disabled={!areArraysEqual(indde, additionalIngredients) || isChecked ? false : true}
                             type="button"
-                            className={`mr-5 text-white ${areArraysEqual(indde, additionalIngredients) ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#73664B]'
+                            className={`mr-5 text-white ${!areArraysEqual(indde, additionalIngredients) || isChecked ? 'bg-[#73664B]' : 'bg-gray-400 cursor-not-allowed'
                                 } focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2`}
                         >
                             บันทึก
@@ -457,18 +488,18 @@ function Index() {
                                                     </Dialog.Title>
                                                     <div className="mt-2">
                                                         <p className="text-sm text-[#73664B]">
-                                                        การแก้ไขของคุณยังไม่ได้รับการบันทึก คุณต้องการออกหรือไม่
+                                                            การแก้ไขของคุณยังไม่ได้รับการบันทึก คุณต้องการออกหรือไม่
                                                         </p>
                                                     </div>
                                                     {/*  choose */}
                                                     <div className="flex justify-between mt-2">
                                                         <button
-                                                                type="button"
-                                                                className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#fee2e2] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                onClick={noSave}
-                                                            >
-                                                                ไม่บันทึก
-                                                            </button>
+                                                            type="button"
+                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#fee2e2] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={noSave}
+                                                        >
+                                                            ไม่บันทึก
+                                                        </button>
                                                         <div className="inline-flex justify-end">
                                                             <button
                                                                 type="button"
@@ -477,8 +508,8 @@ function Index() {
                                                             >
                                                                 ยกเลิก
                                                             </button>
-                                                            
-                                                                <button
+
+                                                            <button
                                                                 type="button"
                                                                 className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                                 onClick={handleEditWork}>

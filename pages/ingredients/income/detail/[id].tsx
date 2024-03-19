@@ -93,7 +93,7 @@ function detail() {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlot/${id}`);
                 const data = await response.json();
-                setIngredientLot(data);  // ตั้งค่า ind ใหม่ทุกครั้งที่ fetchData ถูกเรียก
+                setIngredientLot(data); 
                 setLoading(false);
             } catch (error) {
                 console.error('Error:', error);

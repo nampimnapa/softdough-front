@@ -197,7 +197,7 @@ function all() {
                                                     {ingredients.indl_id_name}</td>
                                                     <td className="px-6 py-1 text-left">{ingredients.ind_name}
                                                     </td>
-                                                    <td className="px-6 py-1">{ingredients.qty_stock}
+                                                    <td className="px-6 py-1">{ingredients.stock_quantity}
                                                     </td>
 
                                                     <td className="px-6 py-1">{ingredients.date_exp}

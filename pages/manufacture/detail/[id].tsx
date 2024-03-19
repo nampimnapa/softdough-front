@@ -66,21 +66,44 @@ function detailproduction() {
     // ทำการสร้าง state ใหม่เพื่อเก็บสถานะการเลือกของ Checkbox สำหรับแต่ละรายการใน pdodetail
     const [checkedItems, setCheckedItems] = useState({});
 
+
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
         console.log(isChecked)
 
+    };
+
+    const [isChecked2, setIsChecked2] = useState(false); // State to track checkbox status
+
+    const handleCheckboxChange2 = () => {
+        const newIsChecked = !isChecked2; // สลับสถานะ isChecked2
+
         // สร้างอาร์เรย์ใหม่เพื่อเก็บสถานะของ Checkbox แต่ละอันในตาราง
         const newCheckedItems = {};
         detail.pdodetail.forEach(pdodetail => {
-            newCheckedItems[pdodetail.id] = !isChecked;
+            newCheckedItems[pdodetail.pdod_id] = newIsChecked;
         });
-        setCheckedItems(newCheckedItems);
+
+        setIsChecked2(newIsChecked); // ตั้งค่า isChecked2 ใหม่
+        setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
+        console.log(newIsChecked)
+        console.log(newCheckedItems)
+
+        // ตรวจสอบและส่งค่า pdo_status เป็น 3 หาก isChecked2 เป็น true
+        if (isChecked2) {
+            // ส่งค่า pdo_status เป็น 3 ทั้งหมด
+            // อย่าลืมเปลี่ยน detail.pdodetail ให้เป็นข้อมูลจริงที่ได้มาจาก API และอ้างถึง pdodetail.pdod_status แทน
+            detail.pdodetail.forEach(pdodetail => {
+                // ส่งค่า pdo_status เป็น 3 ให้กับรายการที่มี pdod_id นี้
+                sendPdoStatus(pdodetail.pdod_id, 3); // ส่งค่า pdo_status ไปยัง API
+            });
+        }
+
     };
 
-    const handleCheckboxChangeDetail = (id) => {
+    const handleCheckboxChangeDetail = (pdod_id) => {
         // เปลี่ยนสถานะของ Checkbox แต่ละอันในตาราง
-        const newCheckedItems = { ...checkedItems, [id]: !checkedItems[id] };
+        const newCheckedItems = { ...checkedItems, [pdod_id]: checkedItems[pdod_id] };
         setCheckedItems(newCheckedItems);
     };
     const isCheckedForDetail = (id) => {
@@ -89,7 +112,6 @@ function detailproduction() {
 
 
     const handleStatusChange = async (id) => {
-
         // Check if pdo_status is '1', then only proceed with updating
         if (!isChecked && detail && detail.pdo_status === '1') {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus/${id}`, {
@@ -105,11 +127,15 @@ function detailproduction() {
 
             if (responseData.status === 200) {
                 setMessage('Data update successfully');
-                router.push('/product/all');
+                // router.push('/product/all');
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
         }
+
+
+    };
+    const sendPdoStatus = (pdodId, status) => {
 
     };
 
@@ -175,9 +201,10 @@ function detailproduction() {
                                                 }`}>
                                                 {pdodetail.status === '3' ? 'เสร็จสิ้นแล้ว' : pdodetail.status === '1' ? 'รอยืนยันดำเนินการ' : ''}
                                                 {pdodetail.status === '2' && (
-                                                    <Checkbox color="success"
-                                                        onChange={() => handleCheckboxChangeDetail(pdodetail.id)}
-                                                        checked={isCheckedForDetail(pdodetail.id)}
+                                                    <Checkbox
+                                                        color="success"
+                                                        onChange={() => handleCheckboxChangeDetail(pdodetail.pdod_id)}
+                                                        isSelected={checkedItems[pdodetail.pdod_id]} // ใช้ค่าจาก checkedItems เพื่อกำหนดสถานะ checked หรือ unchecked
                                                     >
                                                     </Checkbox>
                                                 )}
@@ -214,8 +241,13 @@ function detailproduction() {
                         )} */}
                         {detail.pdo_status === '2' && (
                             <div className="ml-6 mt-5">
-                                <Checkbox radius="sm" color="warning" onClick={handleCheckboxChange} checked={isChecked}>
-                                    Select All
+                                <Checkbox
+                                    radius="sm"
+                                    color="warning"
+                                    onClick={handleCheckboxChange2}
+                                    isSelected={isChecked2} // ใช้ค่าของ isChecked2 โดยตรงเพื่อกำหนดสถานะ checked หรือ unchecked
+                                >
+                                    ยืนยันการผลิตสำเร็จ
                                 </Checkbox>
                             </div>
                         )}
@@ -231,7 +263,6 @@ function detailproduction() {
                 detail !== null ? (
                     <div className="flex justify-start">
                         <div className="w-1/2  mt-10  flex justify-start " >
-
                             <Button
                                 // href="/manufacture/listorder"
                                 onClick={() => {
@@ -239,10 +270,12 @@ function detailproduction() {
                                         // If isChecked is true, navigate without showing modal
                                         router.push('/manufacture/listorder');
                                     } else {
-                                        // If isChecked is false, open modal
+                                        // If isChecked is false, open modal and call the function
                                         openModal();
+                                        
                                     }
                                 }}
+                                
                                 type="button"
                                 className=" text-white bg-[#73664B]  focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-5">
                                 เสร็จสิ้น</Button>

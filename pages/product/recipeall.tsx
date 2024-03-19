@@ -37,6 +37,8 @@ function recipeall() {
             });
 
     }, [id]);
+
+    console.log(Recipe);
     return (
         <div className="h-screen flex flex-col">
             <p className='text-[#F2B461] font-medium m-4'>สูตรอาหาร</p>
@@ -78,9 +80,9 @@ function recipeall() {
                                     {recipe.pd_name}
                                 </p>
                                 <button type="button">
-                                    <a href="/product/recipe_edit" className="w-full flex justify-center items-center">
+                                    <Link href={`/product/recipeedit/${recipe.pd_id}`} className="w-full flex justify-center items-center">
                                         <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                    </a>
+                                    </Link>
                                 </button>
                             </div>
                             <div className="flex justify-between">
