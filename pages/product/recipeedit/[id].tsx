@@ -11,7 +11,7 @@ import { Kanit } from "next/font/google";
 import { useRouter } from "next/router";
 import { Input } from "@nextui-org/react";
 import { Dialog, Transition } from '@headlessui/react';
-import { Button, Card, Image, CardFooter, Spinner } from "@nextui-org/react";
+import { Button, Card, Image, CardFooter, Spinner, Checkbox } from "@nextui-org/react";
 
 
 const kanit = Kanit({
@@ -28,7 +28,12 @@ function recipeedit() {
     const [loading, setLoading] = useState(true);
     const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
 
-    const [productData, setProductData] = useState<any[]>([]);
+    // ค่าเดิม
+    const [productOld, setProductOld] = useState<any[]>([]);
+    const [addedIngredientsOld, setAddedIngredientsOld] = useState([]);
+
+
+
     const [product, setProduct] = useState({
         "pd_id": 0,
         "pd_name": "",
@@ -42,7 +47,8 @@ function recipeedit() {
         "un_id": "0"
     });
 
-
+// State to track checkbox status
+    console.log(product)
     interface Ingredients {
         ind_id: string;
         ind_name: string;
@@ -57,6 +63,9 @@ function recipeedit() {
         pdc_id: string;
         pdc_name: string;
     }
+
+    const [isChecked, setIsChecked] = useState(false);
+
     useEffect(() => {
 
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
@@ -99,6 +108,8 @@ function recipeedit() {
                 .then(data => {
                     setProduct(data.product);
                     setUploadedImage(data.product.picture);
+                    setProductOld(data.product);
+                    
                 })
                 .catch(error => {
                     console.error('Error fetching product data:', error);
@@ -110,16 +121,21 @@ function recipeedit() {
 
     useEffect(() => {
         if (id) { // ตรวจสอบว่ามีค่า ID หรือยัง
-                fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/pdset/${id}`)
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/pdset/${id}`)
                 .then(response => response.json())
-                .then(data => { 
+                .then(data => {
                     // console.log(data.recipedetail);
                     setAddedIngredients(data.recipedetail);
-                 })
+                    setAddedIngredientsOld(data.recipedetail);
+                    
+                })
+        }
+        if(product.status !== ""){
+            setIsChecked(product.status == "1");
+
         }
 
-
-    }, [id]);
+    }, [id,product]);
 
 
     const [currentPage, setCurrentPage] = useState("item1");
@@ -128,7 +144,6 @@ function recipeedit() {
     const handleItemClick = (itemId) => {
         setCurrentPage(itemId); // อัพเดท state เมื่อมีการคลิกที่ลิงก์
     };
-
 
     const handleBackClick = () => {
         handleItemClick("item1"); // เมื่อกดปุ่ม "ถัดไป" ให้ตั้ง currentPage เป็น "item1"
@@ -140,15 +155,16 @@ function recipeedit() {
         const ingredientId = parseInt((document.getElementById("ingredients") as HTMLSelectElement).value);
         const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value);
         const unitId = parseInt((document.getElementById("unit") as HTMLSelectElement).value);
-        const existingIngredient = addedIngredients.find((ingredient) => ingredient.id === ingredientId && parseInt(ingredient.unit) === unitId);
+        const existingIngredient = addedIngredients.find((ingredient) => ingredient.ind_id === ingredientId && parseInt(ingredient.un_id) === unitId);
+        const desiredIngredient = ingredientsOptions.find(ingredient => ingredient.ind_id == ingredientId.toString());
 
 
         if (existingIngredient) {
             // If the ingredient already exists, update the quantity
             setAddedIngredients((prevIngredients) => (
                 prevIngredients.map((ingredient) =>
-                    ingredient.id === ingredientId && ingredient.unit === unitId
-                        ? { ...ingredient, quantity: ingredient.quantity + ingredientQty }
+                    ingredient.ind_id === ingredientId && parseInt(ingredient.un_id) === unitId
+                        ? { ...ingredient, ingredients_qty: ingredient.ingredients_qty + ingredientQty }
                         : ingredient
                 )
             ));
@@ -156,7 +172,7 @@ function recipeedit() {
             // If the ingredient doesn't exist, add it to the list
             setAddedIngredients((prevIngredients) => [
                 ...prevIngredients,
-                { id: ingredientId, quantity: ingredientQty, unit: unitId }
+                { ind_id: ingredientId, ingredients_qty: ingredientQty, un_id: unitId, ind_name: desiredIngredient.ind_name }
             ]);
         }
         // Clear the input fields
@@ -165,11 +181,11 @@ function recipeedit() {
 
 
     const handleDeleteIngredient = (id) => {
-        setAddedIngredients((prevIngredients) => {
-            const updatedIngredients = prevIngredients.filter((ingredient) => ingredient.id !== id);
-            return updatedIngredients;
-        });
+        setAddedIngredients(addedIngredients.splice(id,1));
     };
+    
+    
+    
     const [recipe, setRecipe] = useState({
         qtyLifetime: "0",
         produced_qty: "0"
@@ -187,7 +203,7 @@ function recipeedit() {
     const handleClickDelete = () => {
         setProduct(prevState => ({
             ...prevState,
-            img: '/images/logo.svg'
+            picture: '/images/logo.svg'
         }));
         setUploadedImage(null);
     }
@@ -258,19 +274,19 @@ function recipeedit() {
             const productData = {
                 pd_name: product.pd_name,
                 pd_qtyminimum: typeof product.pd_qtyminimum === 'string' ? parseInt(product.pd_qtyminimum) : product.pd_qtyminimum,
-                status: product.status,
                 // picture: product.img ? product.img.toString('base64') : null, // แปลงรูปภาพเป็น base64 ก่อนส่ง                pdc_id: product.pdc_id,
                 picture: product.picture,
                 pdc_id: product.pdc_id,
+                status: isChecked,
                 recipe: {
-                    qtylifetime: typeof recipe.qtyLifetime === 'string' ? parseInt(recipe.qtyLifetime) : recipe.qtyLifetime,
-                    produced_qty: typeof recipe.produced_qty === 'string' ? parseInt(recipe.produced_qty) : recipe.produced_qty,
+                    qtylifetime: product.qtylifetime,
+                    produced_qty: product.produced_qty,
                     un_id: parseInt(product.un_id)
                 },
                 recipedetail: addedIngredients.map((ingredient) => ({
-                    ind_id: parseInt(ingredient.id),
-                    ingredients_qty: ingredient.quantity,
-                    un_id: parseInt(ingredient.unit)
+                    ind_id: parseInt(ingredient.ind_id),
+                    ingredients_qty: ingredient.ingredients_qty,
+                    un_id: parseInt(ingredient.un_id)
                 }))
             };
             console.log("Product Data:", productData);
@@ -290,8 +306,8 @@ function recipeedit() {
             // }))));
 
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/addProductWithRecipe`, {
-                method: 'POST',
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/editProductWithRecipe/${id}`, {
+                method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -301,13 +317,15 @@ function recipeedit() {
             const responseData = await response.json();
             console.log(responseData)
 
-            if (responseData.status === 200) {
+            if (responseData.message === 'Product updated successfully!') {
 
-                setMessage('Data added successfully');
+                setMessage('Product updated successfully!');
                 router.push('/product/recipeall');
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
+
+            console.log(productData);
         }
 
 
@@ -315,7 +333,30 @@ function recipeedit() {
 
     };
 
-    console.log(addedIngredients);
+
+    // const handleCheckboxChange = () => {
+    //     setIsChecked(!isChecked); // Toggle checkbox status
+    //     console.log(isChecked)
+    // };
+
+
+    const handleCheckboxChange = () => {
+        setIsChecked(!isChecked); // เปลี่ยนสถานะของ checkbox
+    
+        const newValue = isChecked ? "0" : "1"; // สลับค่า
+    
+        setProduct(prevProduct => ({
+            ...prevProduct,
+            status: newValue
+        }));
+    };
+
+    // console.log(isChecked);
+    // console.log(product.status == "1");
+    // console.log(addedIngredients);
+
+
+
 
     return (
 
@@ -394,6 +435,17 @@ function recipeedit() {
                                             </option>
                                         ))}
                                     </select>
+                                </div>
+                                <div className="ml-6 mt-5">
+                                    <Checkbox
+                                        className="text-sm text-[#73664B]"
+                                        radius="sm"
+                                        color="warning"
+                                        onChange={handleCheckboxChange}
+                                        isSelected={isChecked}
+                                    >
+                                        ยืนยันการใช้งาน
+                                    </Checkbox>
                                 </div>
                             </div>
                             <div className="w-1/2">
@@ -521,19 +573,19 @@ function recipeedit() {
                                                 ))} */}
 
 
-                                                {addedIngredients && addedIngredients.length > 0 && addedIngredients.map((ingredient,index) => (
+                                                {addedIngredients && addedIngredients.length > 0 && addedIngredients.map((ingredient, index) => (
                                                     <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                                    <td scope="col" className="flex-1 text-center">{ingredient.ind_name}</td>
-                                                    <td scope="col" className="flex-1 text-center">{ingredient.ingredients_qty}</td>
-                                                    <td scope="col" className="flex-1 text-center">{unitOptions.find((u) => parseInt(u.un_id) === ingredient.un_id)?.un_name}</td>
-                                                    <td scope="col" className="flex-1 text-center">
-                                                        <div className="flex items-center justify-center">
-                                                            <button onClick={() => handleDeleteIngredient(index)}>
-                                                                <TrashIcon className="h-5 w-5 text-red-500" />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                        <td scope="col" className="flex-1 text-center">{ingredient.ind_name}</td>
+                                                        <td scope="col" className="flex-1 text-center">{ingredient.ingredients_qty}</td>
+                                                        <td scope="col" className="flex-1 text-center">{unitOptions.find((u) => parseInt(u.un_id) === ingredient.un_id)?.un_name}</td>
+                                                        <td scope="col" className="flex-1 text-center">
+                                                            <div className="flex items-center justify-center">
+                                                                <button onClick={() => handleDeleteIngredient(index)}>
+                                                                    <TrashIcon className="h-5 w-5 text-red-500" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
                                                 ))}
                                             </tbody>
                                         </table>
@@ -548,7 +600,7 @@ function recipeedit() {
                                         type="number"
                                         name="qtylifetime"
                                         id="qtyLifetime"
-                                        value={parent(product.qtylifetime)}
+                                        value={product.qtylifetime}
                                         className="px-3 bg-[#FFFFDD] w-1/12 block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                                     />
                                     <p className="text-sm pl-3">ชิ้น</p>
@@ -602,7 +654,7 @@ function recipeedit() {
                     </button>
                 </div>
                 <div className="flex justify-start">
-                    <button onClick={handleNextClick}>
+                    <button onClick={handleNextClick} >
                         <Link
                             href="#item2"
                             type="button"

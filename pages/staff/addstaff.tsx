@@ -763,9 +763,9 @@ function addstaff() {
       <div className="flex justify-center">
         <div className="mt-5 w-1/2 ">
           <form className="grid grid-cols-4 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
               ชื่อพนักงาน :</label>
-              <div className="mt-2 col-span-3">
+            <div className="mt-2 col-span-3">
               <input
                 type="text"
                 name="st_name"
@@ -778,7 +778,7 @@ function addstaff() {
             </div>
           </form>
           <div className="grid grid-cols-4 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
               ชื่อผู้ใช้งาน :</label>
             <div className="mt-2 col-span-3">
               <input
@@ -794,7 +794,7 @@ function addstaff() {
 
           </div>
           <div className="grid grid-cols-4 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
               รหัสผ่าน :</label>
             <div className="mt-2 col-span-3">
               <input
@@ -809,7 +809,7 @@ function addstaff() {
             </div>
           </div>
           <div className="grid grid-cols-4 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
               เบอร์โทร :</label>
             <div className="mt-2 col-span-3">
               <input
@@ -824,7 +824,7 @@ function addstaff() {
             </div>
           </div>
           <div className="grid grid-cols-4 items-center ">
-          <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
               แผนก :</label>
             <div className="mt-2 col-span-3 flex">
               <div className="form-control">
@@ -849,7 +849,7 @@ function addstaff() {
             </div>
           </div>
           <div className="grid grid-cols-4 items-center mt-3 ">
-          <label className="mr- block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+            <label className="mr- block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
               วันที่เข้าทำงาน :</label>
             <Datepicker
               // className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}

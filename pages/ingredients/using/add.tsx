@@ -1,0 +1,372 @@
+import React, { Fragment, useEffect, useState } from "react";
+import Link from "next/link";
+import {
+    ChevronLeftIcon,
+    MagnifyingGlassIcon,
+    PlusIcon,
+    PencilSquareIcon,
+    TrashIcon
+} from "@heroicons/react/24/outline";
+import { Dialog, Transition } from '@headlessui/react';
+import { Kanit } from "next/font/google";
+import Datepicker from "react-tailwindcss-datepicker";
+import { useRouter } from "next/router";
+import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
+
+const kanit = Kanit({
+    subsets: ["thai", "latin"],
+    weight: ["100", "200", "300", "400", "500", "600", "700"],
+});
+
+function add() {
+
+    // const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    //     const { name, value } = e.target;
+    //     setValueForm((prevIngredient) => ({
+    //         ...prevIngredient,
+    //         [name]: value,
+    //     }));
+    // };
+    const [addedIngredients, setAddedIngredients] = useState([]);
+    const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
+    const [isOpen, setIsOpen] = useState(false);
+
+    const handleCheckboxChange = () => {
+        setIsChecked(!isChecked); // Toggle checkbox status
+    };
+    const closeModal = () => {
+        setIsOpen(false);
+    };
+
+    const openModal = () => {
+        setIsOpen(true);
+    };
+    const [message, setMessage] = useState('Loading');
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const ingredientData = {
+            ind_id: e.target.ind_id.value,
+            ind_name: e.target.ind_id.options[e.target.ind_id.selectedIndex].text, // Get the selected ingredient name
+            qty_used_sum: parseInt(e.target.qty_used_sum.value),
+            scrap: parseInt(e.target.scrap.value),
+        };
+        // setAddedIngredients((prevIngredients) => [...prevIngredients, ingredientData]);
+        // Check if the ingredient already exists in the addedIngredients array
+        const existingIngredientIndex = addedIngredients.findIndex((ingredient) => ingredient.ind_id === ingredientData.ind_id);
+
+        if (existingIngredientIndex !== -1) {
+            // If the ingredient is already added, update its quantity and scrap
+            const updatedIngredients = [...addedIngredients];
+            updatedIngredients[existingIngredientIndex].qty_used_sum += ingredientData.qty_used_sum;
+            updatedIngredients[existingIngredientIndex].scrap += ingredientData.scrap;
+            setAddedIngredients(updatedIngredients);
+        } else {
+            // If the ingredient doesn't exist, add it to the addedIngredients array
+            setAddedIngredients(prevIngredients => [...prevIngredients, ingredientData]);
+        }
+
+    };
+    const handleDeleteIngredient = (index) => {
+        setAddedIngredients((prevIngredients) => {
+            const updatedIngredients = [...prevIngredients];
+            updatedIngredients.splice(index, 1);
+            return updatedIngredients;
+        });
+    };
+    const [type, setType] = useState(""); // เก็บค่าประเภทที่เลือก
+
+    const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
+    interface Ingredients {
+        ind_id: String;
+        ind_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    useEffect(() => {
+        // Fetch unit data from the server and set the options
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
+            .then(response => response.json())
+            .then(data => {
+                setIngredientsOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }, []); // Run only once on component mount
+
+    const handleSubmit2 = async () => {
+        const ingredientLotDetail = addedIngredients.map((ingredient) => ({
+            ind_id: parseInt(ingredient.ind_id),
+            qty_used_sum: parseInt(ingredient.qty_used_sum), // แปลงเป็นตัวเลข
+            scrap: parseInt(ingredient.scrap), // แปลงเป็นตัวเลข
+        }));
+        const noteValue = (document.getElementById("note") as HTMLInputElement).value; // แปลงเป็น HTMLInputElement
+
+        const requestData = {
+            ingredient_Used: {
+                status: isChecked ? 2 : 1,
+                note: noteValue, // ใช้ค่าที่แปลงเป็น HTMLInputElement
+            },
+            ingredient_Used_detail: ingredientLotDetail
+        };
+        console.log("add:", requestData)
+
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/addUseIngrediantnew`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData),
+        });
+        const responseData = await response.json();
+        if (responseData.message === 'success') {
+            setMessage('Data added successfully');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+
+    };
+
+
+    return (
+        <div>
+            <button className='my-3 mx-5 '>
+                <Link href="/ingredients/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
+                    <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
+                    วัตถุดิบที่ใช้
+                </Link>
+            </button>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182]  border-b border-[#C5B182] py-2'>เพิ่มวัตถุดิบที่ใช้</p>
+            <div>
+                <div className="mx-6">
+                    <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+                        เลือกประเภท :</label>
+                    <div className="mt-2 col-span-3 flex">
+                        <div className="form-control">
+                            <label className="label cursor-pointer ">
+                                <input type="radio" name="st_type"
+                                    value="1"
+                                    className="radio checked:bg-[#C5B182]"
+                                    onChange={() => setType("1")} // เมื่อเลือกผลิตตามใบสั่งผลิต
+                                />
+                                <span className="label-text text-[#73664B] px-3 ">ผลิตตามใบสั่งผลิต</span>
+                            </label>
+                        </div>
+                        <div className="form-control ml-4">
+                            <label className="label cursor-pointer">
+                                <input type="radio" name="st_type"
+                                    value="2"
+                                    className="radio checked:bg-[#C5B182]"
+                                    onChange={() => setType("2")} // เมื่อเลือกประเภทอื่นๆ
+                                />
+                                <span className="label-text text-[#73664B] px-3">อื่นๆ</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {/* แสดง input text เมื่อเลือกประเภท "ผลิตตามใบสั่งผลิต" */}
+                {type === "1" && (
+                    <div className="mt-4">
+                        <label htmlFor="produce" className="block text-sm font-medium text-[#73664B]">ปริมาณที่ผลิตตามใบสั่งผลิต :</label>
+                        <input
+                            type="text"
+                            id="produce"
+                            name="produce"
+                            className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="ป้อนปริมาณที่ผลิตตามใบสั่งผลิต"
+                        />
+                    </div>
+                )}
+                {/* แสดง input เมื่อเลือกประเภท "อื่นๆ" */}
+                {type === "2" && (
+                    <div className="mt-4 mx-6">
+                        <div className="flex w-1/2 justify-start">
+                            <label className="block text-sm  leading-6 text-[#73664B]  mt-3 text-left ">
+                                หมายเหตุ :</label>
+                            <div className="mt-2 col-span-3">
+                                <input
+                                    type="text"
+                                    name="note"
+                                    id="note"
+                                    className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
+                                />
+                            </div>
+                        </div>
+                        <p className=" my-4 text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
+                        <form
+                            onSubmit={handleSubmit}
+                        >
+                            <div className="grid grid-cols-6">
+                                <div className="flex items-center justify-center">
+                                    <p className="text-sm ml-6 mr-3 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ: </p>
+                                    <select id="ind_id"
+                                        className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
+                                        {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
+                                            <option key={ind.ind_id} value={ind.ind_id}>
+                                                {ind.ind_name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex items-center justify-center mr-5">
+                                    <p className="text-sm  text-[#73664B] flex justify-center items-center w-full">จำนวน : </p>
+                                    <input
+                                        min="1"
+                                        // onChange={handleCancelClick}
+                                        type="number"
+                                        name="qty_used_sum"
+                                        id="qty_used_sum"
+                                        className="px-3 bg-[#FFFFDD] w-full block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                                    />
+                                </div>
+
+                                <div className="flex items-center justify-center">
+                                    <p className="text-sm  py-2 text-[#73664B] flex justify-center items-center mr-3">เศษ : </p>
+                                    <input
+                                        min="1"
+                                        // onChange={handleCancelClick}
+                                        type="number"
+                                        pattern="[0-9]+([.,][0-9]+)?"
+                                        name="scrap"
+                                        id="scrap"
+                                        className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                                    />
+                                </div>
+                                <div className="scale-75 w-full my-2 flex justify-end">
+                                    <Button
+                                        type="submit"
+                                        value="เพิ่มวัตถุดิบ"
+                                        className="text-lg text-white border bg-[#F2B461] rounded-full mr-6 py-2 px-2">เพิ่มวัตถุดิบ</Button>
+                                </div>
+                            </div >
+                        </form>
+                        <div className=" mt-3 h-1/2">
+                            <div className="flex flex-col">
+                                <div className="bg-[#908362] text-white text-sm flex">
+                                    <div className="flex-1 py-3 text-center">วัตถุดิบ</div>
+                                    <div className="flex-1 py-3 text-center">จำนวน</div>
+                                    <div className="flex-1 py-3 text-center">เศษ</div>
+                                    <div className="flex-1 py-3 text-center"></div>
+                                </div>
+                                <div className="max-h-40 overflow-y-auto mb-5">
+                                    <table className="w-full">
+                                        <tbody className="w-full">
+                                            {addedIngredients.map((addedIngredient, index) => (
+                                                <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                                    <td scope="col" className="flex-1 text-center">{addedIngredient.ind_name}</td>
+                                                    <td scope="col" className="flex-1 text-center">{addedIngredient.qty_used_sum}</td>
+                                                    <td scope="col" className="flex-1 text-center">{addedIngredient.scrap}</td>
+                                                    <td scope="col" className="flex-1 text-center">
+                                                        <div className="flex items-center justify-center">
+                                                            <button onClick={() => handleDeleteIngredient(index)}>
+                                                                <TrashIcon className="h-5 w-5 text-red-500" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="">
+                            {/* เช็คคือยืนยันการใช้งาน */}
+                            <Checkbox radius="sm" color="warning" checked={isChecked} onChange={handleCheckboxChange} className="text-sm text-[#73664B]">
+                                ยืนยันการเพิ่มวัตถุดิบที่ใช้ทันที
+                            </Checkbox>
+                        </div>
+
+                        < div className="mt-8 " >
+                            <button>
+                                <Link href="/ingredients/income/all"
+                                    type="button"
+                                    className="mx-auto text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
+                                    ย้อนกลับ</Link></button>
+                            <>
+                                {isOpen && (
+                                    <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                                        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                                            <Transition.Child
+                                                as={Fragment}
+                                                enter="ease-out duration-300"
+                                                enterFrom="opacity-0"
+                                                enterTo="opacity-100"
+                                                leave="ease-in duration-200"
+                                                leaveFrom="opacity-100"
+                                                leaveTo="opacity-0"
+                                            >
+                                                <div className="fixed inset-0 bg-black/25" />
+                                            </Transition.Child>
+
+                                            <div className="fixed inset-0 overflow-y-auto">
+                                                <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                    <Transition.Child
+                                                        as={Fragment}
+                                                        enter="ease-out duration-300"
+                                                        enterFrom="opacity-0 scale-95"
+                                                        enterTo="opacity-100 scale-100"
+                                                        leave="ease-in duration-200"
+                                                        leaveFrom="opacity-100 scale-100"
+                                                        leaveTo="opacity-0 scale-95"
+                                                    >
+                                                        <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                            <Dialog.Title
+                                                                as="h3"
+                                                                className="text-lg font-medium leading-6 text-[73664B]"
+                                                            >
+                                                                ยืนยันการเพิ่มวัตถุดิบเข้าร้าน
+                                                            </Dialog.Title>
+                                                            <div className="mt-2">
+                                                                <p className="text-sm text-[#73664B]">
+                                                                    คุณต้องการเพิ่มวัตถุดิบเข้าร้านหรือไม่
+                                                                </p>
+                                                            </div>
+                                                            {/*  choose */}
+                                                            <div className="flex justify-end">
+                                                                <div className="inline-flex justify-end">
+                                                                    <button
+                                                                        type="button"
+                                                                        className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                        onClick={closeModal}
+                                                                    >
+                                                                        ยกเลิก
+                                                                    </button>
+
+                                                                    <button
+                                                                        type="button"
+                                                                        className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                        onClick={handleSubmit2}
+                                                                    ><Link href="/ingredients/using/list">
+                                                                            ยืนยัน
+                                                                        </Link></button>
+                                                                </div>
+                                                            </div>
+                                                        </Dialog.Panel>
+                                                    </Transition.Child>
+                                                </div>
+                                            </div>
+                                        </Dialog>
+                                    </Transition>
+                                )
+                                }
+                            </>
+                            <button onClick={openModal} type="button" className="ml-2 mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">บันทึก</button>
+                        </div >
+
+
+
+
+
+                    </div>
+
+                )}
+            </div>
+
+        </div>
+    )
+}
+
+export default add

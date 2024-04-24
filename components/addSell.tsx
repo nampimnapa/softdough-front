@@ -314,7 +314,7 @@ export default function AddSell({
     }
   }, [sellMenuFix, submitRequested]);
 
-  // console.log(sellMenuFix);
+  console.log(sellMenuFix);
 
 
   return (

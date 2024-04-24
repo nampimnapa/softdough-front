@@ -490,11 +490,11 @@ function edit() {
                     <div className="mt-2 col-span-2">
                         <select id="countries"
                             className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
-                            value={ind.un_purchased}
+                            value={ind.un_ind}
                             name="un_purchased_name"
                             onChange={handleInputChange}
                         >
-                            <option value='' >{ind.un_purchased_name} </option>
+                            {/* <option value={ind.un_purchased_name} > </option> */}
 
                             {unitOptions.map((unit: UnitType) => (
                                 <option key={unit.un_id} value={unit.un_id}>

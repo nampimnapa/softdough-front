@@ -208,54 +208,34 @@ function sell_all() {
                     <option>ดิป</option>
                 </select>
             </div>
-            {sm.map((smtItem) => (
-                <div key={smtItem.smt_id}>
-                    <div>
-                        <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">{smtItem.smt_name}</p>
-                    </div>
-                    <div className="flex flex-wrap">
-                        {sm.map((menu) => {
-                            const foundSmt = smt.find(item => item.smt_id === smtItem.smt_id);
-                            if (foundSmt && menu.smt_name === foundSmt.smt_name) {
-                                return (
-                                    <div key={menu.id} className="card w-52 h-52 bg-base-100 shadow-sm mx-2 ml-5 mb-5">
-                                        <div className="flex justify-end mt-1">
-                                            <Link href="/product/sell_edit">
-                                                <PencilSquareIcon className="h-5 w-5 text-[#73664B] mr-2" />
-                                            </Link>
-                                            <Link href="/product/sell_detail">
-                                                <InformationCircleIcon className="h-5 w-5 text-[#73664B] mr-2" />
-                                            </Link>
-                                        </div>
-                                        <div className="flex justify-center w-full">
-                                            <Image
-                                                alt={menu.name}
-                                                className="w-36 object-cover h-32 justify-center items-center"
-                                                height={200}
-                                                sizes={`(max-width: 768px) ${32}px, ${32}px`}
-                                                src={menu.image}
-                                                width={200}
-                                            />
-                                        </div>
-                                        <div className="card-body p-0">
-                                            <div className="text-center">
-                                                <p className="text-mediem text-[#73664B]">
-                                                    {menu.sm_name}, {findSmtNameById(menu.smt_id)}
-                                                </p>
-                                            </div>
-                                            <div className="text-center">
-                                                <p className="text-[#F2B461]">{menu.sm_price} บาท</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            } else {
-                                return null;
-                            }
-                        })}
-                    </div>
-                </div>
-            ))}
+            {sm.length > 0 ? (
+    sm.map((smtItem) => (
+        <div key={smtItem.smt_id}>
+            <div>
+                <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">{smtItem.smt_name}</p>
+            </div>
+            <div className="flex flex-wrap">
+                {sm.map((menu) => {
+                    const foundSmt = smt.find(item => item.smt_id === smtItem.smt_id);
+                    if (foundSmt && menu.smt_name === foundSmt.smt_name) {
+                        return (
+                            <div key={menu.id} className="card w-52 h-52 bg-base-100 shadow-sm mx-2 ml-5 mb-5">
+                                {/* โค้ดส่วนอื่น ๆ ของการ์ด */}
+                            </div>
+                        );
+                    } else {
+                        return null;
+                    }
+                })}
+            </div>
+        </div>
+    ))
+) : (
+    <div className="flex justify-center items-center w-full">
+        <p className="text-sm text-gray-400">ไม่มีข้อมูลเมนูสำหรับขาย</p>
+    </div>
+)}
+
 
 
 

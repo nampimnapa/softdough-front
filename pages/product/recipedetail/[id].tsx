@@ -8,6 +8,8 @@ import {
     TrashIcon
 } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
+import { Button, Card, Image, CardFooter, Spinner, Checkbox } from "@nextui-org/react";
+
 import { Kanit } from "next/font/google";
 import { useRouter } from "next/router";
 import { Input } from "@nextui-org/react";
@@ -169,7 +171,18 @@ function recipe_detail() {
                             </div>
                             <div className="w-full flex">
                                 <p className="ml-3">รูปภาพ :</p>
-                                <img src={recipe.product.picture} alt="Product Image" className="w-24 h-24" />
+                                {/* <img src={recipe.product.picture} alt="Product Image" className="w-24 h-24" /> */}
+                                <Card isFooterBlurred radius="lg" className="border-none max-w-[100px] max-h-[100px] ml-3">
+                                    <Image
+                                        alt="Woman listing to music"
+                                        className="w-[100px] object-cover h-[100px]"
+                                        height={200}
+                                        sizes={`(max-width: 768px) ${50}px, ${50}px`}
+                                        src={recipe.product.picture}
+                                        // src="/images/logo.svg"
+                                        width={200}
+                                    />
+                                    </Card>
                             </div>
                         </div>
                     ) : (

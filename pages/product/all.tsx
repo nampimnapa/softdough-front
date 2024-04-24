@@ -257,7 +257,7 @@ function all() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {TypeProduct.map((type, index) => (
+                                        {/* {TypeProduct.map((type, index) => (
                                             <tr key={type.pdc_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                 <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
                                                     {index + 1}
@@ -297,7 +297,52 @@ function all() {
                                                 )}
 
                                             </tr>
-                                        ))}
+                                        ))} */}
+
+                                        {TypeProduct.length > 0 ? (
+                                            TypeProduct.map((type, index) => (
+                                                <tr key={type.pdc_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                    <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                        {index + 1}
+                                                    </td>
+                                                    {openInput === type.pdc_id ? (
+                                                        <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                            <input
+                                                                className="w-full h-9 focus:outline-none border"
+                                                                type="text"
+                                                                defaultValue={type.pdc_name}
+                                                                onChange={(event) => handleInputChange(event, type.pdc_id)}
+                                                            />
+                                                        </td>
+                                                    ) : (
+                                                        <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                            {type.pdc_name}
+                                                        </td>
+                                                    )}
+                                                    {isEditing && openInput === type.pdc_id ? (
+                                                        <>
+                                                            <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem]  flex items-center justify-end">
+                                                                <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก</button>
+                                                                <button type="button" onClick={() => handleSaveChanges(type.pdc_id)} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก</button>
+                                                            </td>
+                                                        </>
+                                                    ) : (
+                                                        <td className="me-2 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
+                                                            <button type="button" onClick={() => changeInput(type.pdc_id)}>
+                                                                <a href="#" className="w-full flex justify-center items-center">
+                                                                    <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                                                </a>
+                                                            </button>
+                                                        </td>
+                                                    )}
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <div className="flex justify-center items-center w-full">
+                                            <p className="text-sm text-gray-400">ไม่มีข้อมูลประเภทสินค้า</p>
+                                        </div>
+                                        )}
+
                                         {isAdding && (
                                             <>
                                                 <tr key="new" className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">

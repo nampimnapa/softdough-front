@@ -189,6 +189,7 @@ function add() {
                         <div className="flex-1 py-3 text-center">จำนวน</div>
                         <div className="flex-1 py-3 text-center">วันหมดอายุ</div>
                         <div className="flex-1 py-3 text-center">ราคา</div>
+                        <div className="flex-1 py-3 text-center"></div>
                     </div>
                     <div className="max-h-40 overflow-y-auto mb-5">
                         <table className="w-full">
@@ -197,6 +198,7 @@ function add() {
                                     <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
                                         <td scope="col" className="flex-1 text-center">{addedIngredient.name}</td>
                                         <td scope="col" className="flex-1 text-center">{addedIngredient.quantity}</td>
+                                        <td scope="col" className="flex-1 text-center">{addedIngredient.exp}</td>
                                         <td scope="col" className="flex-1 text-center">{addedIngredient.price}</td>
                                         <td scope="col" className="flex-1 text-center">
                                             <div className="flex items-center justify-center">

@@ -306,7 +306,6 @@ function Index() {
                             <div className="flex items-center justify-center">
                                 <p className="text-sm  py-2 text-[#73664B] flex justify-center items-center mr-3">ราคา : </p>
                                 <input
-                                required
                                     min="1"
                                     // onChange={handleCancelClick}
                                     type="number"

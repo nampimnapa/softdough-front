@@ -24,7 +24,7 @@ import { Icon } from '@iconify/react';
 const ingredientDropdown = [
   { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/income/all" },
   { title: "วัตถุดิบทั้งหมด", href: "/ingredients/all" },
-  { title: "วัตถุดิบที่ใช้", href: "/ingredients/using" },
+  { title: "วัตถุดิบที่ใช้", href: "/ingredients/using/list" },
   { title: "รออนุมัติ", href: "/ingredients/pending" },
 ];
 // สินค้า
