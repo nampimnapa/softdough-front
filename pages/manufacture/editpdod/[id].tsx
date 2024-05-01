@@ -17,41 +17,38 @@ const kanit = Kanit({
   subsets: ["thai", "latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
+interface Ingredients {
+  ind_id: string;
+  ind_name: string;
+}
+interface ProductCat {
+  pdc_id: string;
+  pdc_name: string;
+}
+interface Recipe {
+  pd_name: String,
+  pd_qtyminimum: number,
+  status: String,
+  picture: String,
+  pdc_id: number,
+  qtylifetime: number,
+  produced_qty: number,
+  un_id: number,
+  ind_id: number,
+  ingredients_qty: number,
 
+}
 function editpdod() {
   const router = useRouter();
   const { id } = router.query;
   // เก็บที่ fetch มา ดีเทลใหญ่ดีเทลเล็ก
   const [detail, setDetail] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [unitOptions, setUnitOptions] = useState([]);
   const [productCat, setProductCat] = useState([]);
   const [Ingredientall, setIngredientall] = useState<any[]>([]);
   const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
   const [Recipe, setRecipe] = useState([]);
-  interface Ingredients {
-    ind_id: string;
-    ind_name: string;
-    // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
-  }
-  interface ProductCat {
-    pdc_id: string;
-    pdc_name: string;
-  }
-  interface Recipe {
-    pd_name: String,
-    pd_qtyminimum: number,
-    status: String,
-    picture: String,
-    pdc_id: number,
-    qtylifetime: number,
-    produced_qty: number,
-    un_id: number,
-    ind_id: number,
-    ingredients_qty: number,
 
-    // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
-  }
   useEffect(() => {
 
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
@@ -88,8 +85,6 @@ function editpdod() {
         });
     }
 
-
-
   }, [id]);
   const [selectedProductType, setSelectedProductType] = useState(1); // ประเภทสินค้าที่ถูกเลือก
   const [selectedProductId, setSelectedProductId] = useState(1); // ประเภทสินค้าที่ถูกเลือก
@@ -99,7 +94,7 @@ function editpdod() {
 
 
 
-  const handleAddDetail = () => {
+  const handleAddDetail = (event) => {
     event.preventDefault();
 
     const selectedProductType = parseInt((document.getElementById("productType") as HTMLSelectElement).value);
@@ -142,6 +137,7 @@ function editpdod() {
         pd_id: selectedProduct?.pd_id || '',
         num: enteredQuantity,
       };
+      console.log(detail)
 
       setAddedDetail(prevDetail => [...prevDetail, newDetail]);
     }
@@ -149,18 +145,15 @@ function editpdod() {
     setSelectedProductType(1);
     (document.getElementById("product") as HTMLSelectElement).value = "";
     (document.getElementById("num") as HTMLInputElement).value = "";
+
   };
-
-
-
-
-
 
   const handleDeleteProduct = (idx: number) => {
     setDetail(prevDetail => {
       const newDetail = { ...prevDetail };
       newDetail.pdodetail.splice(idx, 1);
       return newDetail;
+
     });
   };
 
@@ -186,6 +179,36 @@ function editpdod() {
     const product = Recipe.find((item) => item.pd_id === productId);
     return product ? product.pd_name : '';
   };
+  const [message, setMessage] = useState('Loading');
+
+  const handleConfirm = async () => {
+    const pdo_status = isChecked ? 2 : 1;
+    const productionOrder = { pdo_status };
+    const productionOrderdetail = addedDetail.map(detail => ({ qty: detail.num, pd_id: detail.pd_id }));
+
+    const postData = {
+      productionOrder,
+      productionOrderdetail
+    };
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/editData/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ postData }),
+    });
+
+    const responseData = await response.json();
+    console.log(responseData);
+
+    if (responseData.status === 200) {
+      setMessage('Data update successfully');
+      // router.push('/product/all');
+    } else {
+      setMessage(responseData.message || 'Error occurred');
+    }
+
+  }
 
 
   return (
@@ -250,8 +273,8 @@ function editpdod() {
                 <Button
                   onClick={handleAddDetail}
                   type="submit"
-                  value="เพิ่มวัตถุดิบ"
-                  className="text-lg text-white border  bg-[#F2B461] rounded-full py-2 px-2 ">เพิ่มวัตถุดิบ</Button>
+                  value="เพิ่มสินค้า"
+                  className="text-lg text-white border  bg-[#F2B461] rounded-full py-2 px-2 ">เพิ่มสินค้า</Button>
               </div>
             </div>
           </form>
@@ -367,11 +390,11 @@ function editpdod() {
                             as="h3"
                             className="text-lg font-medium leading-6 text-[73664B]"
                           >
-                            ยืนยันการเพิ่มใบสั่งผลิต
+                            ยืนยันการแก้ไขใบสั่งผลิต
                           </Dialog.Title>
                           <div className="mt-2">
                             <p className="text-sm text-[#73664B]">
-                              คุณต้องการเพิ่มใบสั่งผลิตหรือไม่
+                              คุณต้องการแก้ไขใบสั่งผลิตหรือไม่
                             </p>
                           </div>
                           {/*  choose */}
@@ -388,7 +411,7 @@ function editpdod() {
                               <button
                                 type="button"
                                 className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                              // onClick={handleConfirm}
+                                onClick={handleConfirm}
                               ><Link href="#">
                                   ยืนยัน
                                 </Link></button>

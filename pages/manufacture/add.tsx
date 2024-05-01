@@ -176,13 +176,13 @@ function add() {
         setIsOpen(true);
     };
 
-   
+
     const handleConfirm = async () => {
-        
+
         closeModal();
         const pdo_status = isChecked ? 2 : 1;
-        
-        const productionOrder = {pdo_status};
+
+        const productionOrder = { pdo_status };
         const productionOrderdetail = addedDetail.map(detail => ({ qty: detail.num, pd_id: detail.pd_id }));
 
         const postData = {
@@ -321,8 +321,8 @@ function add() {
             </div>
             <div className="flex justify-start">
                 <div className="w-1/2  mt-10  flex justify-start " >
-                    <Link href="/product/sell_all">
-                        <Button href="/product/sell_all"
+                    <Link href="/manufacture/listorder">
+                        <Button href="/manufacture/listorder"
                             onClick={handleCancel}
                             type="button"
                             className=" text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
@@ -382,7 +382,7 @@ function add() {
                                                                 type="button"
                                                                 className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                                 onClick={handleConfirm}
-                                                            ><Link href="/menufacture/listorder">
+                                                            ><Link href="/manufacture/listorder">
                                                                     ยืนยัน
                                                                 </Link></button>
                                                         </div>

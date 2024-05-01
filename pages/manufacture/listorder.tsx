@@ -88,14 +88,13 @@ function listorder() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {Production
-                                            .filter((order) => {
-                                                if (selectedTab.name === "ทั้งหมด") {
-                                                    return true; // แสดงทุก pdo_status เมื่อเลือกแท็บ "ทั้งหมด"
-                                                } else {
-                                                    return order.pdo_status.toString() === selectedTab.id.toString();
-                                                }
-                                            })
+                                        {Array.isArray(Production) && Production.filter((order) => {
+                                            if (selectedTab.name === "ทั้งหมด") {
+                                                return true; // แสดงทุก pdo_status เมื่อเลือกแท็บ "ทั้งหมด"
+                                            } else {
+                                                return order.pdo_status.toString() === selectedTab.id.toString();
+                                            }
+                                        })
                                             .map((order) => (
                                                 <tr
                                                     key={order.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10"
@@ -111,10 +110,11 @@ function listorder() {
                                                     {/* order.pdo_status === 'เสร็จสิ้น' ? ' text-green-600' : */}
                                                     <td className={`h-10 
                                                     ${order.pdo_status === '2' ? ' text-yellow-500' :
-                                                            order.pdo_status === '1' ? 'text-[#C5B182]' : ''
+                                                            order.pdo_status === '1' ? 'text-[#C5B182]' : 
+                                                            order.pdo_status === '3' ? 'text-green-500' :''
                                                         }`}>
 
-                                                        {order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
+                                                        {order.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' :order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center">
 

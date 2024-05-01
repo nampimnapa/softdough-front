@@ -90,25 +90,27 @@ function detailproduction() {
         console.log(newCheckedItems)
 
         // ตรวจสอบและส่งค่า pdo_status เป็น 3 หาก isChecked2 เป็น true
-        if (isChecked2) {
-            // ส่งค่า pdo_status เป็น 3 ทั้งหมด
-            // อย่าลืมเปลี่ยน detail.pdodetail ให้เป็นข้อมูลจริงที่ได้มาจาก API และอ้างถึง pdodetail.pdod_status แทน
-            detail.pdodetail.forEach(pdodetail => {
-                // ส่งค่า pdo_status เป็น 3 ให้กับรายการที่มี pdod_id นี้
-                sendPdoStatus(pdodetail.pdod_id, 3); // ส่งค่า pdo_status ไปยัง API
-            });
-        }
+        // if (isChecked2) {
+        //     // ส่งค่า pdo_status เป็น 3 ทั้งหมด
+        //     // อย่าลืมเปลี่ยน detail.pdodetail ให้เป็นข้อมูลจริงที่ได้มาจาก API และอ้างถึง pdodetail.pdod_status แทน
+        //     detail.pdodetail.forEach(pdodetail => {
+        //         // ส่งค่า pdo_status เป็น 3 ให้กับรายการที่มี pdod_id นี้
+        //         sendPdoStatus(pdodetail.pdod_id, 3); // ส่งค่า pdo_status ไปยัง API
+        //     });
+        // }
 
     };
 
     const handleCheckboxChangeDetail = (pdod_id) => {
         // เปลี่ยนสถานะของ Checkbox แต่ละอันในตาราง
-        const newCheckedItems = { ...checkedItems, [pdod_id]: checkedItems[pdod_id] };
+        const newCheckedItems = { ...checkedItems, [pdod_id]: !checkedItems[pdod_id] };
         setCheckedItems(newCheckedItems);
+        console.log(newCheckedItems);
+
     };
-    const isCheckedForDetail = (id) => {
-        return detail.pdo_status === '2' && checkedItems[id];
-    };
+    // const isCheckedForDetail = (id) => {
+    //     return detail.pdo_status === '2' && checkedItems[id];
+    // };
 
 
     const handleStatusChange = async (id) => {
@@ -133,12 +135,73 @@ function detailproduction() {
             }
         }
 
-
-    };
-    const sendPdoStatus = (pdodId, status) => {
-
     };
 
+    // const sendPdoStatus = async () => {
+    //     // Check the value of pdo_status
+    //     if (detail.pdo_status === '1') {
+    //         // If pdo_status is '1', navigate back to listorder
+    //         router.push('/manufacture/listorder');
+    //     } else if (isChecked && detail.pdo_status === '2') {
+    //         // If pdo_status is '2', update the status using API
+    //         const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+    //         if (checkedIds.length === 0) {
+    //             setMessage('No items selected');
+    //             return;
+    //         }
+    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+    //             method: 'PATCH',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify({ pdod_ids: checkedIds  }),
+    //         })
+
+    //         const responseData = await response.json();
+    //         console.log(responseData);
+
+    //         if (responseData.status === 200) {
+    //             setMessage('Data update successfully');
+    //             // router.push('/product/all');
+    //         } else {
+    //             setMessage(responseData.message || 'Error occurred');
+    //         }
+    //     }
+
+    // };
+    const sendPdoStatus = async () => {
+        // Check the value of pdo_status
+        if (detail.pdo_status === '1') {
+            // If pdo_status is '1', navigate back to listorder
+            router.push('/manufacture/listorder');
+        } else if (isChecked && detail.pdo_status === '2') {
+            // If pdo_status is '2', update the status using API
+            const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+
+            if (checkedIds.length === 0) {
+                setMessage('No items selected');
+                return;
+            }
+
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pdod_id: checkedIds }),
+            });
+
+            const responseData = await response.json();
+            console.log(responseData);
+
+            if (responseData.status === 200) {
+                setMessage('Data update successfully');
+                // router.push('/product/all');
+            } else {
+                setMessage(responseData.message || 'Error occurred');
+            }
+        }
+    };
 
     return (
         <div>
@@ -153,8 +216,9 @@ function detailproduction() {
                 {detail !== null ? (
                     <div>
                         <p className={`text-base px-6 py-2 font-bold
-                                    ${detail.pdo_status === '2' ? 'text-yellow-500' :
-                                detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
+                                    ${detail.pdo_status === '3' ? 'text-green-500' :
+                                detail.pdo_status === '2' ? 'text-yellow-500' :
+                                    detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
                             }`}>
                             {detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
                         </p>
@@ -196,8 +260,8 @@ function detailproduction() {
                                             </td>
 
                                             <td className={`text-sm px-6 py-2 
-    ${detail.pdo_status === '3' ? 'text-green-500' :
-                                                    detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
+    ${pdodetail.status === '3' ? 'text-green-500' :
+    pdodetail.status === '1' ? 'text-[#C5B182]' : ''
                                                 }`}>
                                                 {pdodetail.status === '3' ? 'เสร็จสิ้นแล้ว' : pdodetail.status === '1' ? 'รอยืนยันดำเนินการ' : ''}
                                                 {pdodetail.status === '2' && (
@@ -263,23 +327,22 @@ function detailproduction() {
                 detail !== null ? (
                     <div className="flex justify-start">
                         <div className="w-1/2  mt-10  flex justify-start " >
+
                             <Button
-                                // href="/manufacture/listorder"
-                                onClick={() => {
-                                    if (isChecked) {
-                                        // If isChecked is true, navigate without showing modal
-                                        router.push('/manufacture/listorder');
-                                    } else {
-                                        // If isChecked is false, open modal and call the function
-                                        openModal();
-                                        
-                                    }
-                                }}
-                                
+                                onClick={sendPdoStatus}
+                                // // href="/manufacture/listorder"
+                                // onClick={() => {
+                                //     if (isChecked) {
+                                //         // If isChecked is true, navigate without showing modal
+                                //         router.push('/manufacture/listorder');
+                                //     } else {
+                                //         // If isChecked is false, open modal and call the function
+                                //         openModal();
+                                //     }
+                                // }}
                                 type="button"
                                 className=" text-white bg-[#73664B]  focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-5">
                                 เสร็จสิ้น</Button>
-
 
                             {detail !== null && detail.pdo_status === '1' && (
                                 <div className="w-full flex justify-start">
