@@ -18,7 +18,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function add() {
+function addusedind() {
 
     // const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     //     const { name, value } = e.target;
@@ -168,134 +168,15 @@ function add() {
                 </div>
                 {/* แสดง input text เมื่อเลือกประเภท "ผลิตตามใบสั่งผลิต" */}
                 {type === "1" && (
-                    <div className="mt-4 mx-6">
-                        <div className="flex w-1/2 justify-start">
-                            <label className="block text-sm  leading-6 text-[#73664B]  mt-3 text-left ">
-                                เลขล็อตผลิต :</label>
-                            <div className="mt-2 col-span-3">
-                                <input
-                                    placeholder="เลขใบสั่งผลิต"
-                                    type="text"
-                                    name="note"
-                                    id="note"
-                                    className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
-                                />
-                            </div>
-                        </div>
-                        <p className="mt-4 mb-2  text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
-                        <div className="flex justify-end">
-                            <Button className="ml-auto  text-white bg-[#F2B461] focus:outline-none rounded-full text-sm px-4 py-2  mb-2 ">แก้ไข</Button></div>
-
-                        <div className="flex flex-col">
-                            <div className="bg-[#908362] text-white text-sm flex">
-                                <div className="flex-1 py-3 text-center">วัตถุดิบ</div>
-                                <div className="flex-1 py-3 text-center">จำนวน</div>
-                                <div className="flex-1 py-3 text-center">เศษ</div>
-                                <div className="flex-1 py-3 text-center"></div>
-                            </div>
-                            <div className="max-h-40 overflow-y-auto mb-5">
-                                <table className="w-full">
-                                    <tbody className="w-full">
-                                        {/* {addedIngredients.map((addedIngredient, index) => ( */}
-                                        <tr className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                            <td scope="col" className="flex-1 text-center"></td>
-                                            <td scope="col" className="flex-1 text-center"></td>
-                                            <td scope="col" className="flex-1 text-center"></td>
-                                            <td scope="col" className="flex-1 text-center">
-                                                <div className="flex items-center justify-center">
-                                                    <button onClick={() => handleDeleteIngredient(index)}>
-                                                        <TrashIcon className="h-5 w-5 text-red-500" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {/* ))} */}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div className="">
-                            {/* เช็คคือยืนยันการใช้งาน */}
-                            <Checkbox radius="sm" color="warning" checked={isChecked} onChange={handleCheckboxChange} className="text-sm text-[#73664B]">
-                                ยืนยันการเพิ่มวัตถุดิบที่ใช้ทันที
-                            </Checkbox>
-                        </div>
-                        < div className="mt-8 " >
-                            <button>
-                                <Link href="/ingredients/income/all"
-                                    type="button"
-                                    className="mx-auto text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
-                                    ยกเลิก</Link></button>
-                            <>
-                                {isOpen && (
-                                    <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                        <Dialog as="div" className="relative z-10" onClose={closeModal}>
-                                            <Transition.Child
-                                                as={Fragment}
-                                                enter="ease-out duration-300"
-                                                enterFrom="opacity-0"
-                                                enterTo="opacity-100"
-                                                leave="ease-in duration-200"
-                                                leaveFrom="opacity-100"
-                                                leaveTo="opacity-0"
-                                            >
-                                                <div className="fixed inset-0 bg-black/25" />
-                                            </Transition.Child>
-
-                                            <div className="fixed inset-0 overflow-y-auto">
-                                                <div className="flex min-h-full items-center justify-center p-4 text-center">
-                                                    <Transition.Child
-                                                        as={Fragment}
-                                                        enter="ease-out duration-300"
-                                                        enterFrom="opacity-0 scale-95"
-                                                        enterTo="opacity-100 scale-100"
-                                                        leave="ease-in duration-200"
-                                                        leaveFrom="opacity-100 scale-100"
-                                                        leaveTo="opacity-0 scale-95"
-                                                    >
-                                                        <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                                            <Dialog.Title
-                                                                as="h3"
-                                                                className="text-lg font-medium leading-6 text-[73664B]"
-                                                            >
-                                                                ยืนยันการเพิ่มวัตถุดิบเข้าร้าน
-                                                            </Dialog.Title>
-                                                            <div className="mt-2">
-                                                                <p className="text-sm text-[#73664B]">
-                                                                    คุณต้องการเพิ่มวัตถุดิบเข้าร้านหรือไม่
-                                                                </p>
-                                                            </div>
-                                                            {/*  choose */}
-                                                            <div className="flex justify-end">
-                                                                <div className="inline-flex justify-end">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                        onClick={closeModal}
-                                                                    >
-                                                                        ยกเลิก
-                                                                    </button>
-
-                                                                    <button
-                                                                        type="button"
-                                                                        className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                        onClick={handleSubmit2}
-                                                                    ><Link href="/ingredients/using/list">
-                                                                            ยืนยัน
-                                                                        </Link></button>
-                                                                </div>
-                                                            </div>
-                                                        </Dialog.Panel>
-                                                    </Transition.Child>
-                                                </div>
-                                            </div>
-                                        </Dialog>
-                                    </Transition>
-                                )
-                                }
-                            </>
-                            <button onClick={openModal} type="button" className="ml-2 mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">บันทึก</button>
-                        </div >
+                    <div className="mt-4">
+                        <label htmlFor="produce" className="block text-sm font-medium text-[#73664B]">ปริมาณที่ผลิตตามใบสั่งผลิต :</label>
+                        <input
+                            type="text"
+                            id="produce"
+                            name="produce"
+                            className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="ป้อนปริมาณที่ผลิตตามใบสั่งผลิต"
+                        />
                     </div>
                 )}
                 {/* แสดง input เมื่อเลือกประเภท "อื่นๆ" */}
@@ -313,7 +194,6 @@ function add() {
                                 />
                             </div>
                         </div>
-
                         <p className=" my-4 text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
                         <form
                             onSubmit={handleSubmit}
@@ -489,4 +369,4 @@ function add() {
     )
 }
 
-export default add
+export default addusedind

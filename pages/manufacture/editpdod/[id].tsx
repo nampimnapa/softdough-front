@@ -102,7 +102,6 @@ function editpdod() {
     const selectedProduct = filteredProducts.find(product => product.pd_id === selectedProductId);
     const typepd = productCat.find(type => type.pdc_id === selectedProductType)?.pdc_name;
 
-
     if (!selectedProduct) {
       alert("กรุณาเลือกสินค้า");
       return;
@@ -115,39 +114,26 @@ function editpdod() {
       return;
     }
 
-    const existingDetailIndex = addedDetail.findIndex(detail => detail.pd_id === selectedProductId);
+    const newDetail = {
+      pd_id: selectedProduct?.pd_id || '',
+      pd_name: selectedProduct?.pd_name || '',
+      pdc_name: typepd || '',
+      pdo_id: detail.pdo_id, // รับค่า pdo_id จาก detail ที่เก็บค่าไว้ก่อนหน้านี้
+      pdod_id: null, // กำหนดให้เป็น null เพราะเป็นการเพิ่มรายการใหม่
+      qty: enteredQuantity,
+      status: "1", // กำหนดสถานะเป็น "1" เพราะเป็นรายการใหม่
+    };
 
-    if (existingDetailIndex !== -1) {
-      // Product already exists in the addedDetail array, update the quantity
-      const updatedAddedDetail = addedDetail.map((detail, index) => {
-        if (index === existingDetailIndex) {
-          return {
-            ...detail,
-            num: detail.num + enteredQuantity,
-          };
-        }
-        return detail;
-      });
+    setAddedDetail(prevDetail => [...prevDetail, newDetail]); // เพิ่มรายการใหม่เข้าไปใน addedDetail
 
-      setAddedDetail(updatedAddedDetail);
-    } else {
-      // Product does not exist, add a new detail
-      const newDetail = {
-        type: typepd || '',
-        pd_id: selectedProduct?.pd_id || '',
-        num: enteredQuantity,
-      };
-      console.log(detail)
-
-      setAddedDetail(prevDetail => [...prevDetail, newDetail]);
-    }
-
+    // Clear form fields after adding a new product
     setSelectedProductType(1);
     (document.getElementById("product") as HTMLSelectElement).value = "";
     (document.getElementById("num") as HTMLInputElement).value = "";
-
   };
 
+  console.log(detail)
+  console.log(addedDetail)
   const handleDeleteProduct = (idx: number) => {
     setDetail(prevDetail => {
       const newDetail = { ...prevDetail };
@@ -184,11 +170,13 @@ function editpdod() {
   const handleConfirm = async () => {
     const pdo_status = isChecked ? 2 : 1;
     const productionOrder = { pdo_status };
-    const productionOrderdetail = addedDetail.map(detail => ({ qty: detail.num, pd_id: detail.pd_id }));
+
+    // Create the data structure to be sent to the server
+    const dataToEdit = addedDetail.map(detail => ({ pd_id: detail.pd_id, qty: detail.qty }));
 
     const postData = {
       productionOrder,
-      productionOrderdetail
+      dataToEdit
     };
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/editData/${id}`, {
       method: 'PATCH',
@@ -327,7 +315,7 @@ function editpdod() {
                     <td scope="row"
                       className="px-6 py-1 whitespace-nowrap dark:text-white">{detail.type}</td>
                     <td className="px-6 py-1">{getProductNameById(detail.pd_id)}</td>
-                    <td className="px-6 py-1 h-10 ">{detail.num}</td>
+                    <td className="px-6 py-1 h-10 ">{detail.qty}</td>
                     <td >
 
                       <button onClick={() => handleDeleteProduct(index)}>

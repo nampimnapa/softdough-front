@@ -1,5 +1,6 @@
 // import Sidebar from "@components/admin-softdough/Sidebar";
 import Sidebar from "../components/admin-softdough/Sidebar";
+// import Sidebar from "../components/staffpro/Sidebar";
 import "../styles/globals.css";
 import React from "react";
 import { Kanit } from "next/font/google";
