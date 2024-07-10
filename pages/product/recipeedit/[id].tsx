@@ -48,7 +48,6 @@ function recipeedit() {
     });
 
 // State to track checkbox status
-    console.log(product)
     interface Ingredients {
         ind_id: string;
         ind_name: string;
@@ -181,7 +180,13 @@ function recipeedit() {
 
 
     const handleDeleteIngredient = (id) => {
-        setAddedIngredients(addedIngredients.splice(id,1));
+        // setAddedIngredients(addedIngredients.splice(id,1));
+        setAddedIngredients(prevIngredients => {
+            const newIngredients = [...prevIngredients];
+            newIngredients.splice(id, 1);
+            return newIngredients;
+          });
+        console.log("ID :",id)
     };
     
     
@@ -334,12 +339,6 @@ function recipeedit() {
     };
 
 
-    // const handleCheckboxChange = () => {
-    //     setIsChecked(!isChecked); // Toggle checkbox status
-    //     console.log(isChecked)
-    // };
-
-
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // เปลี่ยนสถานะของ checkbox
     
@@ -351,12 +350,9 @@ function recipeedit() {
         }));
     };
 
-    // console.log(isChecked);
-    // console.log(product.status == "1");
-    // console.log(addedIngredients);
 
 
-
+    console.log("สินค้า : ",addedIngredients )
 
     return (
 
@@ -574,7 +570,7 @@ function recipeedit() {
 
 
                                                 {addedIngredients && addedIngredients.length > 0 && addedIngredients.map((ingredient, index) => (
-                                                    <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                                    <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white flex items-center">
                                                         <td scope="col" className="flex-1 text-center">{ingredient.ind_name}</td>
                                                         <td scope="col" className="flex-1 text-center">{ingredient.ingredients_qty}</td>
                                                         <td scope="col" className="flex-1 text-center">{unitOptions.find((u) => parseInt(u.un_id) === ingredient.un_id)?.un_name}</td>

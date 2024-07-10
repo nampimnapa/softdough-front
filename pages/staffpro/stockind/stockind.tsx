@@ -110,10 +110,10 @@ function stockind() {
                                         {ingredients.qtyminimum}
                                     </td>
                                     <td className={`px-6 py-1 
-                                                    ${ingredients.status === 'ปกติ' ? 'text-green-500'
-                                            : ingredients.status === 'ซื้อเพิ่ม' ? 'text-red-500'
-                                                : ingredients.status === 'ไม่มี' ? 'text-red-500' : ''}`}>
-                                        {ingredients.status}
+                                                    ${ingredients.status === '1' ? 'text-green-500'
+                                            : ingredients.status === '0' ? 'text-red-500'
+                                                : ingredients.status === '0' ? 'text-red-500' : ''}`}>
+                                                                 {ingredients.status === '1' ? 'ปกติ' :ingredients.status === '2' ? 'ซื้อเพิ่ม' : ingredients.status}
 
                                     </td>
                                     <td className="px-6 py-4 flex items-center justify-center  ">

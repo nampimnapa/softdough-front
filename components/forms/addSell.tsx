@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Switch, CheckboxGroup, Tabs, Chip, User, Tab, cn, Input, Avatar, Card, CardHeader, CardBody, Divider, ScrollShadow, Button, Select, SelectItem, CardFooter, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Textarea, RadioGroup, Radio, Breadcrumbs, BreadcrumbItem, Image } from "@nextui-org/react";
 import { CiTrash } from "react-icons/ci";
 import { FaTrash } from 'react-icons/fa';
-import menusell from '../data/menusell';
 // import { revalidatePath } from 'next/cache';
 import { useRouter } from 'next/router';
+
 
 export const CustomRadio = (props) => {
   const { children, ...otherProps } = props;
@@ -34,8 +34,6 @@ interface AddSellProps {
   onClose: () => void;
   typesellmenufix: any;
   typesellmenumix: any;
-  doughAllData: any;
-  diffAllData: any;
 }
 
 
@@ -46,17 +44,15 @@ export default function AddSell({
   onClose,
   typesellmenufix,
   typesellmenumix,
-  doughAllData,
-  diffAllData,
 }: AddSellProps) {
 
+
   const [sellMenuFix, setSellMenuFix] = useState({
-    id: 8,
     name: "",
     price: 0,
     type: "",
     image: '/images/logo.svg',
-    status: 'Close',
+    status: 'c',
     selltype: 1,
     product: [
 
@@ -65,12 +61,15 @@ export default function AddSell({
 
   const [quantityData, setQuantityData] = useState(0);
   const selectedType = typesellmenufix.find(type => type.id === sellMenuFix.type.toString());
-  const remainingQuantity = selectedType ? selectedType.num - sellMenuFix.product.reduce((acc, item) => acc + item.quantity, 0) : 0;
+  const remainingQuantity = selectedType ? selectedType.num - sellMenuFix.product.reduce((acc, item) => acc + item.qty, 0) : 0;
   const inputRef = useRef(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imageUpload, setImageUpload] = useState(null);
   const [isLoanding, setIsLoading] = useState(false);
   const [submitRequested, setSubmitRequested] = useState(false);
+
+  const [doughAllData, setDoughAllData] = useState([]);
+  const [diffAllData, setDiffAllData] = useState([]);
 
   const router = useRouter();
 
@@ -83,12 +82,12 @@ export default function AddSell({
     if (switchStatus) {
       setSellMenuFix((prevProduct) => ({
         ...prevProduct,
-        status: "Close"
+        status: "c"
       }));
     } else {
       setSellMenuFix((prevProduct) => ({
         ...prevProduct,
-        status: "Open"
+        status: "o"
       }));
     }
   }
@@ -97,14 +96,14 @@ export default function AddSell({
   const handleAddProduct = () => {
     setSellMenuFix(prevState => ({
       ...prevState,
-      product: [...prevState.product, { id: '', quantity: 1 }]
+      product: [...prevState.product, { pd_id: '', qty: 1 }]
     }));
   };
 
   const handleSelechTypeTwo = () => {
     setSellMenuFix(prevState => ({
       ...prevState,
-      product: [...prevState.product, { id: '0' }],
+      product: [...prevState.product, { pd_id: '0' }],
       type: "",
       image: '/images/logo.svg'
     }));
@@ -126,7 +125,8 @@ export default function AddSell({
   const handleProductChange = (index, value) => {
     setSellMenuFix(prevState => {
       const updatedProducts = [...prevState.product];
-      updatedProducts[index].id = value;
+      updatedProducts[index].pd_id = value;
+      console.log(value)
       return {
         ...prevState,
         product: updatedProducts
@@ -151,7 +151,7 @@ export default function AddSell({
   const handleQuantityChange = (index, delta) => {
     setSellMenuFix(prevState => {
       const newProduct = { ...prevState.product[index] };
-      newProduct.quantity = Math.max(0, newProduct.quantity + delta);
+      newProduct.qty = Math.max(0, newProduct.qty + delta);
 
       const updatedProducts = prevState.product.map((item, idx) =>
         idx === index ? newProduct : item
@@ -188,16 +188,18 @@ export default function AddSell({
 
   const handSelectedChange = (e) => {
     const selectedValue = JSON.parse(e.target.value);
-    const { id, image } = selectedValue;
+    const { pd_id, image } = selectedValue;
+
+    console.log(pd_id, image)
 
     setSellMenuFix((prevSellMenuFix) => ({
       ...prevSellMenuFix,
-      product: [{ id: id, image: image }]
+      product: [{ pd_id: pd_id, image: image }]
     }));
 
     if (imageUpload == null) {
       setUploadedImage(image);
-      addData(image,"image");
+      addData(image, "image");
     }
 
     // console.log(id);
@@ -236,7 +238,7 @@ export default function AddSell({
         return response.json();
       })
       .then(data => {
-        addData(data.pathFile,"image");
+        addData(data.pathFile, "image");
       })
       .catch(error => console.error(error));
   };
@@ -252,12 +254,11 @@ export default function AddSell({
 
   const clearData = () => {
     setSellMenuFix({
-      id: 8,
       name: "",
       price: 0,
       type: "",
       image: 'images/logo.svg',
-      status: 'Close',
+      status: 'c',
       selltype: 1,
       product: [
 
@@ -269,38 +270,59 @@ export default function AddSell({
 
   // console.log(sellMenuFix.product);
 
+
+  // send data to api eyefu
   const sellSubmit = async (sellType) => {
-    if(sellType == 2){
-    if (sellMenuFix.type == "4") {
-      addData(2, "selltype");
-    } else if (sellMenuFix.type == "1" || sellMenuFix.type == "2") {
-      if (sellSelectMix.length > 0) {
-        const newProducts = sellSelectMix.map(item => ({ id: item }));
-        setSellMenuFix(prevState => ({
-          ...prevState,
-          product: [...prevState.product, ...newProducts]
-        }));
-      addData(2, "selltype");
+    if (sellType == 2) {
+      if (sellMenuFix.type == "4") {
+        // addData(2, "selltype");
+      } else if (sellMenuFix.type == "1" || sellMenuFix.type == "2") {
+        if (sellSelectMix.length > 0) {
+          const newProducts = sellSelectMix.map(item => ({ id: item }));
+          setSellMenuFix(prevState => ({
+            ...prevState,
+            product: [...prevState.product, ...newProducts]
+          }));
+          // addData(2, "selltype");
+        }
       }
-    }}
-    // console.log(sellType);
+    }
     setIsLoading(true);
     setSubmitRequested(true);
-  }
 
-  const submit = () => {
-    menusell.push(sellMenuFix);
-    setTimeout(() => {
-      setIsLoading(false);
-      console.log(menusell);
-      // console.log(sellMenuFix);
-      clearData(); // เคลียร์ข้อมูลหลังจากเพิ่มข้อมูลเข้าอาร์เรย์
-      onClose(); // ปิด Modal
-      router.replace('/product/sell_all'); // นำทางไปยังหน้าอื่น
-    }, 2000);
-  }
+    setTimeout(async () => {
+      const dataToSend = {
+        sellMenuFix
+      };
 
-  const addData = (data,name) => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/addsm`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(dataToSend.sellMenuFix)
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        const result = await response.json();
+        console.log('Success:', result);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+      finally {
+        setIsLoading(false);
+        setSubmitRequested(false);
+        onClose();
+      }
+    }, 0);
+  };
+
+
+  const addData = (data, name) => {
     setSellMenuFix(prevState => ({
       ...prevState,
       [name]: data
@@ -308,13 +330,26 @@ export default function AddSell({
   }
 
   useEffect(() => {
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`)
+      .then(response => response.json())
+      .then(data => {
+        setDoughAllData(data);
+
+      })
+      .catch(error => {
+        console.error('Error fetching unit data:', error);
+      });
+
+
+
     if (submitRequested) {
-      submit();
       setSubmitRequested(false); // Reset the flag
     }
   }, [sellMenuFix, submitRequested]);
 
-  console.log(sellMenuFix);
+  // console.log(sellMenuFix);
+  // console.log(doughAllData)
 
 
   return (
@@ -408,7 +443,7 @@ export default function AddSell({
                         color="primary"
                         name="type"
                         onChange={handleProductInputChangeFix}
-
+                        onClick={() => { addData(1, "selltype") }}
                       >
                         {typesellmenufix.map((type) => (
                           <SelectItem key={type.id} value={type.id}>
@@ -485,10 +520,13 @@ export default function AddSell({
                               onChange={(e) => handleProductChange(index, e.target.value)}
                             >
                               {doughAllData.map((prod) => (
-                                <SelectItem key={prod.id} value={prod.id}>
-                                  {prod.name}
-                                </SelectItem>
+                                prod.pdc_id === 1 ? (
+                                  <SelectItem key={prod.pd_id} value={prod.pd_id}>
+                                    {prod.pd_name}
+                                  </SelectItem>
+                                ) : null
                               ))}
+
                             </Select>
                           </div>
                           <div className="flex w-full">
@@ -497,7 +535,7 @@ export default function AddSell({
                               <button
                                 className="btn btn-square bg-[#D9CAA7] btn-sm"
                                 onClick={() => handleQuantityChange(index, -1)}
-                                disabled={sellMenuFix.product[index].id === "" || product.quantity === 0}
+                                disabled={sellMenuFix.product[index].id === "" || product.qty === 0}
                               >
                                 <svg
                                   className="text-[#73664B]"
@@ -512,7 +550,7 @@ export default function AddSell({
                                   />
                                 </svg>
                               </button>
-                              <span className="w-4 text-center mx-2">{product.quantity}</span>
+                              <span className="w-4 text-center mx-2">{product.qty}</span>
                               <button
                                 className="btn btn-square bg-[#D9CAA7] btn-sm"
                                 onClick={() => handleQuantityChange(index, 1)}
@@ -636,7 +674,7 @@ export default function AddSell({
                         color="primary"
                         name="type"
                         onChange={handleProductInputChangeFix}
-
+                        onClick={() => { addData(2, "selltype") }}
                       >
                         {typesellmenumix.map((type) => (
                           <SelectItem key={type.id} value={type.id}>
@@ -704,27 +742,32 @@ export default function AddSell({
                             value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ id: "0", image: "" })}
 
                           >
-                            {diffAllData.map((diff, index) => (
-                              <CustomRadio value={JSON.stringify({ id: diff.id, image: diff.image })} key={index}>
-                                <div className="flex justify-center items-center">
-                                  <Avatar radius="sm" src={diff.image} />
-                                  <p className="justify-center ml-3">{diff.name}</p>
-                                </div>
-                              </CustomRadio>
+                            {doughAllData.map((diff, index) => (
+                              diff.pdc_id === 2 ? (
+                                <CustomRadio value={JSON.stringify({ id: diff.pd_id, image: diff.picture })} key={index}>
+                                  <div className="flex justify-center items-center">
+                                    <Avatar radius="sm" src={diff.picture} />
+                                    <p className="justify-center ml-3">{diff.pd_name}</p>
+                                  </div>
+                                </CustomRadio>
+                              ) : null
                             ))}
+
                           </RadioGroup>
                         ) : sellMenuFix.type == "3" ? (
                           <RadioGroup
                             onChange={handSelectedChange}
-                            value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ id: "0", image: "" })}
+                            value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ pd_id: "0", image: "" })}
                           >
                             {doughAllData.map((dough, index) => (
-                              <CustomRadio value={JSON.stringify({ id: dough.id, image: dough.image })} key={index}>
-                                <div className="flex justify-center items-center">
-                                  <Avatar radius="sm" src={dough.image} />
-                                  <p className="justify-center ml-3">{dough.name}</p>
-                                </div>
-                              </CustomRadio>
+                              dough.pdc_id === 1 ? (
+                                <CustomRadio value={JSON.stringify({ pd_id: dough.pd_id, image: dough.picture })} key={index}>
+                                  <div className="flex justify-center items-center">
+                                    <Avatar radius="sm" src={dough.picture} />
+                                    <p className="justify-center ml-3">{dough.pd_name}</p>
+                                  </div>
+                                </CustomRadio>
+                              ) : null
                             ))}
                           </RadioGroup>
 
@@ -734,23 +777,25 @@ export default function AddSell({
                             onChange={(value) => setSellSelectMix(value)}
                           >
                             {doughAllData.map((dough, index) => (
-                              <Checkbox
-                                classNames={{
-                                  base: cn(
-                                    "inline-flex max-w-full w-full bg-content1 m-0",
-                                    "hover:bg-content2 items-center justify-start",
-                                    "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
-                                    "data-[selected=true]:border-primary"
-                                  ),
-                                  label: "w-full",
-                                }}
-                                key={dough.id} value={dough.id.toString()}
-                              >
-                                <div className="flex justify-start items-center gap-1">
-                                  <Avatar radius="sm" src={dough.image} />
-                                  <p className="justify-center ml-3">{dough.name}</p>
-                                </div>
-                              </Checkbox>
+                              dough.pdc_id === 1 ? (
+                                <Checkbox
+                                  classNames={{
+                                    base: cn(
+                                      "inline-flex max-w-full w-full bg-content1 m-0",
+                                      "hover:bg-content2 items-center justify-start",
+                                      "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
+                                      "data-[selected=true]:border-primary"
+                                    ),
+                                    label: "w-full",
+                                  }}
+                                  key={dough.pd_id} value={dough.pd_id.toString()}
+                                >
+                                  <div className="flex justify-start items-center gap-1">
+                                    <Avatar radius="sm" src={dough.picture} />
+                                    <p className="justify-center ml-3">{dough.pd_name}</p>
+                                  </div>
+                                </Checkbox>
+                              ) : null
                             ))}
                           </CheckboxGroup>
                         )}

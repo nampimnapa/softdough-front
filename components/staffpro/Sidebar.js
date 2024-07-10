@@ -57,13 +57,13 @@ const Sidebar = ({ children, className }) => {
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "ใบสั่งผลิตทั้งหมด"}
-                        href="/dashboard"
+                        href="/staffpro/orderlist/list"
                         title="ใบสั่งผลิตทั้งหมด"
                         startIcon={<Icon icon="lets-icons:order" width="1.2em" height="1.2em"  className="h-5 w-5 bold " />}
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "รอดำเนินการผลิต"}
-                        href="/dashboard"
+                        href="/staffpro/orderlist/waiting"
                         title="รอดำเนินการผลิต"
                         startIcon={<Icon icon="fluent:clock-bill-16-regular" width="1.2em" height="1.2em"  className="h-5 w-5 inherit " />}
                         handleActive={handleActive} />

@@ -4,6 +4,37 @@ import { Tab } from '@headlessui/react';
 import Link from "next/link";
 
 function list() {
+
+    const [ind, setIngredientall] = useState<any[]>([]);
+    const [indlot, setIngredientLot] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // useEffect(() => {
+    //     // Fetch staff data on component mount
+    //     fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
+    //         .then((response) => response.json())
+    //         .then((data) => {
+    //             console.log(data);
+    //             setIngredientall(data); // Assuming the response is an array of staff objects
+    //             setLoading(false);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error:', error);
+    //             setLoading(false);
+    //         });
+
+    //     fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlotdetail`)
+    //         .then((response) => response.json())
+    //         .then((data) => {
+    //             console.log(data);
+    //             setIngredientLot(data); // Assuming the response is an array of staff objects
+    //             setLoading(false);
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error:', error);
+    //             setLoading(false);
+    //         });
+    // }, []);
     return (
         <div>
             <p className='text-[#F2B461] font-medium m-4'>วัตถุดิบที่ใช้</p>

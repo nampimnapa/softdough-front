@@ -26,7 +26,7 @@ const ingredientDropdown = [
   { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/income/all" },
   { title: "วัตถุดิบทั้งหมด", href: "/ingredients/all" },
   { title: "วัตถุดิบที่ใช้", href: "/ingredients/using/list" },
-  { title: "รออนุมัติ", href: "/ingredients/pending" },
+  { title: "รออนุมัติ", href: "/ingredients/approve" },
 ];
 // สินค้า
 const productDropdown = [
