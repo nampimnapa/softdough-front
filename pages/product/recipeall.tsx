@@ -100,7 +100,8 @@ function recipeall() {
                     </div>
                     <div className="flex justify-end">
                         <p className="text-sm text-[#73664B]">{recipe.pd_qtyminimum} ชิ้น</p>
-                    </div>
+                    </div>.
+                    {/* 20.2 */}
                 </div>
                 <div className="card-actions flex justify-between">
                     <div className="flex justify-items-center">

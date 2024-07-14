@@ -20,6 +20,8 @@ const kanit = Kanit({
 
 function detailproduction() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isOpen2, setIsOpen2] = useState(false);
+
 
     const closeModal = () => {
         setIsOpen(false);
@@ -29,7 +31,10 @@ function detailproduction() {
         setIsOpen(true);
     };
     const openModal2 = () => {
-        setIsOpen(true);
+        setIsOpen2(true);
+    };
+    const closeModal2 = () => {
+        setIsOpen2(false);
     };
     const handleCancel = () => {
         closeModal();
@@ -171,12 +176,25 @@ function detailproduction() {
     // };
     const sendPdoStatus = async () => {
         // Check the value of pdo_status
+        // ตรวจสอบสถานะ pdo_status
         if (detail.pdo_status === '1') {
-            // If pdo_status is '1', navigate back to listorder
+            // หาก pdo_status เป็น '1' ให้ย้ายไปที่หน้า listorder
+            router.push('/manufacture/listorder');
+        } else if (detail.pdo_status === '2') {
+            // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
+            router.push('/manufacture/listorder');
+        } else if (detail.pdo_status === '3') {
+            // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
+            router.push('/manufacture/listorder');
+        } else if (detail.pdo_status === '4') {
+            // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
             router.push('/manufacture/listorder');
         } else if (isChecked && detail.pdo_status === '2') {
+
             // If pdo_status is '2', update the status using API
             const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+            const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
+
 
             if (checkedIds.length === 0) {
                 setMessage('No items selected');
@@ -188,11 +206,11 @@ function detailproduction() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ pdod_id: checkedIds }),
+                body: JSON.stringify({ pdod_ids: checkedIdsAsNumbers }),
             });
 
             const responseData = await response.json();
-            console.log(responseData);
+            console.log(checkedIds);
 
             if (responseData.status === 200) {
                 setMessage('Data update successfully');
@@ -200,9 +218,11 @@ function detailproduction() {
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
-        }
-    };
 
+        }
+
+
+    };
     return (
         <div>
             <button className='my-3 mx-5 '>
@@ -261,7 +281,7 @@ function detailproduction() {
 
                                             <td className={`text-sm px-6 py-2 
     ${pdodetail.status === '3' ? 'text-green-500' :
-    pdodetail.status === '1' ? 'text-[#C5B182]' : ''
+                                                    pdodetail.status === '1' ? 'text-[#C5B182]' : ''
                                                 }`}>
                                                 {pdodetail.status === '3' ? 'เสร็จสิ้นแล้ว' : pdodetail.status === '1' ? 'รอยืนยันดำเนินการ' : ''}
                                                 {pdodetail.status === '2' && (
@@ -315,6 +335,18 @@ function detailproduction() {
                                 </Checkbox>
                             </div>
                         )}
+                        {/* {detail.pdo_status === '3' && (
+                            <div className="ml-6 mt-5">
+                                <Checkbox
+                                    radius="sm"
+                                    color="warning"
+                                    onClick={handleCheckboxChange2}
+                                    isSelected={isChecked2} // ใช้ค่าของ isChecked2 โดยตรงเพื่อกำหนดสถานะ checked หรือ unchecked
+                                >
+                                    ยืนยันการผลิตสำเร็จ
+                                </Checkbox>
+                            </div>
+                        )} */}
 
                         {/* Rest of your component */}
                     </div>
@@ -326,28 +358,29 @@ function detailproduction() {
             {
                 detail !== null ? (
                     <div className="flex justify-start">
-                        <div className="w-1/2  mt-10  flex justify-start " >
-
+                        <div className="w-full mt-10 flex justify-start">
                             <Button
                                 onClick={sendPdoStatus}
-                                // // href="/manufacture/listorder"
-                                // onClick={() => {
-                                //     if (isChecked) {
-                                //         // If isChecked is true, navigate without showing modal
-                                //         router.push('/manufacture/listorder');
-                                //     } else {
-                                //         // If isChecked is false, open modal and call the function
-                                //         openModal();
-                                //     }
-                                // }}
                                 type="button"
-                                className=" text-white bg-[#73664B]  focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-5">
-                                เสร็จสิ้น</Button>
+                                className="text-white bg-[#73664B] focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 mb-2 ml-5">
+                                เสร็จสิ้น
+                            </Button>
 
                             {detail !== null && detail.pdo_status === '1' && (
                                 <div className="w-full flex justify-start">
-                                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
+                                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
                                         แก้ไขใบสั่งผลิต
+                                    </Button>
+                                </div>
+                            )}
+                            {/* ต้องแก้ให้ pdo.status =3 อันนี้เอาไว้ดู ui เฉยๆ มีเรื่อง modal*/}
+                            {detail !== null && detail.pdodetail.some(item => item.status === '3') && (
+                                <div className="w-full flex justify-between">
+                                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
+                                        สั่งผลิตอีกครั้ง
+                                    </Button>
+                                    <Button onClick={openModal2} type="button" className="mr-6 ml-2 text-white bg-[#C5B182] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
+                                        เพิ่มวัตถุดิบที่ใช้
                                     </Button>
                                 </div>
                             )}
@@ -482,6 +515,150 @@ function detailproduction() {
                                                                         <button
                                                                             type="button"
                                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                        // onClick={handleConfirm}
+                                                                        ><Link href={`../editpdod/${id}`}>
+                                                                                ยืนยัน
+                                                                            </Link></button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
+                                    )
+                                    }
+                                </>
+                            )}
+
+
+                            {/* {isChecked && detail && detail.pdo_status === '3' && ( */}
+                            {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (
+                                // {/* // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2' */}
+                                <>
+                                    {isOpen && (
+                                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0 bg-black/25" />
+                                                </Transition.Child>
+
+                                                <div className="fixed inset-0 overflow-y-auto">
+                                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                <Dialog.Title
+                                                                    as="h3"
+                                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                                >
+                                                                    ไปที่หน้าเพิ่มใบสั่งผลิตอีกครั้ง
+                                                                </Dialog.Title>
+                                                                <div className="mt-2">
+                                                                    <p className="text-sm text-[#73664B]">
+                                                                        คุณต้องการสั่งผลิตอีกครั้งหรือไม่
+                                                                    </p>
+                                                                </div>
+                                                                {/*  choose */}
+                                                                <div className="flex justify-end">
+                                                                    <div className="inline-flex justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none "
+                                                                            onClick={closeModal}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none "
+                                                                        // onClick={handleConfirm}
+                                                                        ><Link href={`../editpdod/${id}`}>
+                                                                                ยืนยัน
+                                                                            </Link></button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
+                                    )
+                                    }
+                                </>
+                            )}
+                            {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (                                // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
+                                <>
+                                    {isOpen2 && (
+                                        <Transition appear show={isOpen2} as={Fragment} className={kanit.className}>
+                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0 bg-black/25" />
+                                                </Transition.Child>
+
+                                                <div className="fixed inset-0 overflow-y-auto">
+                                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                <Dialog.Title
+                                                                    as="h3"
+                                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                                >
+                                                                    ไปที่หน้าเพิ่มวัตถุดิบที่ใช้
+                                                                </Dialog.Title>
+                                                                <div className="mt-2">
+                                                                    <p className="text-sm text-[#73664B]">
+                                                                        คุณต้องการเพิ่มวัตถุดิบที่ใช้หรือไม่
+                                                                    </p>
+                                                                </div>
+                                                                {/*  choose */}
+                                                                <div className="flex justify-end">
+                                                                    <div className="inline-flex justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none "
+                                                                            onClick={closeModal2}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none "
                                                                         // onClick={handleConfirm}
                                                                         ><Link href={`../editpdod/${id}`}>
                                                                                 ยืนยัน

@@ -9,32 +9,22 @@ function list() {
     const [indlot, setIngredientLot] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // useEffect(() => {
-    //     // Fetch staff data on component mount
-    //     fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
-    //         .then((response) => response.json())
-    //         .then((data) => {
-    //             console.log(data);
-    //             setIngredientall(data); // Assuming the response is an array of staff objects
-    //             setLoading(false);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error:', error);
-    //             setLoading(false);
-    //         });
+    useEffect(() => {
+        // Fetch staff data on component mount
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/usedIngredients`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setIngredientall(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
 
-    //     fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlotdetail`)
-    //         .then((response) => response.json())
-    //         .then((data) => {
-    //             console.log(data);
-    //             setIngredientLot(data); // Assuming the response is an array of staff objects
-    //             setLoading(false);
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error:', error);
-    //             setLoading(false);
-    //         });
-    // }, []);
+
+    }, []);
     return (
         <div>
             <p className='text-[#F2B461] font-medium m-4'>วัตถุดิบที่ใช้</p>
@@ -83,26 +73,30 @@ function list() {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10 items-center">
-                            <td scope="row" className="px-1 py-1 text-[#73664B] whitespace-nowrap dark:text-white">
-                            </td>
-                            <td className="px-6 py-1  text-[#73664B] text-center">
-                            </td>
-                            <td className=""
-                            >
-                            </td>
-                            <td className="px-1 py-3  items-center justify-center  ">
-                            </td>
-                            <td className="px-1 py-3  items-center justify-center  ">
-                                <button >
-                                    <Link href="#" className="w-full flex justify-center items-center">
-                                        <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
-                                    </Link>
-                                </button>
-                            </td>
+                        {ind.map((ingredients, idx) => (
+                            <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10 items-center">
+                                <td scope="row" className="px-1 py-1 text-[#73664B] whitespace-nowrap dark:text-white">
+                                    {/* {ingredients.checkk === "production" ? ingredients.note : ingredients.name} */}
+                                </td>
+                                <td className="px-6 py-1  text-[#73664B] text-center">
+                                    {ingredients.created_at}
+                                </td>
+                                <td className="">
+                                    {ingredients.checkk === "other" ? ingredients.note : ingredients.name}
+                                </td>
+                                <td className="px-1 py-3  items-center justify-center  ">
+                                    {ingredients.status}
+                                </td>
+                                <td className="px-1 py-3  items-center justify-center  ">
+                                    <button >
+                                        <Link href="#" className="w-full flex justify-center items-center">
+                                            <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
+                                        </Link>
+                                    </button>
+                                </td>
 
-                        </tr>
-
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             </div>

@@ -40,7 +40,7 @@ function listorder() {
         [{ id: 0, name: "ทั้งหมด" },
         { id: 1, name: "สั่งผลิตแล้ว" },
         { id: 2, name: "กำลังดำเนินการ" },
-        { id: 3, name: "ยกเลิกแล้ว" },
+        
         { id: 4, name: "เสร็จสิ้น" }
         ];
 
@@ -110,11 +110,12 @@ function listorder() {
                                                     {/* order.pdo_status === 'เสร็จสิ้น' ? ' text-green-600' : */}
                                                     <td className={`h-10 
                                                     ${order.pdo_status === '2' ? ' text-yellow-500' :
-                                                            order.pdo_status === '1' ? 'text-[#C5B182]' : 
-                                                            order.pdo_status === '3' ? 'text-green-500' :''
+                                                            order.pdo_status === '1' ? 'text-[#C5B182]' :
+                                                                order.pdo_status === '3' ? 'text-green-500' :
+                                                                    order.pdo_status === '4' ? 'text-green-500' : ''
                                                         }`}>
-
-                                                        {order.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' :order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
+                                                        {/* 3 เสร็จสิ้นแล้วแบบยังไม่เพิ่มวัตถุดิบที่ใช้   4 เสร็จสิ้นแล้วเพิ่มแล้ว */}
+                                                        {order.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : order.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center">
 

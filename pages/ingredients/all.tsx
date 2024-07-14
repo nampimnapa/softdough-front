@@ -18,7 +18,7 @@ function all() {
 
     useEffect(() => {
         // Fetch staff data on component mount
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readall`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
