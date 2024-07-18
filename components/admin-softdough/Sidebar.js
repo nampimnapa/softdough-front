@@ -55,8 +55,8 @@ const promotionDropdown = [
 ];
 // รายการจ่่าย
 const payDropdown = [
-  { title: "ประเภทรายการจ่าย", href: "/ingredients/instore" },
-  { title: "เพิ่มรายการจ่าย", href: "/ingredients/all" },
+  { title: "ประเภทรายการจ่าย", href: "/expenses/type" },
+  { title: "เพิ่มรายการจ่าย", href: "/expenses/add" },
   { title: "รายการจ่ายทั้งหมด", href: "/ingredients/instore" },
   { title: "รออนุมัติ", href: "/ingredients/all" }
 ];

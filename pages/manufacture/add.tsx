@@ -178,15 +178,12 @@ function add() {
 
 
     const handleConfirm = async () => {
-
         closeModal();
         const pdo_status = isChecked ? 2 : 1;
-
         const productionOrder = { pdo_status };
         const productionOrderdetail = addedDetail.map(detail => ({ qty: detail.num, pd_id: detail.pd_id }));
-
         const postData = {
-            productionOrder,
+            productionOrder: [productionOrder], // Send productionOrder as an array
             productionOrderdetail
         };
 

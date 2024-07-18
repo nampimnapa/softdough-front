@@ -18,7 +18,7 @@ function all() {
 
     useEffect(() => {
         // Fetch staff data on component mount
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readall`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
@@ -140,10 +140,10 @@ function all() {
                                                     {ingredients.qtyminimum}
                                                 </td>
                                                 <td className={`px-6 py-1 
-                                                    ${ingredients.status === '1' ? 'text-green-500'
-                                                        : ingredients.status === '2' ? 'text-red-500'
+                                                    ${ingredients.status === '2' ? 'text-green-500'
+                                                        : ingredients.status === '1' ? 'text-red-500'
                                                             : ingredients.status === '0' ? 'text-red-500' : ''}`}>
-                                                                 {ingredients.status === '1' ? 'ปกติ' :ingredients.status === '2' ? 'ซื้อเพิ่ม' : ingredients.status}
+                                                                 {ingredients.status === '1' ? 'ซื้อเพิ่ม' :ingredients.status === '2' ? 'ปกติ' : ingredients.status === '0' ? 'ไม่มี' : ingredients.status}
 
                                                 </td>
                                                 <td className="px-6 py-4 flex items-center justify-center  ">

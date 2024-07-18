@@ -38,6 +38,15 @@ interface Recipe {
   ingredients_qty: number,
 
 }
+interface PdodDetail {
+  pd_id: number;
+  pd_name: string;
+  pdc_name: string;
+  pdo_id: number;
+  pdod_id: number | null;
+  qty: number;
+  status: string;
+}
 function editpdod() {
   const router = useRouter();
   const { id } = router.query;
@@ -94,44 +103,45 @@ function editpdod() {
 
 
 
-  const handleAddDetail = (event) => {
+  const handleAddDetail = (event: React.FormEvent) => {
     event.preventDefault();
 
-    const selectedProductType = parseInt((document.getElementById("productType") as HTMLSelectElement).value);
-    const selectedProductId = parseInt((document.getElementById("product") as HTMLSelectElement).value);
     const selectedProduct = filteredProducts.find(product => product.pd_id === selectedProductId);
     const typepd = productCat.find(type => type.pdc_id === selectedProductType)?.pdc_name;
 
     if (!selectedProduct) {
-      alert("กรุณาเลือกสินค้า");
+      alert('กรุณาเลือกสินค้า');
       return;
     }
 
-    // Validate that a quantity is entered
-    const enteredQuantity = parseInt((document.getElementById("num") as HTMLInputElement).value);
+    const enteredQuantity = parseInt((document.getElementById('num') as HTMLInputElement).value);
     if (isNaN(enteredQuantity) || enteredQuantity <= 0) {
-      alert("กรุณากรอกจำนวนที่ถูกต้อง");
+      alert('กรุณากรอกจำนวนที่ถูกต้อง');
       return;
     }
 
-    const newDetail = {
-      pd_id: selectedProduct?.pd_id || '',
-      pd_name: selectedProduct?.pd_name || '',
-      pdc_name: typepd || '',
-      pdo_id: detail.pdo_id, // รับค่า pdo_id จาก detail ที่เก็บค่าไว้ก่อนหน้านี้
-      pdod_id: null, // กำหนดให้เป็น null เพราะเป็นการเพิ่มรายการใหม่
-      qty: enteredQuantity,
-      status: "1", // กำหนดสถานะเป็น "1" เพราะเป็นรายการใหม่
-    };
+    const existingDetailIndex = detail.pdodetail.findIndex((detail: PdodDetail) => detail.pd_id === selectedProduct.pd_id);
+    if (existingDetailIndex >= 0) {
+      const updatedDetail = [...detail.pdodetail];
+      updatedDetail[existingDetailIndex].qty += enteredQuantity;
+      setDetail({ ...detail, pdodetail: updatedDetail });
+    } else {
+      const newDetail: PdodDetail = {
+        pd_id: selectedProduct.pd_id,
+        pd_name: selectedProduct.pd_name,
+        pdc_name: typepd || '',
+        pdo_id: detail.pdo_id,
+        pdod_id: null,
+        qty: enteredQuantity,
+        status: '1',
+      };
+      setDetail({ ...detail, pdodetail: [...detail.pdodetail, newDetail] });
+    }
 
-    setAddedDetail(prevDetail => [...prevDetail, newDetail]); // เพิ่มรายการใหม่เข้าไปใน addedDetail
-
-    // Clear form fields after adding a new product
     setSelectedProductType(1);
-    (document.getElementById("product") as HTMLSelectElement).value = "";
-    (document.getElementById("num") as HTMLInputElement).value = "";
+    (document.getElementById('product') as HTMLSelectElement).value = '';
+    (document.getElementById('num') as HTMLInputElement).value = '';
   };
-
   console.log(detail)
   console.log(addedDetail)
   const handleDeleteProduct = (idx: number) => {
@@ -172,26 +182,35 @@ function editpdod() {
     const productionOrder = { pdo_status };
 
     // Create the data structure to be sent to the server
-    const dataToEdit = addedDetail.map(detail => ({ pd_id: detail.pd_id, qty: detail.qty }));
+    // const dataToEdit = detail.pdodetail.map(detail => 
+    //   ({ pd_id: detail.pd_id, qty: detail.qty }));
+    const dataToEdit = [
+      ...detail.pdodetail,
+      ...addedDetail
+    ].map(detail => ({
+      pd_id: detail.pd_id,
+      qty: detail.qty
+    }));
 
     const postData = {
-      productionOrder,
       dataToEdit
+
     };
+    
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/editData/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ postData }),
+      body: JSON.stringify( postData ),
     });
 
     const responseData = await response.json();
-    console.log(responseData);
+    console.log(postData);
 
     if (responseData.status === 200) {
       setMessage('Data update successfully');
-      // router.push('/product/all');
+      router.push(`/detail/${detail.pdo_id}`);    
     } else {
       setMessage(responseData.message || 'Error occurred');
     }
@@ -291,34 +310,28 @@ function editpdod() {
                   <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                     <td
                       scope="row"
-                      className="px-6 py-1 whitespace-nowrap dark:text-white"
-                    >
+                      className="px-6 py-1 whitespace-nowrap dark:text-white">
                       {pdodetail.pdc_name}
                     </td>
                     <td className="px-6 py-1">{pdodetail.pd_name}</td>
-
                     <td className="px-6 py-1 h-10 ">
                       {pdodetail.qty}
                     </td>
-                    {/* <td className="px-6 py-4 flex items-center justify-center">
-                                        {pdodetail.status}
-                                        </td> */}
                     <td >
                       <button onClick={() => handleDeleteProduct(idx)}>
                         <TrashIcon className="h-5 w-5 text-red-500" /></button>
                     </td>
                   </tr>
-
                 ))}
-                {addedDetail.map((detail, index) => (
-                  <tr key={index} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                {addedDetail.map((detail, idx) => (
+                  <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                     <td scope="row"
-                      className="px-6 py-1 whitespace-nowrap dark:text-white">{detail.type}</td>
+                      className="px-6 py-1 whitespace-nowrap dark:text-white">{detail.pdc_name}</td>
                     <td className="px-6 py-1">{getProductNameById(detail.pd_id)}</td>
                     <td className="px-6 py-1 h-10 ">{detail.qty}</td>
                     <td >
 
-                      <button onClick={() => handleDeleteProduct(index)}>
+                      <button onClick={() => handleDeleteProduct(idx)}>
                         <TrashIcon className="h-5 w-5 text-red-500" />
                       </button>
 
@@ -400,7 +413,7 @@ function editpdod() {
                                 type="button"
                                 className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                 onClick={handleConfirm}
-                              ><Link href="#">
+                              ><Link href={`../detail/${id}`}>
                                   ยืนยัน
                                 </Link></button>
                             </div>

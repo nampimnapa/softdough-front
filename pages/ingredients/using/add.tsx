@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, ChangeEvent } from "react";
 import Link from "next/link";
 import {
     ChevronLeftIcon,
@@ -27,9 +27,16 @@ function add() {
     //         [name]: value,
     //     }));
     // };
+    const [ind, setIngredientall] = useState<any[]>([]);
+    const [indlot, setIngredientLot] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+
     const [addedIngredients, setAddedIngredients] = useState([]);
     const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
     const [isOpen, setIsOpen] = useState(false);
+    // const [LotOptions, setLotOptions] = useState<Lot[]>([]);
+    // const [formData, setFormData] = useState<{ pdo_id_name: string }>({ pdo_id_name: '' });
 
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
@@ -78,11 +85,25 @@ function add() {
     const [type, setType] = useState(""); // เก็บค่าประเภทที่เลือก
 
     const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
+    // const [LotOptions, setLotOptions] = useState<Ingredients[]>([]);
+
+    // const [formData, setFormData] = useState({
+    //     pdo_id: '',
+    //     pdo_id_name: '',
+
+    // });
     interface Ingredients {
         ind_id: String;
         ind_name: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
+    interface UnitType {
+        pdo_id: string;
+        pdo_id_name: string;
+        // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
+    }
+    const [unitOptions, setUnitOptions] = useState([]);
+
     useEffect(() => {
         // Fetch unit data from the server and set the options
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
@@ -93,8 +114,27 @@ function add() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
-    }, []); // Run only once on component mount
 
+        
+    }, []); // Run only once on component mount
+    useEffect(() => {
+        // Fetch unit data from the server and set the options
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/readall`)
+            .then(response => response.json())
+            .then(data => {
+                setUnitOptions(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }, []); // Run only once on component mount
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        setUnitOptions((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
     const handleSubmit2 = async () => {
         const ingredientLotDetail = addedIngredients.map((ingredient) => ({
             ind_id: parseInt(ingredient.ind_id),
@@ -173,13 +213,26 @@ function add() {
                             <label className="block text-sm  leading-6 text-[#73664B]  mt-3 text-left ">
                                 เลขล็อตผลิต :</label>
                             <div className="mt-2 col-span-3">
-                                <input
+                                {/* <input
                                     placeholder="เลขใบสั่งผลิต"
                                     type="text"
                                     name="note"
                                     id="note"
                                     className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
-                                />
+                                /> */}
+
+                                <select id="countries"
+                                    className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
+                                    name="pdo_id_name"
+                                    //  value={}
+                                    onChange={handleInputChange}>
+                                    <option value="">เลขล็อตผลิต </option>
+                                    {Array.isArray(unitOptions) && unitOptions.map((unit: UnitType) => (
+                                        <option key={unit.pdo_id} value={unit.pdo_id}>
+                                            {unit.pdo_id_name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                         <p className="mt-4 mb-2  text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
@@ -345,7 +398,7 @@ function add() {
                                 <div className="flex items-center justify-center">
                                     <p className="text-sm  py-2 text-[#73664B] flex justify-center items-center mr-3">เศษ : </p>
                                     <input
-                                        min="1"
+                                        min="0"
                                         // onChange={handleCancelClick}
                                         type="number"
                                         pattern="[0-9]+([.,][0-9]+)?"

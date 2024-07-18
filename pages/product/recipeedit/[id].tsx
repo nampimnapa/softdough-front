@@ -270,8 +270,6 @@ function recipeedit() {
     const [message, setMessage] = useState('Loading');
 
     const handleNextClick = async () => {
-
-
         if (currentPage !== "item2") {
             handleItemClick("item2");
         }
