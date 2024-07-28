@@ -225,7 +225,7 @@ function add() {
     return (
         <div>
             <div>
-                <p className='text-[#F2B461] font-medium m-6'>เพิ่มใบสั่งผลิต</p>
+                <p className='text-[#F2B461] font-medium m-4'>เพิ่มใบสั่งผลิต</p>
                 <form >
                     <div className="grid grid-cols-4">
                         <div className="flex items-center justify-center">

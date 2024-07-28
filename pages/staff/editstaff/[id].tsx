@@ -306,7 +306,7 @@ function detailstaff() {
                     รายละเอียดพนักงาน
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>แก้ไขพนักงาน</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>แก้ไขพนักงาน</p>
 
             <div className="mt-5 w-1/2 ">
                 <div className="grid grid-cols-3 items-center ">

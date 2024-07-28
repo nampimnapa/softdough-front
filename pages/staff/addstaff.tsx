@@ -394,10 +394,10 @@
 // function addstaff() {
 
 //   const [nameEm, setNameEm] = useState('');
-//   const [userName , setUserName] = useState('');
-//   const [userTel , setUserTel] = useState('');
-//   const [userPassw , setUserPassw] = useState('');
-//   const [userDepart , setUserDepart] = useState('');
+//   const [userName, setUserName] = useState('');
+//   const [userTel, setUserTel] = useState('');
+//   const [userPassw, setUserPassw] = useState('');
+//   const [userDepart, setUserDepart] = useState('');
 //   const [value, setValue] = useState({
 //     startDate: null,
 //     endDate: null
@@ -418,7 +418,7 @@
 //   const openModal = () => {
 //     setIsOpen(true);
 //   };
-// // ปุ่มยกเลิก
+//   // ปุ่มยกเลิก
 //   const [formData, setFormData] = useState({
 //     name: '',
 //     username: '',
@@ -437,7 +437,7 @@
 //   // };
 
 //   // FormData sand to API ถ้าส่งให้ อฟ ก็ส่งอันนี้ไปให้เลย Type JSON
-//     const formDatasave = {
+//   const formDatasave = {
 //     nameEm,
 //     userName,
 //     userPassw,
@@ -452,19 +452,20 @@
 //       username: '',
 //       tel: '',
 //       pw: '',
-//       depart: ''});
+//       depart: ''
+//     });
 
-//       console.log("Test data => ", formDatasave);
+//     console.log("Test data => ", formDatasave);
 
-//       setNameEm('');
-//       setUserName('');
-//       setUserDepart('');
-//       setUserPassw('');
-//       setUserTel('');
-//       setValue({
-//         startDate: null,
-//         endDate: null
-//       });
+//     setNameEm('');
+//     setUserName('');
+//     setUserDepart('');
+//     setUserPassw('');
+//     setUserTel('');
+//     setValue({
+//       startDate: null,
+//       endDate: null
+//     });
 //   };
 
 //   // console.log("Name => ",nameEm);
@@ -476,7 +477,7 @@
 //       <p className='text-[#F2B461] font-medium m-4'>เพิ่มพนักงาน</p>
 //       <div className="mt-5 w-1/2 ">
 //         <div className="grid grid-cols-3 items-center ">
-//           <label  className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+//           <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
 //             ชื่อพนักงาน :</label>
 //           <div className="mt-2 col-span-2">
 //             <input
@@ -491,7 +492,7 @@
 //           </div>
 //         </div>
 //         <div className="grid grid-cols-3 items-center ">
-//           <label  className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+//           <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
 //             ชื่อผู้ใช้งาน :</label>
 //           <div className="mt-2 col-span-2">
 //             <input
@@ -537,7 +538,7 @@
 //           </div>
 //         </div>
 //         <div className="grid grid-cols-3 items-center ">
-//           <label  className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+//           <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
 //             แผนก :</label>
 //           <div className="mt-2 col-span-2 flex">
 //             <div className="form-control">
@@ -699,6 +700,16 @@ function addstaff() {
       [name]: value,
     }));
   };
+  const handleValueChange = (newValue) => {
+    console.log("newValue:", newValue);
+    setStartValue(newValue);
+
+    // Assuming newValue is in the format { startDate: "2024-03-15", endDate: "2024-03-16" }
+    setValueForm((prevForm) => ({
+      ...prevForm,
+      st_start: newValue.startDate,
+    }));
+  };
 
   const handleValueChangeDate = (newValue: { startDate: any; endDate: any; }) => {
     console.log("newValue:", newValue.startDate);
@@ -760,10 +771,10 @@ function addstaff() {
   return (
     <div className='h-screen'>
       <p className='text-[#F2B461] font-medium m-4' >เพิ่มพนักงาน</p>
-      <div className="flex justify-center">
+      <div className="flex justify-start ml-4">
         <div className="mt-5 w-1/2 ">
           <form className="grid grid-cols-4 items-center ">
-            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
               ชื่อพนักงาน :</label>
             <div className="mt-2 col-span-3">
               <input
@@ -778,7 +789,7 @@ function addstaff() {
             </div>
           </form>
           <div className="grid grid-cols-4 items-center ">
-            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5 ">
               ชื่อผู้ใช้งาน :</label>
             <div className="mt-2 col-span-3">
               <input
@@ -794,7 +805,7 @@ function addstaff() {
 
           </div>
           <div className="grid grid-cols-4 items-center ">
-            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5 ">
               รหัสผ่าน :</label>
             <div className="mt-2 col-span-3">
               <input
@@ -809,7 +820,7 @@ function addstaff() {
             </div>
           </div>
           <div className="grid grid-cols-4 items-center ">
-            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5 ">
               เบอร์โทร :</label>
             <div className="mt-2 col-span-3">
               <input
@@ -824,7 +835,7 @@ function addstaff() {
             </div>
           </div>
           <div className="grid grid-cols-4 items-center ">
-            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
+            <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5 ">
               แผนก :</label>
             <div className="mt-2 col-span-3 flex">
               <div className="form-control">
@@ -849,16 +860,18 @@ function addstaff() {
             </div>
           </div>
           <div className="grid grid-cols-4 items-center mt-3 ">
-            <label className="mr- block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+            <label className="mr- block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
               วันที่เข้าทำงาน :</label>
-            <Datepicker
-              // className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}
-              useRange={false}
-              asSingle={true}
-              value={startValue}
-              onChange={handleValueChangeDate}
-            // name="st_start"
-            />
+            <div className="col-span-2" >
+              <Datepicker
+                // className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}
+                useRange={false}
+                asSingle={true}
+                value={startValue}
+                onChange={handleValueChange}
+              // name="st_start"
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -872,8 +885,8 @@ function addstaff() {
             ยกเลิก</button>
           <>
             {isOpen && (
-              <Transition appear show={isOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-10" onClose={closeModal}>
+              <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                <Dialog as="div" className="relative z-10" onClose={closeModal} >
                   <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"

@@ -113,7 +113,7 @@ function detailstaff() {
                     พนักงานทั้งหมด
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-b-3 border-[#C5B182] py-2'>รายละเอียดพนักงาน</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b  border-[#C5B182] py-2'>รายละเอียดพนักงาน</p>
             {staff !== null ? (
                 <div>
                     <p className="text-sm px-6 py-2 text-[#73664B]">ชื่อพนักงาน : {staff.st_name}</p>

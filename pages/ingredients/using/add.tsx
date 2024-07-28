@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState, ChangeEvent } from "react";
 import Link from "next/link";
+
 import {
     ChevronLeftIcon,
     MagnifyingGlassIcon,
@@ -19,24 +20,11 @@ const kanit = Kanit({
 });
 
 function add() {
-
-    // const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    //     const { name, value } = e.target;
-    //     setValueForm((prevIngredient) => ({
-    //         ...prevIngredient,
-    //         [name]: value,
-    //     }));
-    // };
-    const [ind, setIngredientall] = useState<any[]>([]);
-    const [indlot, setIngredientLot] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-
-
+    const router = useRouter(); // Declare router here
     const [addedIngredients, setAddedIngredients] = useState([]);
     const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
     const [isOpen, setIsOpen] = useState(false);
-    // const [LotOptions, setLotOptions] = useState<Lot[]>([]);
-    // const [formData, setFormData] = useState<{ pdo_id_name: string }>({ pdo_id_name: '' });
+
 
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
@@ -75,6 +63,7 @@ function add() {
         }
 
     };
+
     const handleDeleteIngredient = (index) => {
         setAddedIngredients((prevIngredients) => {
             const updatedIngredients = [...prevIngredients];
@@ -87,13 +76,9 @@ function add() {
     const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
     // const [LotOptions, setLotOptions] = useState<Ingredients[]>([]);
 
-    // const [formData, setFormData] = useState({
-    //     pdo_id: '',
-    //     pdo_id_name: '',
 
-    // });
     interface Ingredients {
-        ind_id: String;
+        ind_id: string;
         ind_name: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
@@ -102,7 +87,19 @@ function add() {
         pdo_id_name: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
-    const [unitOptions, setUnitOptions] = useState([]);
+    interface DetailData {
+        pdod_id: number; // Added pdod_id here
+        pd_name: string;
+        ind_name: string;
+        ind_id: number;
+        qty_used_sum: number;
+        scrap: number;
+    }
+    const [selectedId, setSelectedId] = useState<string>('');
+    const [detailData, setDetailData] = useState<DetailData[]>([]);
+    const [unitOptions, setUnitOptions] = useState<UnitType[]>([]);
+    const { id } = router.query;
+
 
     useEffect(() => {
         // Fetch unit data from the server and set the options
@@ -114,9 +111,8 @@ function add() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
+    }, []);
 
-        
-    }, []); // Run only once on component mount
     useEffect(() => {
         // Fetch unit data from the server and set the options
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/readall`)
@@ -127,14 +123,45 @@ function add() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
-    }, []); // Run only once on component mount
-    const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = event.target;
-        setUnitOptions((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
+    }, []);
+
+    useEffect(() => {
+        if (id) {
+            setSelectedId(id as string);
+        }
+    }, [id]);
+
+
+
+    useEffect(() => {
+        if (selectedId) {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/addUseIngrediantLotpro/${selectedId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Extract the array from finalResults property
+                    if (data && Array.isArray(data.finalResults)) {
+                        setDetailData(data.finalResults);
+                    } else {
+                        console.error('Unexpected data structure:', data);
+                        setDetailData([]);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching detail data:', error);
+                    setDetailData([]); // Set to an empty array on error
+                });
+        }
+    }, [selectedId]);
+
+    // const handleInputChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    //     const { name, value } = event.target;
+    //     setUnitOptions((prevData) => ({
+    //         ...prevData,
+    //         [name]: value,
+    //     }));
+    //     setSelectedPdoIdName(value);
+
+    // };
     const handleSubmit2 = async () => {
         const ingredientLotDetail = addedIngredients.map((ingredient) => ({
             ind_id: parseInt(ingredient.ind_id),
@@ -153,21 +180,110 @@ function add() {
         console.log("add:", requestData)
 
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/addUseIngrediantnew`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData),
-        });
-        const responseData = await response.json();
-        if (responseData.message === 'success') {
-            setMessage('Data added successfully');
-        } else {
-            setMessage(responseData.message || 'Error occurred');
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/addUseIngrediantnew`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            });
+            const responseData = await response.json();
+
+            if (responseData.message === 'success') {
+                setMessage('Data added successfully');
+                router.push('/ingredients/using/list'); // Navigate to the specified route
+            } else {
+                setMessage(responseData.message || 'Error occurred');
+            }
+        } catch (error) {
+            setMessage('Error occurred while submitting data');
+            console.error('Error:', error);
         }
 
     };
+    // const handleSubmitPro = async () => {
+    //     const ingredientLotDetail = addedIngredients.map((ingredient) => ({
+    //         pdod_id: parseInt(ingredient.pdod_id), // Assuming you have pdod_id in your addedIngredients
+    //         ind_id: parseInt(ingredient.ind_id),
+    //         qty_used_sum: parseInt(ingredient.qty_used_sum), // Convert to number
+    //         scrap: parseInt(ingredient.scrap), // Convert to number
+    //     }));
+
+
+    //     const requestData = {
+    //         ingredient_Used_Lot: ingredientLotDetail, // Updating to match the expected structure
+    //     };
+
+    //     console.log("Request Data:", requestData);
+
+    //     try {
+    //         // Sending the POST request to the API
+    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/addUseIngrediantLotpro`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             body: JSON.stringify(requestData),
+    //         });
+
+    //         // Handling the response
+    //         const responseData = await response.json();
+    //         if (responseData.message === 'success') {
+    //             setMessage('Data added successfully');
+    //             router.push('/ingredients/using/list'); // Navigate to the specified route
+    //         } else {
+    //             setMessage(responseData.message || 'Error occurred');
+    //         }
+    //     } catch (error) {
+    //         setMessage('Error occurred while submitting data');
+    //         console.error('Error:', error);
+    //     }
+    // };
+    const handleSubmitPro = async () => {
+        // Mapping detailData to the required format for the API request
+        
+        const ingredientLotDetail = detailData.map((ingredient) => ({
+            pdod_id: ingredient.pdod_id, // Ensure pdod_id exists in DetailData
+            ind_id: ingredient.ind_id,
+            qty_used_sum: ingredient.qty_used_sum, // Assuming it's already a number
+            scrap: ingredient.scrap, // Assuming it's already a number
+        }));
+
+        // Preparing the request payload according to the API's expected format
+        const requestData = {
+            pdo_id: selectedId,
+            ingredient_Used_Lot: ingredientLotDetail,
+        };
+
+        console.log("Request Data:", requestData);
+
+        try {
+            // Sending the POST request to the API
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/addUseIngrediantLot`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData),
+            });
+
+            // Handling the response
+            const responseData = await response.json();
+            if (responseData.message === 'success') {
+                setMessage('Data added successfully');
+                router.push('/ingredients/using/list'); // Navigate to the specified route
+            } else {
+                setMessage(responseData.message || 'Error occurred');
+            }
+        } catch (error) {
+            setMessage('Error occurred while submitting data');
+            console.error('Error:', error);
+        }
+        console.log("Request Data:", requestData);
+
+    };
+
 
 
     return (
@@ -211,28 +327,21 @@ function add() {
                     <div className="mt-4 mx-6">
                         <div className="flex w-1/2 justify-start">
                             <label className="block text-sm  leading-6 text-[#73664B]  mt-3 text-left ">
-                                เลขล็อตผลิต :</label>
+                                เลขใบสั่งผลิต :</label>
                             <div className="mt-2 col-span-3">
-                                {/* <input
-                                    placeholder="เลขใบสั่งผลิต"
-                                    type="text"
-                                    name="note"
-                                    id="note"
-                                    className="px-3 focus:outline-none bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]   sm:text-sm sm:leading-6"
-                                /> */}
-
-                                <select id="countries"
-                                    className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm    sm:text-sm sm:leading-6 pl-2"
-                                    name="pdo_id_name"
-                                    //  value={}
-                                    onChange={handleInputChange}>
-                                    <option value="">เลขล็อตผลิต </option>
-                                    {Array.isArray(unitOptions) && unitOptions.map((unit: UnitType) => (
+                                <select
+                                    id="countries"
+                                    className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
+                                    value={selectedId}
+                                    onChange={(e) => setSelectedId(e.target.value)}
+                                >
+                                    {unitOptions.map((unit) => (
                                         <option key={unit.pdo_id} value={unit.pdo_id}>
                                             {unit.pdo_id_name}
                                         </option>
                                     ))}
                                 </select>
+
                             </div>
                         </div>
                         <p className="mt-4 mb-2  text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
@@ -249,11 +358,10 @@ function add() {
                             <div className="max-h-40 overflow-y-auto mb-5">
                                 <table className="w-full">
                                     <tbody className="w-full">
-                                        {/* {addedIngredients.map((addedIngredient, index) => ( */}
-                                        <tr className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                            <td scope="col" className="flex-1 text-center"></td>
-                                            <td scope="col" className="flex-1 text-center"></td>
-                                            <td scope="col" className="flex-1 text-center"></td>
+                                        {detailData.map((detail, index) => (<tr className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                            <td scope="col" className="flex-1 text-center">{detail.ind_name}</td>
+                                            <td scope="col" className="flex-1 text-center">{detail.qty_used_sum}</td>
+                                            <td scope="col" className="flex-1 text-center">{detail.scrap}</td>
                                             <td scope="col" className="flex-1 text-center">
                                                 <div className="flex items-center justify-center">
                                                     <button onClick={() => handleDeleteIngredient(index)}>
@@ -262,7 +370,7 @@ function add() {
                                                 </div>
                                             </td>
                                         </tr>
-                                        {/* ))} */}
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
@@ -332,7 +440,7 @@ function add() {
                                                                     <button
                                                                         type="button"
                                                                         className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                        onClick={handleSubmit2}
+                                                                        onClick={handleSubmitPro}
                                                                     ><Link href="/ingredients/using/list">
                                                                             ยืนยัน
                                                                         </Link></button>
@@ -376,11 +484,12 @@ function add() {
                                     <p className="text-sm ml-6 mr-3 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ: </p>
                                     <select id="ind_id"
                                         className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
-                                        {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
-                                            <option key={ind.ind_id} value={ind.ind_id}>
-                                                {ind.ind_name}
-                                            </option>
-                                        ))}
+                                        {Array.isArray(ingredientsOptions) &&
+                                            ingredientsOptions.map((ind: Ingredients) => (
+                                                <option key={ind.ind_id.toString()} value={ind.ind_id}>
+                                                    {ind.ind_name}
+                                                </option>
+                                            ))}
                                     </select>
                                 </div>
                                 <div className="flex items-center justify-center mr-5">
@@ -454,10 +563,10 @@ function add() {
 
                         < div className="mt-8 " >
                             <button>
-                                <Link href="/ingredients/income/all"
+                                <Link href="/ingredients/using/list"
                                     type="button"
                                     className="mx-auto text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
-                                    ย้อนกลับ</Link></button>
+                                    ยกเลิก</Link></button>
                             <>
                                 {isOpen && (
                                     <Transition appear show={isOpen} as={Fragment} className={kanit.className}>

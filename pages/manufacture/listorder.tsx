@@ -95,6 +95,7 @@ function listorder() {
                                                 return order.pdo_status.toString() === selectedTab.id.toString();
                                             }
                                         })
+                                        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
                                             .map((order) => (
                                                 <tr
                                                     key={order.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10"
