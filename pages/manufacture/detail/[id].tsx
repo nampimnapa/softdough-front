@@ -75,7 +75,6 @@ function detailproduction() {
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
         console.log(isChecked)
-
     };
 
     const [isChecked2, setIsChecked2] = useState(false); // State to track checkbox status
@@ -174,28 +173,34 @@ function detailproduction() {
     //     }
 
     // };
+
+    console.log("id", `${id}`)
     const sendPdoStatus = async () => {
         // Check the value of pdo_status
         // ตรวจสอบสถานะ pdo_status
-        if (detail.pdo_status === '1') {
+        if (isChecked && detail.pdo_status === '1') {
             // หาก pdo_status เป็น '1' ให้ย้ายไปที่หน้า listorder
             router.push('/manufacture/listorder');
-        } else if (detail.pdo_status === '2') {
+        } else if (!isChecked && detail.pdo_status === '1') {
             // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
-            router.push('/manufacture/listorder');
-        } else if (detail.pdo_status === '3') {
-            // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
-            router.push('/manufacture/listorder');
-        } else if (detail.pdo_status === '4') {
-            // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
-            router.push('/manufacture/listorder');
+            openModal();
+            // } else if (detail.pdo_status === '3') {
+            //     // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
+            //     router.push('/manufacture/listorder');
+            // } else if (detail.pdo_status === '4') {
+            //     // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
+            //     router.push('/manufacture/listorder');
         } else if (isChecked && detail.pdo_status === '2') {
-
+            const idpdo = `${id}`;
             // If pdo_status is '2', update the status using API
             const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
             const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
-
-
+            const requestBody = {
+                pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
+                pdo_id: idpdo // Add the pdo_id
+            };
+            console.log("console.log(requestBody);", requestBody);
+            router.push('/manufacture/listorder');
             if (checkedIds.length === 0) {
                 setMessage('No items selected');
                 return;
@@ -206,11 +211,12 @@ function detailproduction() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ pdod_ids: checkedIdsAsNumbers }),
+                body: JSON.stringify(requestBody),
             });
 
             const responseData = await response.json();
-            console.log(checkedIds);
+
+
 
             if (responseData.status === 200) {
                 setMessage('Data update successfully');
@@ -240,7 +246,7 @@ function detailproduction() {
                                 detail.pdo_status === '2' ? 'text-yellow-500' :
                                     detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
                             }`}>
-                            {detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
+                            {detail.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
                         </p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">ใบสั่งผลิต : {detail.pdo_id_name}</p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">วันที่สั่งผลิต : {detail.updated_at}</p>
@@ -360,7 +366,7 @@ function detailproduction() {
                     <div className="flex justify-start">
                         <div className="w-full mt-10 flex justify-start">
                             <Button
-                                onClick={sendPdoStatus}
+                                onClick={sendPdoStatus} // Proceed with status update
                                 type="button"
                                 className="text-white bg-[#73664B] focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 mb-2 ml-5">
                                 เสร็จสิ้น
@@ -371,6 +377,7 @@ function detailproduction() {
                                     <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
                                         แก้ไขใบสั่งผลิต
                                     </Button>
+                                   
                                 </div>
                             )}
                             {/* ต้องแก้ให้ pdo.status =3 อันนี้เอาไว้ดู ui เฉยๆ มีเรื่อง modal*/}
@@ -385,8 +392,7 @@ function detailproduction() {
                                 </div>
                             )}
 
-
-                            {!isChecked && detail && detail.pdo_status === '1' && (
+                            {!isChecked && detail.pdo_status === '1' && (
                                 // Modal แสดงเมื่อ isChecked เป็น true และ detail.pdo_status เท่ากับ '2'
                                 <div className="flex justify-start">
                                     <div className="w-1/2 mt-10 flex justify-start">
@@ -460,7 +466,7 @@ function detailproduction() {
                                     </div>
                                 </div>
                             )}
-                            {isChecked && detail && detail.pdo_status === '1' && (
+                            {isChecked && detail.pdo_status === '1' && (
                                 // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
                                 <>
                                     {isOpen && (

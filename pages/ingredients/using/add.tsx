@@ -85,6 +85,7 @@ function add() {
     interface UnitType {
         pdo_id: string;
         pdo_id_name: string;
+        pdo_status: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     interface DetailData {
@@ -162,6 +163,8 @@ function add() {
     //     setSelectedPdoIdName(value);
 
     // };
+    const filteredUnitOptions = unitOptions.filter(unit => [1, 2, 3].includes(Number(unit.pdo_status)));
+
     const handleSubmit2 = async () => {
         const ingredientLotDetail = addedIngredients.map((ingredient) => ({
             ind_id: parseInt(ingredient.ind_id),
@@ -242,7 +245,7 @@ function add() {
     // };
     const handleSubmitPro = async () => {
         // Mapping detailData to the required format for the API request
-        
+
         const ingredientLotDetail = detailData.map((ingredient) => ({
             pdod_id: ingredient.pdod_id, // Ensure pdod_id exists in DetailData
             ind_id: ingredient.ind_id,
@@ -289,7 +292,7 @@ function add() {
     return (
         <div>
             <button className='my-3 mx-5 '>
-                <Link href="/ingredients/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
+                <Link href="/ingredients/using/list" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
                     วัตถุดิบที่ใช้
                 </Link>
@@ -335,7 +338,7 @@ function add() {
                                     value={selectedId}
                                     onChange={(e) => setSelectedId(e.target.value)}
                                 >
-                                    {unitOptions.map((unit) => (
+                                    {filteredUnitOptions.map((unit) => (
                                         <option key={unit.pdo_id} value={unit.pdo_id}>
                                             {unit.pdo_id_name}
                                         </option>
@@ -346,7 +349,9 @@ function add() {
                         </div>
                         <p className="mt-4 mb-2  text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
                         <div className="flex justify-end">
-                            <Button className="ml-auto  text-white bg-[#F2B461] focus:outline-none rounded-full text-sm px-4 py-2  mb-2 ">แก้ไข</Button></div>
+                            <Button  href={`../using/edit/${selectedId}`} as={Link}
+                                className="ml-auto  text-white bg-[#F2B461] focus:outline-none rounded-full text-sm px-4 py-2  mb-2 ">แก้ไข</Button>
+                        </div>
 
                         <div className="flex flex-col">
                             <div className="bg-[#908362] text-white text-sm flex">

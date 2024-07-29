@@ -40,7 +40,7 @@ function listorder() {
         [{ id: 0, name: "ทั้งหมด" },
         { id: 1, name: "สั่งผลิตแล้ว" },
         { id: 2, name: "กำลังดำเนินการ" },
-        
+
         { id: 4, name: "เสร็จสิ้น" }
         ];
 
@@ -95,7 +95,7 @@ function listorder() {
                                                 return order.pdo_status.toString() === selectedTab.id.toString();
                                             }
                                         })
-                                        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+                                            .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
                                             .map((order) => (
                                                 <tr
                                                     key={order.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10"

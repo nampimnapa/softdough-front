@@ -77,7 +77,7 @@ function list() {
                         {ind.map((ingredients, idx) => (
                             <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10 items-center">
                                 <td scope="row" className="px-1 py-1 text-[#73664B] whitespace-nowrap dark:text-white">
-                                    {/* {ingredients.checkk === "production" ? ingredients.note : ingredients.name} */}
+                                    {ingredients.checkk === "production" ? ingredients.id : null}
                                 </td>
                                 <td className="px-6 py-1  text-[#73664B] text-center">
                                     {ingredients.created_at}
