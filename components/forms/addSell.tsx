@@ -3,7 +3,7 @@ import { Switch, CheckboxGroup, Tabs, Chip, User, Tab, cn, Input, Avatar, Card, 
 import { CiTrash } from "react-icons/ci";
 import { FaTrash } from 'react-icons/fa';
 // import { revalidatePath } from 'next/cache';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import sell_all from '../../pages/product/sell_all';
 
 export const CustomRadio = (props) => {
@@ -310,7 +310,7 @@ export default function AddSell({
         }
 
         const result = await response.json();
-        router.push('/product/sell_all');
+        router.reload();
         // console.log('Success:', result);
       } catch (error) {
         // console.error('Error:', error);
