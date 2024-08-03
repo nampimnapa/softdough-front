@@ -3,8 +3,8 @@ import { Switch, CheckboxGroup, Tabs, Chip, User, Tab, cn, Input, Avatar, Card, 
 import { CiTrash } from "react-icons/ci";
 import { FaTrash } from 'react-icons/fa';
 // import { revalidatePath } from 'next/cache';
-import { useRouter } from 'next/router';
-
+import { useRouter } from 'next/navigation';
+import sell_all from '../../pages/product/sell_all';
 
 export const CustomRadio = (props) => {
   const { children, ...otherProps } = props;
@@ -60,8 +60,9 @@ export default function AddSell({
   });
 
   const [quantityData, setQuantityData] = useState(0);
-  const selectedType = typesellmenufix.find(type => type.id === sellMenuFix.type.toString());
-  const remainingQuantity = selectedType ? selectedType.num - sellMenuFix.product.reduce((acc, item) => acc + item.qty, 0) : 0;
+  const selectedType = typesellmenufix.find(type => type.smt_id.toString() === sellMenuFix.type.toString());
+  console.log("selectedType",selectedType);
+  const remainingQuantity = selectedType ? selectedType.qty_per_unit - sellMenuFix.product.reduce((acc, item) => acc + item.qty, 0) : 0;
   const inputRef = useRef(null);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [imageUpload, setImageUpload] = useState(null);
@@ -186,11 +187,11 @@ export default function AddSell({
     setSellSelectMix([])
   };
 
-  const handSelectedChange = (e) => {
+  const handSelectedChange = (e: { target: { value: string; }; }) => {
     const selectedValue = JSON.parse(e.target.value);
     const { pd_id, image } = selectedValue;
 
-    console.log(pd_id, image)
+    // console.log(pd_id, image)
 
     setSellMenuFix((prevSellMenuFix) => ({
       ...prevSellMenuFix,
@@ -309,13 +310,15 @@ export default function AddSell({
         }
 
         const result = await response.json();
-        console.log('Success:', result);
+        router.push('/product/sell_all');
+        // console.log('Success:', result);
       } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
       }
       finally {
         setIsLoading(false);
         setSubmitRequested(false);
+        sell_all
         onClose();
       }
     }, 0);
@@ -438,18 +441,26 @@ export default function AddSell({
                         isRequired
                         label="ประเภทเมนูสำหรับขาย"
                         className="max-w-xs mb-3 bg-fourth text-primary label-primary"
-                        // variant="faded"
                         size="sm"
                         color="primary"
                         name="type"
                         onChange={handleProductInputChangeFix}
-                        onClick={() => { addData(1, "selltype") }}
+                        onClick={() => { addData(2, "selltype") }}
+                        disabledKeys={["not"]}
                       >
-                        {typesellmenufix.map((type) => (
-                          <SelectItem key={type.id} value={type.id}>
-                            {type.name}
+                        {typesellmenumix.some(type => type.qty_per_unit > 1) ? (
+                          typesellmenumix.map((type) => (
+                            type.qty_per_unit > 1 && (
+                              <SelectItem key={type.smt_id} value={type.smt_id}>
+                                {type.smt_name}
+                              </SelectItem>
+                            )
+                          ))
+                        ) : (
+                          <SelectItem key="not" value="not">
+                            ไม่พบประเภทเมนูสำหรับขาย
                           </SelectItem>
-                        ))}
+                        )}
                       </Select>
 
                       <Input
@@ -669,18 +680,26 @@ export default function AddSell({
                         isRequired
                         label="ประเภทเมนูสำหรับขาย"
                         className="max-w-xs mb-3 bg-fourth text-primary label-primary"
-                        // variant="faded"
                         size="sm"
                         color="primary"
                         name="type"
                         onChange={handleProductInputChangeFix}
                         onClick={() => { addData(2, "selltype") }}
+                        disabledKeys={["not"]}
                       >
-                        {typesellmenumix.map((type) => (
-                          <SelectItem key={type.id} value={type.id}>
-                            {type.name}
+                        {typesellmenumix.some(type => type.qty_per_unit == 1) ? (
+                          typesellmenumix.map((type) => (
+                            type.qty_per_unit == 1 && (
+                              <SelectItem key={type.smt_id} value={type.smt_id}>
+                                {type.smt_name}
+                              </SelectItem>
+                            )
+                          ))
+                        ) : (
+                          <SelectItem key="not" value="not">
+                            ไม่พบประเภทเมนูสำหรับขาย
                           </SelectItem>
-                        ))}
+                        )}
                       </Select>
 
                       <Input
@@ -735,70 +754,21 @@ export default function AddSell({
                   {sellMenuFix.type !== "" && (
                     <Card>
                       <CardBody className="h-[190px] overflow-auto">
-                        {sellMenuFix.type == "4" ? (
                           <RadioGroup
                             name="prodiff"
                             onChange={handSelectedChange}
                             value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ id: "0", image: "" })}
-
                           >
                             {doughAllData.map((diff, index) => (
-                              diff.pdc_id === 2 ? (
-                                <CustomRadio value={JSON.stringify({ id: diff.pd_id, image: diff.picture })} key={index}>
+                                <CustomRadio value={JSON.stringify({ pd_id: diff.pd_id, image: diff.picture })} key={index}>
                                   <div className="flex justify-center items-center">
                                     <Avatar radius="sm" src={diff.picture} />
                                     <p className="justify-center ml-3">{diff.pd_name}</p>
                                   </div>
                                 </CustomRadio>
-                              ) : null
                             ))}
 
                           </RadioGroup>
-                        ) : sellMenuFix.type == "3" ? (
-                          <RadioGroup
-                            onChange={handSelectedChange}
-                            value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ pd_id: "0", image: "" })}
-                          >
-                            {doughAllData.map((dough, index) => (
-                              dough.pdc_id === 1 ? (
-                                <CustomRadio value={JSON.stringify({ pd_id: dough.pd_id, image: dough.picture })} key={index}>
-                                  <div className="flex justify-center items-center">
-                                    <Avatar radius="sm" src={dough.picture} />
-                                    <p className="justify-center ml-3">{dough.pd_name}</p>
-                                  </div>
-                                </CustomRadio>
-                              ) : null
-                            ))}
-                          </RadioGroup>
-
-                        ) : (
-                          <CheckboxGroup
-                            value={sellSelectMix}
-                            onChange={(value) => setSellSelectMix(value)}
-                          >
-                            {doughAllData.map((dough, index) => (
-                              dough.pdc_id === 1 ? (
-                                <Checkbox
-                                  classNames={{
-                                    base: cn(
-                                      "inline-flex max-w-full w-full bg-content1 m-0",
-                                      "hover:bg-content2 items-center justify-start",
-                                      "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
-                                      "data-[selected=true]:border-primary"
-                                    ),
-                                    label: "w-full",
-                                  }}
-                                  key={dough.pd_id} value={dough.pd_id.toString()}
-                                >
-                                  <div className="flex justify-start items-center gap-1">
-                                    <Avatar radius="sm" src={dough.picture} />
-                                    <p className="justify-center ml-3">{dough.pd_name}</p>
-                                  </div>
-                                </Checkbox>
-                              ) : null
-                            ))}
-                          </CheckboxGroup>
-                        )}
                       </CardBody>
                     </Card>
                   )}

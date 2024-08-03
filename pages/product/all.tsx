@@ -6,7 +6,7 @@ import { Kanit } from "next/font/google";
 import { HiOutlineTrash } from "react-icons/hi";
 import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Chip } from "@nextui-org/react";
-
+import Head from 'next/head'
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
@@ -193,7 +193,11 @@ function all() {
 
 
     return (
+
         <div className="h-screen">
+            <Head>
+                <title>ประเภทสินค้า/สำหรับขาย - Softdough</title>
+            </Head>
             <p className='text-[#F2B461] font-medium m-4'>ประเภทสินค้า/สำหรับขาย</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75  ">
@@ -339,8 +343,8 @@ function all() {
                                             ))
                                         ) : (
                                             <div className="flex justify-center items-center w-full">
-                                            <p className="text-sm text-gray-400">ไม่มีข้อมูลประเภทสินค้า</p>
-                                        </div>
+                                                <p className="text-sm text-gray-400">ไม่มีข้อมูลประเภทสินค้า</p>
+                                            </div>
                                         )}
 
                                         {isAdding && (

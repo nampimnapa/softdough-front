@@ -213,8 +213,8 @@ export default function EditSalesFixOne({
   };
   
   
-  console.log("dataSmd", dataSmd);
-  console.log(JSON.stringify(dataSm) === JSON.stringify(dataSmOld))
+  // console.log("dataSmd", dataSmd);
+  // console.log(JSON.stringify(dataSm) === JSON.stringify(dataSmOld))
 
   return (
     <Modal

@@ -9,11 +9,15 @@ import { Switch, CheckboxGroup, Tabs, Chip, User, Tab, cn, Input, Avatar, Card, 
 import AddSell from "../../components/forms/addSell";
 import EditSalesFixOne from "../../components/forms/editSalesFixOne";
 import EditSalesFixTwo from "../../components/forms/editSalesFixTwo";
+import Head from 'next/head'
 
 function sell_all() {
     const router = useRouter();
     const { id } = router.query;
     const [Sale, setSale] = useState([]);
+    const [typesellmenufix, setTypesellmenufix] = useState([]);
+    const [typesellmenumix, setTypesellmenumix] = useState([]);
+
     interface Sale {
         sm_id: number,
         sm_name: String,
@@ -29,43 +33,18 @@ function sell_all() {
                 console.error('Error fetching unit data:', error);
             });
 
-    }, [id]);
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
+            .then(response => response.json())
+            .then(data2 => {
+                setTypesellmenufix(data2);
+                setTypesellmenumix(data2);
+                console.log(data2);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
 
-    const typesellmenufix = [
-        {
-            id: "1",
-            name: "กล่อง M",
-            num: 4,
-        },
-        {
-            id: "2",
-            name: "กล่อง L",
-            num: 6,
-        }
-    ]
-
-    const typesellmenumix = [
-        {
-            id: "1",
-            name: "กล่อง M",
-            num: 4,
-        },
-        {
-            id: "2",
-            name: "กล่อง L",
-            num: 6,
-        },
-        {
-            id: "3",
-            name: "เดี่ยว",
-            num: 1,
-        },
-        {
-            id: "4",
-            name: "ดิป",
-            num: 1,
-        },
-    ]
+    }, [id, setSale]);
 
     const { isOpen: isOpenModalAdd, onOpen: onOpenModalAdd, onOpenChange: onOpenChangeModalAdd, onClose: onCloseModelAdd } = useDisclosure();
     const { isOpen: isOpenModalEditOne, onOpen: onOpenModalEditOne, onOpenChange: onOpenChangeModalEditOne, onClose: onCloseModelEditOne } = useDisclosure();
@@ -82,10 +61,23 @@ function sell_all() {
         }
     }
 
-    // console.log("Sales : ", Sale)
+    const getData = () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/small`)
+            .then(response => response.json())
+            .then(data => {
+                setSale(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }
+
 
     return (
         <div className="h-screen flex flex-col">
+            <Head>
+                <title>เมนูสำหรับขาย - Softdough</title>
+            </Head>
             <p className='text-[#F2B461] font-medium m-4'>เมนูสำหรับขาย</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75">
@@ -127,7 +119,7 @@ function sell_all() {
                                     </p>
 
 
-                                    <button type="button" onClick={() => changeFix(sale.fix,sale.sm_id)} >
+                                    <button type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
                                         <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
                                     </button>
 
