@@ -8,7 +8,29 @@ import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Button } from "@nextui-org/react";
 
 function approve() {
+    const [loading, setLoading] = useState(true);
+    const [production, setproduction] = useState([]);
+    interface Production {
+        pdo_id: string;
+        pdo_id_name: string;
+        updated_at: string;
+        pdo_status: number;
 
+    }
+    useEffect(() => {
+        // Fetch staff data on component mount
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/readall`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setproduction(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
+    }, []);
     return (
         <div>
             <p className='text-[#F2B461] font-medium m-4'>รออนุมัติ</p>
@@ -51,7 +73,6 @@ function approve() {
                             }
                         >
                             <div className="relative overflow-x-auto mx-4">
-
                                 <table className="w-full text-sm text-center table-fixed">
                                     <thead >
                                         <tr className="text-white  font-normal  bg-[#908362]  ">
@@ -69,27 +90,24 @@ function approve() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                            <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
-
-                                            </td>
-
-                                            <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
-
-                                            </td>
-
-                                            <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
-
-                                            </td>
-                                            <td className="px-12 py-1 whitespace-nowrap overflow-hidden ">
-                                                <Button className="mr-2 bg-red-500 text-white" size="sm">ยกเลิก</Button>
-                                                <Button size="sm" className="bg-green-500 text-white">ยืนยัน</Button>
-                                            </td>
-
-                                        </tr>
-
-
-
+                                        {production.map((data) => (
+                                            <tr key={data.pdo_id} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+                                                <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                    {data.updated_at}
+                                                </td>
+                                                <td className="py-1  w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                    {data.pdo_id_name}
+                                                </td>
+                                                <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                    {/* Add details here if available */}
+                                                </td>
+                                                <td className="px-12 py-1 whitespace-nowrap overflow-hidden">
+                                                    <Button className="mr-2 bg-red-500 text-white" size="sm">ยกเลิก</Button>
+                                                    <Button size="sm" className="bg-green-500 text-white">ยืนยัน</Button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                   
                                     </tbody>
                                 </table>
                             </div>

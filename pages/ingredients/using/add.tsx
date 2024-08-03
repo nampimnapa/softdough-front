@@ -163,7 +163,7 @@ function add() {
     //     setSelectedPdoIdName(value);
 
     // };
-    const filteredUnitOptions = unitOptions.filter(unit => [1, 2, 3].includes(Number(unit.pdo_status)));
+    const filteredUnitOptions = unitOptions.filter(unit => [3].includes(Number(unit.pdo_status)));
 
     const handleSubmit2 = async () => {
         const ingredientLotDetail = addedIngredients.map((ingredient) => ({
@@ -338,18 +338,20 @@ function add() {
                                     value={selectedId}
                                     onChange={(e) => setSelectedId(e.target.value)}
                                 >
-                                    {filteredUnitOptions.map((unit) => (
-                                        <option key={unit.pdo_id} value={unit.pdo_id}>
-                                            {unit.pdo_id_name}
-                                        </option>
-                                    ))}
+                                    {filteredUnitOptions
+                                        .sort((a, b) => Number(b.pdo_id) - Number(a.pdo_id))
+                                        .map((unit) => (
+                                            <option key={unit.pdo_id} value={unit.pdo_id}>
+                                                {unit.pdo_id_name}
+                                            </option>
+                                        ))}
                                 </select>
 
                             </div>
                         </div>
                         <p className="mt-4 mb-2  text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
                         <div className="flex justify-end">
-                            <Button  href={`../using/edit/${selectedId}`} as={Link}
+                            <Button href={`../using/edit/${selectedId}`} as={Link}
                                 className="ml-auto  text-white bg-[#F2B461] focus:outline-none rounded-full text-sm px-4 py-2  mb-2 ">แก้ไข</Button>
                         </div>
 

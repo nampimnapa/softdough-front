@@ -75,6 +75,7 @@ function detailproduction() {
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
         console.log(isChecked)
+        setIsOpen(true);
     };
 
     const [isChecked2, setIsChecked2] = useState(false); // State to track checkbox status
@@ -93,16 +94,23 @@ function detailproduction() {
         console.log(newIsChecked)
         console.log(newCheckedItems)
 
-        // ตรวจสอบและส่งค่า pdo_status เป็น 3 หาก isChecked2 เป็น true
-        // if (isChecked2) {
-        //     // ส่งค่า pdo_status เป็น 3 ทั้งหมด
-        //     // อย่าลืมเปลี่ยน detail.pdodetail ให้เป็นข้อมูลจริงที่ได้มาจาก API และอ้างถึง pdodetail.pdod_status แทน
-        //     detail.pdodetail.forEach(pdodetail => {
-        //         // ส่งค่า pdo_status เป็น 3 ให้กับรายการที่มี pdod_id นี้
-        //         sendPdoStatus(pdodetail.pdod_id, 3); // ส่งค่า pdo_status ไปยัง API
-        //     });
-        // }
+    };
 
+    const [isChecked3, setIsChecked3] = useState(false); // State to track checkbox status
+
+    const handleCheckboxChange3 = () => {
+        const newIsChecked = !isChecked3; // สลับสถานะ isChecked2
+
+        // สร้างอาร์เรย์ใหม่เพื่อเก็บสถานะของ Checkbox แต่ละอันในตาราง
+        const newCheckedItems = {};
+        detail.pdodetail.forEach(pdodetail => {
+            newCheckedItems[pdodetail.pdod_id] = newIsChecked;
+        });
+
+        setIsChecked3(newIsChecked); // ตั้งค่า isChecked2 ใหม่
+        setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
+        console.log(newIsChecked)
+        console.log(newCheckedItems)
     };
 
     const handleCheckboxChangeDetail = (pdod_id) => {
@@ -119,6 +127,7 @@ function detailproduction() {
 
     const handleStatusChange = async (id) => {
         // Check if pdo_status is '1', then only proceed with updating
+
         if (!isChecked && detail && detail.pdo_status === '1') {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus/${id}`, {
                 method: 'PATCH',
@@ -140,58 +149,17 @@ function detailproduction() {
         }
 
     };
-
-    // const sendPdoStatus = async () => {
-    //     // Check the value of pdo_status
-    //     if (detail.pdo_status === '1') {
-    //         // If pdo_status is '1', navigate back to listorder
-    //         router.push('/manufacture/listorder');
-    //     } else if (isChecked && detail.pdo_status === '2') {
-    //         // If pdo_status is '2', update the status using API
-    //         const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
-    //         if (checkedIds.length === 0) {
-    //             setMessage('No items selected');
-    //             return;
-    //         }
-    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
-    //             method: 'PATCH',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify({ pdod_ids: checkedIds  }),
-    //         })
-
-    //         const responseData = await response.json();
-    //         console.log(responseData);
-
-    //         if (responseData.status === 200) {
-    //             setMessage('Data update successfully');
-    //             // router.push('/product/all');
-    //         } else {
-    //             setMessage(responseData.message || 'Error occurred');
-    //         }
-    //     }
-
-    // };
-
-    console.log("id", `${id}`)
-    const sendPdoStatus = async () => {
-        // Check the value of pdo_status
-        // ตรวจสอบสถานะ pdo_status
-        if (isChecked && detail.pdo_status === '1') {
-            // หาก pdo_status เป็น '1' ให้ย้ายไปที่หน้า listorder
-            router.push('/manufacture/listorder');
-        } else if (!isChecked && detail.pdo_status === '1') {
-            // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
-            openModal();
-            // } else if (detail.pdo_status === '3') {
-            //     // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
-            //     router.push('/manufacture/listorder');
-            // } else if (detail.pdo_status === '4') {
-            //     // หาก pdo_status เป็น '2' ให้ย้ายไปที่หน้า listorder
-            //     router.push('/manufacture/listorder');
-        } else if (isChecked && detail.pdo_status === '2') {
+    const handleConfirmModal = async (id) => {
+        if (!isChecked && detail && detail.pdo_status === '2') {
             const idpdo = `${id}`;
+            const allChecked = Object.values(checkedItems).every(value => value === true);
+            const pdoStatus = allChecked ? 3 : 5;
+
+            // const requestBody = {
+            //     pdod_ids: checkedIdsAsNumbers,
+            //     pdo_id: idpdo,
+            //     pdo_status: pdoStatus
+            // };
             // If pdo_status is '2', update the status using API
             const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
             const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
@@ -199,6 +167,7 @@ function detailproduction() {
                 pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
                 pdo_id: idpdo // Add the pdo_id
             };
+            
             console.log("console.log(requestBody);", requestBody);
             router.push('/manufacture/listorder');
             if (checkedIds.length === 0) {
@@ -224,6 +193,56 @@ function detailproduction() {
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
+        }
+    };
+
+
+
+    console.log("id", `${id}`)
+    const sendPdoStatus = async () => {
+        // Check the value of pdo_status
+        // ตรวจสอบสถานะ pdo_status
+        if (isChecked && detail.pdo_status === '1') {
+            // หาก pdo_status เป็น '1' ให้ย้ายไปที่หน้า listorder
+            router.push('/manufacture/listorder');
+        } else if (!isChecked && detail.pdo_status === '1') {
+            openModal();
+        } else if (isChecked && detail.pdo_status === '2') {
+            openModal();
+
+            // const idpdo = `${id}`;
+            // // If pdo_status is '2', update the status using API
+            // const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+            // const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
+            // const requestBody = {
+            //     pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
+            //     pdo_id: idpdo // Add the pdo_id
+            // };
+            // console.log("console.log(requestBody);", requestBody);
+            // router.push('/manufacture/listorder');
+            // if (checkedIds.length === 0) {
+            //     setMessage('No items selected');
+            //     return;
+            // }
+
+            // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+            //     method: 'PATCH',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(requestBody),
+            // });
+
+            // const responseData = await response.json();
+
+
+
+            // if (responseData.status === 200) {
+            //     setMessage('Data update successfully');
+            //     // router.push('/product/all');
+            // } else {
+            //     setMessage(responseData.message || 'Error occurred');
+            // }
 
         }
 
@@ -322,13 +341,7 @@ function detailproduction() {
                                 </Checkbox>
                             </div>
                         )}
-                        {/* {detail.pdo_status === '2' && (
-                            <div className="ml-6 mt-5">
-                                <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange} checked={isChecked}>
-                                    ยืนยันการผลิตสำเร็จ
-                                </Checkbox>
-                            </div>
-                        )} */}
+
                         {detail.pdo_status === '2' && (
                             <div className="ml-6 mt-5">
                                 <Checkbox
@@ -337,24 +350,11 @@ function detailproduction() {
                                     onClick={handleCheckboxChange2}
                                     isSelected={isChecked2} // ใช้ค่าของ isChecked2 โดยตรงเพื่อกำหนดสถานะ checked หรือ unchecked
                                 >
-                                    ยืนยันการผลิตสำเร็จ
+                                    เลือกรายการการผลิตทั้งหมด
                                 </Checkbox>
                             </div>
                         )}
-                        {/* {detail.pdo_status === '3' && (
-                            <div className="ml-6 mt-5">
-                                <Checkbox
-                                    radius="sm"
-                                    color="warning"
-                                    onClick={handleCheckboxChange2}
-                                    isSelected={isChecked2} // ใช้ค่าของ isChecked2 โดยตรงเพื่อกำหนดสถานะ checked หรือ unchecked
-                                >
-                                    ยืนยันการผลิตสำเร็จ
-                                </Checkbox>
-                            </div>
-                        )} */}
 
-                        {/* Rest of your component */}
                     </div>
                 ) : (
                     <p>Loading...</p>
@@ -377,7 +377,7 @@ function detailproduction() {
                                     <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
                                         แก้ไขใบสั่งผลิต
                                     </Button>
-                                   
+
                                 </div>
                             )}
                             {/* ต้องแก้ให้ pdo.status =3 อันนี้เอาไว้ดู ui เฉยๆ มีเรื่อง modal*/}
@@ -538,6 +538,86 @@ function detailproduction() {
                                 </>
                             )}
 
+                            {isChecked && detail.pdo_status === '2' && (
+                                // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
+                                <>
+                                    {isOpen && (
+                                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0 bg-black/25" />
+                                                </Transition.Child>
+
+                                                <div className="fixed inset-0 overflow-y-auto">
+                                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                <Dialog.Title
+                                                                    as="h3"
+                                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                                >
+                                                                    ยืนยันการผลิตสำเร็จ
+                                                                </Dialog.Title>
+                                                                <div className="mt-2">
+                                                                    <p className="text-sm text-[#73664B]">
+                                                                        คุณต้องการยืนยันการผลิตสำเร็จหรือไม่
+                                                                    </p>
+                                                                </div>
+                                                                <div className="mt-2">
+                                                                    <Checkbox radius="sm" color="warning"
+                                                                        onChange={handleCheckboxChange3}
+                                                                        checked={isChecked} size="sm" className="text-primary" >
+                                                                        ยืนยันการผลิตสำเร็จ
+                                                                    </Checkbox>
+                                                                </div>
+                                                                {/*  choose */}
+                                                                <div className="flex justify-end">
+                                                                    <div className="inline-flex justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                            onClick={closeModal}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                            onClick={handleConfirmModal}
+                                                                        >
+                                                                            ยืนยัน
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
+                                    )
+                                    }
+                                </>
+                            )}
+
 
                             {/* {isChecked && detail && detail.pdo_status === '3' && ( */}
                             {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (
@@ -596,7 +676,7 @@ function detailproduction() {
                                                                             type="button"
                                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none "
                                                                         // onClick={handleConfirm}
-                                                                        ><Link href={`../editpdod/${id}`}>
+                                                                        ><Link href={`../again/${id}`}>
                                                                                 ยืนยัน
                                                                             </Link></button>
                                                                     </div>
@@ -666,7 +746,7 @@ function detailproduction() {
                                                                             type="button"
                                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none "
                                                                         // onClick={handleConfirm}
-                                                                        ><Link href={`../editpdod/${id}`}>
+                                                                        ><Link href={`/ingredients/using/add`}>
                                                                                 ยืนยัน
                                                                             </Link></button>
                                                                     </div>

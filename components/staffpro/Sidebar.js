@@ -51,7 +51,7 @@ const Sidebar = ({ children, className }) => {
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "วัตถุดิบที่ใช้"}
-                        href="/dashboard"
+                        href="/staffpro/indused/list"
                         title="วัตถุดิบที่ใช้"
                         startIcon={<Icon icon="fluent:box-arrow-left-20-regular" className="h-5 w-5 inherit " />}
                         handleActive={handleActive} />

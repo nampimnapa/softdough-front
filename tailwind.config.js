@@ -22,11 +22,12 @@ module.exports = {
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       colors: {
+        base:'#73664B',
         primary: '#73664B',
         secondary: '#C5B182',
         tertiary: '#73664B',
         fourth: '#FFFFDD'
-        // Add more custom colors as needed
+        
       },
     },
   },
@@ -36,6 +37,7 @@ module.exports = {
     themes: {
       light: {
         colors: {
+          base:'#73664B',
           primary: '#73664B',
           secondary: '#C5B182',
           tertiary: '#F2B461',
@@ -44,6 +46,7 @@ module.exports = {
       },
       dark: {
         colors: {
+          base:'#73664B',
           primary: '#73664B',
           secondary: '#C5B182',
           tertiary: '#F2B461',

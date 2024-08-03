@@ -95,7 +95,19 @@ function listorder() {
                                                 return order.pdo_status.toString() === selectedTab.id.toString();
                                             }
                                         })
-                                            .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+                                            .sort((a, b) => Number(b.pdo_id) - Number(a.pdo_id))
+
+                                            // .sort((a, b) => {
+                                            //     // Sort by date first (newest to oldest)
+                                            //     const dateComparison = new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+                                            //     if (dateComparison !== 0) return dateComparison;
+
+                                            //     // Ensure pdo_id is a string and sort it (largest to smallest)
+                                            //     if (typeof b.pdo_id === 'string' && typeof a.pdo_id === 'string') {
+                                            //         return b.pdo_id.localeCompare(a.pdo_id);
+                                            //     }
+                                            //     return 0;
+                                            // })
                                             .map((order) => (
                                                 <tr
                                                     key={order.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10"
