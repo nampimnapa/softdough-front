@@ -34,6 +34,7 @@ interface AddSellProps {
   onClose: () => void;
   typesellmenufix: any;
   typesellmenumix: any;
+  updateSaleData: any;
 }
 
 
@@ -44,6 +45,7 @@ export default function AddSell({
   onClose,
   typesellmenufix,
   typesellmenumix,
+  updateSaleData
 }: AddSellProps) {
 
 
@@ -310,7 +312,8 @@ export default function AddSell({
         }
 
         const result = await response.json();
-        router.reload();
+        // router.reload();
+        updateSaleData();
         // console.log('Success:', result);
       } catch (error) {
         // console.error('Error:', error);
@@ -445,7 +448,7 @@ export default function AddSell({
                         color="primary"
                         name="type"
                         onChange={handleProductInputChangeFix}
-                        onClick={() => { addData(2, "selltype") }}
+                        onClick={() => { addData(1, "selltype") }}
                         disabledKeys={["not"]}
                       >
                         {typesellmenumix.some(type => type.qty_per_unit > 1) ? (

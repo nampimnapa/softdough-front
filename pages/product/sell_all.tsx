@@ -61,16 +61,18 @@ function sell_all() {
         }
     }
 
-    const getData = () => {
+    const updateSaleData = () => {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/small`)
             .then(response => response.json())
             .then(data => {
                 setSale(data);
             })
             .catch(error => {
-                console.error('Error fetching unit data:', error);
+                console.error('Error fetching sale data:', error);
             });
-    }
+    };
+
+    console.log(Sale);
 
 
     return (
@@ -102,7 +104,7 @@ function sell_all() {
                     </button>
                 </div>
             </div>
-            <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">โดนัท</p>
+            <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">เมนูสำหรับขาย</p>
 
             {/* card */}
             <div className="flex flex-wrap ">
@@ -149,9 +151,6 @@ function sell_all() {
                 )}
 
             </div>
-            <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">ดิป</p>
-
-
 
             {/* Show Model Add Sell */}
             <AddSell
@@ -160,25 +159,27 @@ function sell_all() {
                 onClose={onCloseModelAdd}
                 typesellmenufix={typesellmenufix}
                 typesellmenumix={typesellmenumix}
+                updateSaleData={updateSaleData}
             />
 
-            <EditSalesFixOne
-                isOpen={isOpenModalEditOne}
-                onOpenChange={onOpenChangeModalEditOne}
-                onClose={onCloseModelEditOne}
-                typesellmenufix={typesellmenufix}
-                typesellmenumix={typesellmenumix}
-                idFix={editFix}
-            />
+                <EditSalesFixOne
+                    isOpen={isOpenModalEditOne}
+                    onOpenChange={onOpenChangeModalEditOne}
+                    onClose={onCloseModelEditOne}
+                    typesellmenufix={typesellmenufix}
+                    typesellmenumix={typesellmenumix}
+                    idFix={editFix}
+                    updateSaleData={updateSaleData}
+                />
 
-            <EditSalesFixTwo
-                isOpen={isOpenModalEditTwo}
-                onOpenChange={onOpenChangeModalEditTwo}
-                onClose={onCloseModelEditTwo}
-                typesellmenufix={typesellmenufix}
-                typesellmenumix={typesellmenumix}
-                idFix={editFix}
-            />
+                <EditSalesFixTwo
+                    isOpen={isOpenModalEditTwo}
+                    onOpenChange={onOpenChangeModalEditTwo}
+                    onClose={onCloseModelEditTwo}
+                    typesellmenufix={typesellmenufix}
+                    typesellmenumix={typesellmenumix}
+                    idFix={editFix}
+                />
         </div>
     )
 }

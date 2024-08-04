@@ -9,6 +9,7 @@ interface EditSellProps {
   typesellmenufix: any;
   typesellmenumix: any;
   idFix: any;
+  updateSaleData: any;
 }
 
 export default function EditSalesFixOne({
@@ -17,8 +18,19 @@ export default function EditSalesFixOne({
   onClose,
   typesellmenufix,
   typesellmenumix,
-  idFix
+  idFix,
+  updateSaleData
 }: EditSellProps) {
+
+  interface dataSaleMenu {
+    sm_id: number;
+    sm_name: string;
+    sm_price: number;
+    status: string;
+    picture: string;
+    qty_per_unit: number;
+    smt_id: number;
+  }
 
   const [dataSm, setDataSm] = useState(null);
   const [dataSmd, setDataSmd] = useState([]);
@@ -28,12 +40,13 @@ export default function EditSalesFixOne({
   const inputRef = useRef(null);
   const [doughAllData, setDoughAllData] = useState([]);
   const [value, setValue] = React.useState<string>("");
-  const selectedType = typesellmenufix.find(type => type.id === dataSm?.smt_id.toString());
+  const selectedType = typesellmenufix.find(type => type.smt_id === dataSm?.smt_id);
   // const remainingQuantity = selectedType ? selectedType.num - dataSmd?.reduce((acc, item) => acc + item.qty, 0) : 0;
-  const remainingQuantity = selectedType ? selectedType.num - dataSmd.reduce((acc, item) => acc + item.qty, 0) : 0;
+  const remainingQuantity = selectedType ? selectedType.qty_per_unit - dataSmd.reduce((acc, item) => acc + item.qty, 0) : 0;
   const [switchStatus, setSwitchStatus] = useState(false);
   const [isDataChanged, setIsDataChanged] = useState(false);
   const [isLoanding, setIsLoading] = useState(false);
+  var dataarrayDataSMD = [];
 
 
   const changeStatus = () => {
@@ -68,7 +81,7 @@ export default function EditSalesFixOne({
     if (isOpen && idFix) {
       getDataSM();
     }
-    
+
   }, [isOpen, idFix]);
 
   const getDataSM = async () => {
@@ -78,21 +91,27 @@ export default function EditSalesFixOne({
         throw new Error(`Error fetching unit data: ${response.statusText}`);
       }
       const data = await response.json();
-      setDataSm(data.sm);
-      setUploadedImage(data.sm.picture)
-      setDataSmd(data.smd);
-      setDataSmOld(data.sm);
-      setDataSmdOld(data.smd);
-      typesellmenufix.forEach(item => {
-        if (item.id == data.sm.smt_id) {
-          setValue(item.name);
-        }
-      });
-      if (data.sm.status == "o") {
+      console.log("data", data);
+      // setDataSm(data.sm);
+      const dateSMLoad = { sm_id: data[0].sm_id, sm_name: data[0].sm_name, sm_price: data[0].sm_price, status: data[0].status, smt_id: data[0].smt_id, qty_per_unit: data[0].qty_per_unit, smt_name: data[0].smt_name, picture:data[0].picture, fix: data[0].fix }
+      setDataSm(dateSMLoad)
+      setUploadedImage(data[0].picture)
+      // setDataSmd(data.smd);
+      setDataSmOld(dateSMLoad);
+      // setDataSmdOld(data.smd);
+      if (data[0].status == "o") {
         setSwitchStatus(true);
-      } else if (data.sm.status == "c") {
+      } else if (data[0].status == "c") {
         setSwitchStatus(false);
       }
+
+      data.forEach(element => {
+        dataarrayDataSMD.push({pd_id: element.pd_id, qty: element.qty})
+      });
+      setDataSmd(dataarrayDataSMD);
+      setDataSmdOld(dataarrayDataSMD);
+
+
 
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`)
         .then(response => response.json())
@@ -164,20 +183,22 @@ export default function EditSalesFixOne({
       },
       body: JSON.stringify(dataLog),
     })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Success:', data);
-      setIsLoading(false);
-      onClose();
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
+      .then(response => {
+        console.log('Success:', response);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Success:', data);
+        setIsLoading(false);
+        onClose();
+        updateSaleData();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
   }
 
   const handleProductInputChangeFix = (e) => {
@@ -197,11 +218,11 @@ export default function EditSalesFixOne({
 
   const handleAddProduct = () => {
     setDataSmd(prevState => [
-      ...prevState, 
+      ...prevState,
       { pd_name: '', qty: 1 }
     ]);
   };
-  
+
   const handleProductChange = (index, value) => {
     setDataSmd(prevState => {
       const updatedProducts = [...prevState];
@@ -211,10 +232,44 @@ export default function EditSalesFixOne({
       return updatedProducts;
     });
   };
-  
-  
-  // console.log("dataSmd", dataSmd);
-  // console.log(JSON.stringify(dataSm) === JSON.stringify(dataSmOld))
+
+  const [isChanged, setIsChanged] = useState(false);
+
+  useEffect(() => {
+      const changesInSm = hasChanges(dataSm, dataSmOld);
+      const changesInSmd = hasArrayChanges(dataSmd, dataSmdOld);
+      setIsChanged(changesInSm || changesInSmd);
+  }, [dataSm, dataSmd]);
+
+  function hasChanges(newData, oldData) {
+      for (let key in newData) {
+          if (newData[key] !== oldData[key]) {
+              return true;
+          }
+      }
+      return false;
+  }
+
+  function hasArrayChanges(newData, oldData) {
+      if (newData.length !== oldData.length) {
+          return true;
+      }
+
+      for (let i = 0; i < newData.length; i++) {
+          for (let key in newData[i]) {
+              if (newData[i][key] !== oldData[i][key]) {
+                  return true;
+              }
+          }
+      }
+
+      return false;
+  }
+
+
+  console.log("dataSmOld", dataSmdOld);
+  console.log("dataSm", dataSmd);
+  // console.log(dataSm == dataSmOld)
 
   return (
     <Modal
@@ -222,7 +277,7 @@ export default function EditSalesFixOne({
       onOpenChange={onOpenChange}
       placement="center"
       size='xl'
-      isDismissable={false} 
+      isDismissable={false}
       isKeyboardDismissDisabled={true}
     >
       <ModalContent>
@@ -287,7 +342,7 @@ export default function EditSalesFixOne({
                     value={dataSm?.sm_name || ""}
                     onChange={handleProductInputChangeFix}
                   />
-                  <Select
+                  {/* <Select
                     isRequired
                     label="ประเภทเมนูสำหรับขาย"
                     className="max-w-xs mb-3 bg-fourth text-primary"
@@ -302,7 +357,18 @@ export default function EditSalesFixOne({
                         {type.name}
                       </SelectItem>
                     ))}
-                  </Select>
+                  </Select> */}
+                  <Input
+                    isDisabled
+                    type="text"
+                    label="ประเภทเมนูสำหรับขาย"
+                    size="sm"
+                    width="100%"
+                    className="mb-3 bg-fourth text-primary"
+                    color="primary"
+                    value={dataSm?.smt_name || ""}
+                    onChange={handleProductInputChangeFix}
+                  />
                   <Input
                     isRequired
                     type="number"
@@ -350,15 +416,13 @@ export default function EditSalesFixOne({
                           size="sm"
                           color="primary"
                           name="pd_name"
-                          selectedKeys={[product.pd_name]}
+                          selectedKeys={[doughAllData.find(dough => dough.pd_id == product.pd_id)?.pd_name]}
                           onChange={(e) => handleProductChange(index, e.target.value)}
                         >
                           {doughAllData.map(prod =>
-                            prod.pdc_id === 1 && (
-                              <SelectItem key={prod.pd_name} value={prod.pd_name}>
+                              <SelectItem key={prod.pd_name} value={prod.pd_id}>
                                 {prod.pd_name}
                               </SelectItem>
-                            )
                           )}
                         </Select>
                       </div>
@@ -425,7 +489,7 @@ export default function EditSalesFixOne({
                 <Button className="bg-[#C5B182] text-white" variant="flat" onPress={onClose} radius="full">
                   ปิด
                 </Button>
-                <Button onClick={() => { handleSubmit() }} className="text-white bg-[#73664B] ml-3" radius="full" >
+                <Button onClick={() => { handleSubmit() }} className="text-white bg-[#73664B] ml-3" radius="full" isDisabled={!isChanged}>
                   {isLoanding ? (<><Spinner size="sm" className='text-white' color="default" /> กำลังบันทึก</>) : "บันทึก"}
                 </Button>
               </div>
