@@ -194,7 +194,7 @@ function all() {
 
     return (
 
-        <div className="h-screen">
+        <div className="">
             <Head>
                 <title>ประเภทสินค้า/สำหรับขาย - Softdough</title>
             </Head>

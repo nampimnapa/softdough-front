@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import { Spinner, useDisclosure,Image } from "@nextui-org/react";
+import { Spinner, useDisclosure, Image } from "@nextui-org/react";
 import AddSell from "../../components/forms/addSell";
 import EditSalesFixOne from "../../components/forms/editSalesFixOne";
 import EditSalesFixTwo from "../../components/forms/editSalesFixTwo";
@@ -63,7 +63,7 @@ function sell_all() {
         }
     }
 
-    const openRead = (smid : any) => {
+    const openRead = (smid: any) => {
         setEditFix(smid);
         onOpenModalRead();
     }
@@ -85,7 +85,7 @@ function sell_all() {
 
 
     return (
-        <div className="h-screen flex flex-col">
+        <div className="flex flex-col ">
             <Head>
                 <title>เมนูสำหรับขาย - Softdough</title>
             </Head>
@@ -113,57 +113,54 @@ function sell_all() {
                     </button>
                 </div>
             </div>
-            <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">เมนูสำหรับขาย</p>
+            <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">เมนูสำหรับขาย</p>
+                {/* card */}
+                {statusLoading ? (
+                    <div className="flex flex-wrap">
+                        {Sale && Sale.length > 0 ? (
+                            Sale.map((sale, index) => (
+                                <div key={index} className="card w-60 bg-base-100 shadow-md mx-2 h-60 ml-5 mb-4 ">
+                                    <figure className="w-full h-3/4">
+                                        <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
+                                    </figure>
+                                    <div className="card-body">
+                                        <div className="flex justity-between">
+                                            <p className="text-mediem text-[#73664B]">
+                                                {sale.sm_name}
+                                            </p>
 
-            {/* card */}
-            {statusLoading ? (
-                <div className="flex flex-wrap ">
-                    {Sale && Sale.length > 0 ? (
-                        Sale.map((sale, index) => (
-                            <div key={index} className="card w-60 bg-base-100 shadow-md mx-2 h-60 ml-5 mb-4 ">
-                                <figure className="w-full h-3/4">
-                                    <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
-                                </figure>
-                                <div className="card-body">
-                                    <div className="flex justity-between">
-                                        <p className="text-mediem text-[#73664B]">
-                                            {sale.sm_name}
-                                        </p>
 
+                                            <button type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
+                                                <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                            </button>
 
-                                        <button type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
-                                            <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                        </button>
-
-                                        <button type="submit" onClick={() => openRead(sale.sm_id)}>
+                                            <button type="submit" onClick={() => openRead(sale.sm_id)}>
                                                 <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
-                                        </button>
+                                            </button>
 
-                                    </div>
-                                    <div className="flex justify-center">
-                                        {/* <div className="flex justify-start">
+                                        </div>
+                                        <div className="flex justify-center">
+                                            {/* <div className="flex justify-start">
                                         <p className="text-sm text-[#73664B]">ราคา : </p>
                                     </div> */}
-                                        <div className="flex ">
-                                            <p className=" text-[#73664B] text-lg">{sale.sm_price} บาท</p>
+                                            <div className="flex ">
+                                                <p className=" text-[#73664B] text-lg">{sale.sm_price} บาท</p>
+                                            </div>
                                         </div>
+
                                     </div>
-
                                 </div>
+                            ))
+                        ) : (
+                            <div className="flex justify-center items-center w-full">
+                                <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
                             </div>
-                        ))
-                    ) : (
-                        <div className="flex justify-center items-center w-full">
-                            <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
-                        </div>
-                    )}
+                        )}
 
-                </div>
-            ) : (
-                <Spinner label="Loading..." color="warning" />
-            )}
-
-
+                    </div>
+                ) : (
+                    <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
+                )}
             {/* Show Model Add Sell */}
             <AddSell
                 isOpen={isOpenModalAdd}
