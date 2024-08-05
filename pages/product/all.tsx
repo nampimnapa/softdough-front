@@ -5,7 +5,7 @@ import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from
 import { Kanit } from "next/font/google";
 import { HiOutlineTrash } from "react-icons/hi";
 import { FiSave } from "react-icons/fi";
-import { Tabs, Tab, Chip } from "@nextui-org/react";
+import { Tabs, Tab, Chip, Select, SelectItem, Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/react";
 import Head from 'next/head'
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
@@ -24,17 +24,7 @@ function all() {
         qty_per_unit: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
-            .then(response => response.json())
-            .then(data => {
-                setSaleMenu(data);
-            })
-            .catch(error => {
-                console.error('Error fetching unit data:', error);
-            });
 
-    }, [id]);
 
     const [unitOptions, setUnitOptions] = useState([]);
     interface UnitType {
@@ -43,7 +33,7 @@ function all() {
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     useEffect(() => {
-
+        setStatusLoading(false)
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
@@ -53,7 +43,39 @@ function all() {
                 console.error('Error fetching unit data:', error);
             });
 
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
+            .then(response => response.json())
+            .then(data => {
+                setTypeProduct(data);
+                setStatusLoading(true);
+
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
+            .then(response => response.json())
+            .then(data => {
+                setSaleMenu(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+
     }, [id]);
+
+    const getSMT = () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
+            .then(response => response.json())
+            .then(data => {
+                setSaleMenu(data);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }
 
     const [TypeProduct, setTypeProduct] = useState([]);
     interface TypeProduct {
@@ -61,24 +83,15 @@ function all() {
         pdc_name: string;
 
     }
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
-            .then(response => response.json())
-            .then(data => {
-                setTypeProduct(data);
-            })
-            .catch(error => {
-                console.error('Error fetching unit data:', error);
-            });
-
-    }, [id]);
 
     // เอาจากตัวแปรที่ได้จาก API มาทำเป็น State
     const [dataProduct, setDataProduct] = useState(TypeProduct);
     const [dataMenu, setDataMenu] = useState(SaleMenu);
     const [isEditing, setIsEditing] = useState(false);
     const [openInput, setOpenInput] = useState(0);
-
+    const [statusLoading, setStatusLoading] = useState(false);
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const [isLoanding, setIsLoading] = useState(false);
     const changeInput = (id: any) => {
         setOpenInput(id);
         setIsEditing(true);
@@ -187,8 +200,50 @@ function all() {
         }
     };
 
+    const [formData, setFormData] = useState({
+        smt_name: '',
+        un_id: '',
+        qty_per_unit: 0
+    });
 
+    const handleChange = (event) => {
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.value
+        });
+    };
 
+    const handleSubmit = async () => {
+        setIsLoading(true)
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/addtype`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (!response.ok) {
+                throw new Error('ไม่สามารถเพิ่ม');
+            }
+
+            handeClear();
+            onClose();
+            setIsLoading(false);
+            getSMT()
+        } catch (error) {
+            console.error('เกิดข้อผิดพลาด:', error.message);
+        }
+    }
+
+    const handeClear = () => {
+        setFormData({
+            smt_name: '',
+            un_id: '',
+            qty_per_unit: 0
+        })
+    }
 
 
 
@@ -303,48 +358,59 @@ function all() {
                                             </tr>
                                         ))} */}
 
-                                        {TypeProduct.length > 0 ? (
-                                            TypeProduct.map((type, index) => (
-                                                <tr key={type.pdc_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                    <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
-                                                        {index + 1}
-                                                    </td>
-                                                    {openInput === type.pdc_id ? (
-                                                        <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                            <input
-                                                                className="w-full h-9 focus:outline-none border"
-                                                                type="text"
-                                                                defaultValue={type.pdc_name}
-                                                                onChange={(event) => handleInputChange(event, type.pdc_id)}
-                                                            />
+                                        {statusLoading ? (
+                                            TypeProduct.length > 0 ? (
+                                                TypeProduct.map((type, index) => (
+                                                    <tr key={type.pdc_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                        <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                            {index + 1}
                                                         </td>
-                                                    ) : (
-                                                        <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                            {type.pdc_name}
-                                                        </td>
-                                                    )}
-                                                    {isEditing && openInput === type.pdc_id ? (
-                                                        <>
-                                                            <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem]  flex items-center justify-end">
-                                                                <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก</button>
-                                                                <button type="button" onClick={() => handleSaveChanges(type.pdc_id)} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก</button>
+                                                        {openInput === type.pdc_id ? (
+                                                            <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                                <input
+                                                                    className="w-full h-9 focus:outline-none border"
+                                                                    type="text"
+                                                                    defaultValue={type.pdc_name}
+                                                                    onChange={(event) => handleInputChange(event, type.pdc_id)}
+                                                                />
                                                             </td>
-                                                        </>
-                                                    ) : (
-                                                        <td className="me-2 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
-                                                            <button type="button" onClick={() => changeInput(type.pdc_id)}>
-                                                                <a href="#" className="w-full flex justify-center items-center">
-                                                                    <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                                                </a>
-                                                            </button>
-                                                        </td>
-                                                    )}
+                                                        ) : (
+                                                            <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                                {type.pdc_name}
+                                                            </td>
+                                                        )}
+                                                        {isEditing && openInput === type.pdc_id ? (
+                                                            <>
+                                                                <td className="me-2 my-1 pt-[0.30rem] pb-[0.30rem]  flex items-center justify-end">
+                                                                    <button type="button" onClick={handleCancelEdit} className="border px-4 py-1 rounded-xl bg-[#F26161] text-white font-light">ยกเลิก</button>
+                                                                    <button type="button" onClick={() => handleSaveChanges(type.pdc_id)} className="border px-4 py-1 rounded-xl bg-[#87DA46] text-white font-light">บันทึก</button>
+                                                                </td>
+                                                            </>
+                                                        ) : (
+                                                            <td className="me-2 py-4 flex items-center justify-end whitespace-nowrap overflow-hidden">
+                                                                <button type="button" onClick={() => changeInput(type.pdc_id)}>
+                                                                    <a href="#" className="w-full flex justify-center items-center">
+                                                                        <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                                                    </a>
+                                                                </button>
+                                                            </td>
+                                                        )}
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={3}>
+                                                        <div className="flex justify-center items-center w-full">
+                                                            <p className="text-sm text-gray-400">ไม่มีข้อมูลประเภทสินค้า</p>
+                                                        </div>
+                                                    </td>
                                                 </tr>
-                                            ))
-                                        ) : (
-                                            <div className="flex justify-center items-center w-full">
-                                                <p className="text-sm text-gray-400">ไม่มีข้อมูลประเภทสินค้า</p>
-                                            </div>
+                                            )) : (
+                                            <tr>
+                                                <td colSpan={3}>
+                                                    <Spinner label="Loading..." color="warning" className="" />
+                                                </td>
+                                            </tr>
                                         )}
 
                                         {isAdding && (
@@ -390,11 +456,10 @@ function all() {
                         >
                             <div className="second-tab-layout mx-4">
                                 <div className="flex items-center justify-end mb-2">
-                                    <Link href="/product/addmenuforsell" >
-                                        <button className="scale-90 px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex" >
-                                            <PlusIcon className="h-5 w-5 text-white mr-2" />
-                                            เพิ่ม
-                                        </button></Link>
+                                    <button onClick={onOpen} className="scale-90 px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex" >
+                                        <PlusIcon className="h-5 w-5 text-white mr-2" />
+                                        เพิ่ม
+                                    </button>
                                 </div>
                                 <div className="relative overflow-x-auto ">
                                     <table className="w-full text-sm text-center text-gray-500">
@@ -450,6 +515,78 @@ function all() {
                     </Tabs>
                 </div>
             </div>
+
+
+            {/* Modal add addMenuforSell */}
+            <Modal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                placement="center"
+                size='sm'
+                isDismissable={false} isKeyboardDismissDisabled={true}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 text-[#F2B461]" style={{ fontFamily: 'kanit' }}>เพิ่มประเภทเมนูสำหรับขาย</ModalHeader>
+                            <ModalBody style={{ fontFamily: 'kanit' }}>
+                                <Input
+                                    isRequired
+                                    onChange={handleChange}
+                                    type="text"
+                                    label="ชื่อประเภทเมนูสำหรับขาย"
+                                    labelPlacement="outside"
+                                    size="md"
+                                    name="smt_name"
+                                    autoComplete="off"
+                                    placeholder="ชื่อประเภทเมนูสำหรับขาย"
+                                    className='mb-3 bg-fourth text-primary label-primary'
+                                    color="primary"
+                                />
+
+                                <Select
+                                    isRequired
+                                    onChange={handleChange}
+                                    name="un_id"
+                                    labelPlacement="outside"
+                                    label="หน่วยสินค้า"
+                                    placeholder="เลือกหน่วยสินค้า"
+                                    className="mb-3 bg-fourth text-primary label-primary"
+                                    color="primary"
+                                >
+                                    {unitOptions.map((unit: UnitType) => (
+                                        <SelectItem key={unit.un_id} value={unit.un_id}>
+                                            {unit.un_name}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+
+                                <Input
+                                    isRequired
+                                    onChange={handleChange}
+                                    name="qty_per_unit"
+                                    type="number"
+                                    label="จำนวนชิ้น"
+                                    labelPlacement="outside"
+                                    size="md"
+                                    placeholder="จำนวนชิ้น เช่น 50"
+                                    className='mb-3 bg-fourth text-primary label-primary'
+                                    color="primary"
+                                />
+
+                                <div className="flex justify-end mt-4">
+                                    <Button onClick={handeClear} className="bg-[#C5B182] text-white" variant="flat" onPress={onClose} radius="full">
+                                        ปิด
+                                    </Button>
+                                    <Button onClick={() => handleSubmit()} className="text-white bg-[#73664B] ml-3" radius="full" {...(formData.smt_name === "" || formData.un_id === "" || formData.qty_per_unit === 0 || isLoanding ? { isDisabled: true } : { isDisabled: false })}>
+                                        {isLoanding ? (<><Spinner size="sm" className='text-white' color="default" /> กำลังบันทึก</>) : "บันทึก"}
+                                    </Button>
+                                </div>
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     )
 }
