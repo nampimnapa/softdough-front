@@ -2,12 +2,12 @@ import React, { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import { Spinner, useDisclosure } from "@nextui-org/react";
+import { Spinner, useDisclosure,Image } from "@nextui-org/react";
 import AddSell from "../../components/forms/addSell";
 import EditSalesFixOne from "../../components/forms/editSalesFixOne";
 import EditSalesFixTwo from "../../components/forms/editSalesFixTwo";
 import Head from 'next/head'
-import Image from "next/image";
+// import Image from "next/image";
 import ReadSaleMenu from "../../components/modal/readSaleMenu";
 
 function sell_all() {
@@ -122,7 +122,7 @@ function sell_all() {
                         Sale.map((sale, index) => (
                             <div key={index} className="card w-60 bg-base-100 shadow-md mx-2 h-60 ml-5 mb-4 ">
                                 <figure className="w-full h-3/4">
-                                    <img src={sale.picture} alt="Recipe Image" className="object-cover" />
+                                    <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
                                 </figure>
                                 <div className="card-body">
                                     <div className="flex justity-between">

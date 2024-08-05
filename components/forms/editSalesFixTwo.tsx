@@ -199,6 +199,7 @@ export default function EditSalesFixTwo({
       })
       .then(data => {
         console.log('Success:', data);
+        setIsChanged(false);
         setIsLoading(false);
         onClose();
         updateSaleData();
@@ -417,7 +418,7 @@ export default function EditSalesFixTwo({
               </ModalBody>
             </>
           ) : (
-            <Spinner label="Loading..." color="warning" />
+            <Spinner label="Loading..." color="warning" className='my-20'/>
           )
         )}
       </ModalContent>
