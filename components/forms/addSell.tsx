@@ -60,7 +60,7 @@ export default function AddSell({
 
   const [quantityData, setQuantityData] = useState(0);
   const selectedType = typesellmenufix.find(type => type.smt_id.toString() === sellMenuFix.type.toString());
-  console.log("selectedType", selectedType);
+  // console.log("selectedType", selectedType);
   const remainingQuantity = selectedType ? selectedType.qty_per_unit - sellMenuFix.product.reduce((acc, item) => acc + item.qty, 0) : 0;
   const inputRef = useRef(null);
   const [uploadedImage, setUploadedImage] = useState(null);

@@ -39,7 +39,7 @@ function sell_all() {
             .then(data2 => {
                 setTypesellmenufix(data2);
                 setTypesellmenumix(data2);
-                console.log(data2);
+                // console.log(data2);
             })
             .catch(error => {
                 console.error('Error fetching unit data:', error);

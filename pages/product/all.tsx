@@ -1,10 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import { Kanit } from "next/font/google";
-import { HiOutlineTrash } from "react-icons/hi";
-import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Chip, Select, SelectItem, Button, Input, Spinner, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/react";
 import Head from 'next/head'
 function classNames(...classes) {
@@ -91,6 +87,7 @@ function all() {
     const [openInput, setOpenInput] = useState(0);
     const [statusLoading, setStatusLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit, onClose: onCloseEdit } = useDisclosure();
     const [isLoanding, setIsLoading] = useState(false);
     const changeInput = (id: any) => {
         setOpenInput(id);
@@ -114,7 +111,6 @@ function all() {
         console.log("แก้ไขประเภทวัตถุดิบ : ", newValueData);
     };
 
-    console.log(TypeProduct);
 
     const handleCancelEdit = () => {
         setDataProduct(TypeProduct)
@@ -200,6 +196,7 @@ function all() {
         }
     };
 
+    // Function Add Menu for sales
     const [formData, setFormData] = useState({
         smt_name: '',
         un_id: '',
@@ -244,6 +241,57 @@ function all() {
             qty_per_unit: 0
         })
     }
+
+    const [idSmtEdit, setIdSmtEdit] = useState("");
+
+    // Function edit Menu for sale
+    const getDstaForEdit = (idSmt) => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/smt/${idSmt}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length > 0) { 
+                    setIdSmtEdit(idSmt.toString());
+                    setFormData({
+                        smt_name: data[0].smt_name,
+                        un_id: data[0].un_id,
+                        qty_per_unit: data[0].qty_per_unit,
+                    });
+                    onOpenEdit();
+                } else {
+                    console.error('No SaleMenu found'); 
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }
+
+    const handleSubmitEdit = async () => {
+        // console.log(formData)
+        setIsLoading(true);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/updatesmt/${idSmtEdit}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                smt_name: formData.smt_name,
+                un_id: unitOptions.find(unit => unit.un_name === formData.un_id)?.un_id,
+                qty_per_unit: formData.qty_per_unit
+            }),
+
+        });
+        const responseData = await response.json();
+        if (responseData.message === "update success") {
+            handeClear();
+            onCloseEdit();
+            setIsLoading(false);
+            getSMT()
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+    }
+
 
 
 
@@ -498,10 +546,8 @@ function all() {
                                                         {menu.qty_per_unit}
                                                     </td>
                                                     <td className="me-2 py-4 flex items-center justify-end text-[#73664B]">
-                                                        <button type="button">
-                                                            <Link href={`./editsmt/${menu.smt_id}`} className="w-full flex justify-center items-center">
+                                                        <button onClick={() => getDstaForEdit(menu.smt_id)} type="button" className="w-full flex justify-center items-center">
                                                                 <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                                            </Link>
                                                         </button>
 
                                                     </td>
@@ -579,6 +625,80 @@ function all() {
                                         ปิด
                                     </Button>
                                     <Button onClick={() => handleSubmit()} className="text-white bg-[#73664B] ml-3" radius="full" {...(formData.smt_name === "" || formData.un_id === "" || formData.qty_per_unit === 0 || isLoanding ? { isDisabled: true } : { isDisabled: false })}>
+                                        {isLoanding ? (<><Spinner size="sm" className='text-white' color="default" /> กำลังบันทึก</>) : "บันทึก"}
+                                    </Button>
+                                </div>
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+
+            {/* Modal add edit MenuforSell */}
+            <Modal
+                isOpen={isOpenEdit}
+                onOpenChange={onOpenChangeEdit}
+                placement="center"
+                size='sm'
+                isDismissable={false} isKeyboardDismissDisabled={true}
+            >
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 text-[#F2B461]" style={{ fontFamily: 'kanit' }}>เพิ่มประเภทเมนูสำหรับขาย</ModalHeader>
+                            <ModalBody style={{ fontFamily: 'kanit' }}>
+                                <Input
+                                    isRequired
+                                    onChange={handleChange}
+                                    value={formData.smt_name}
+                                    type="text"
+                                    label="ชื่อประเภทเมนูสำหรับขาย"
+                                    labelPlacement="outside"
+                                    size="md"
+                                    name="smt_name"
+                                    autoComplete="off"
+                                    placeholder="ชื่อประเภทเมนูสำหรับขาย"
+                                    className='mb-3 bg-fourth text-primary label-primary'
+                                    color="primary"
+                                />
+
+                                <Select
+                                    isRequired
+                                    onChange={handleChange}
+                                    name="un_id"
+                                    labelPlacement="outside"
+                                    label="หน่วยสินค้า"
+                                    placeholder="เลือกหน่วยสินค้า"
+                                    defaultSelectedKeys={[unitOptions.find(unit => unit.un_id === formData.un_id)?.un_name]}
+                                    className="mb-3 bg-fourth text-primary label-primary"
+                                    color="primary"
+                                >
+                                    {unitOptions.map((unit: UnitType) => (
+                                        <SelectItem key={unit.un_name} value={unit.un_id}>
+                                            {unit.un_name}
+                                        </SelectItem>
+                                    ))}
+                                </Select>
+
+                                <Input
+                                    isRequired
+                                    onChange={handleChange}
+                                    value={formData.qty_per_unit.toString()}
+                                    name="qty_per_unit"
+                                    type="number"
+                                    label="จำนวนชิ้น"
+                                    labelPlacement="outside"
+                                    size="md"
+                                    placeholder="จำนวนชิ้น เช่น 50"
+                                    className='mb-3 bg-fourth text-primary label-primary'
+                                    color="primary"
+                                />
+
+                                <div className="flex justify-end mt-4">
+                                    <Button onClick={handeClear} className="bg-[#C5B182] text-white" variant="flat" onPress={onCloseEdit} radius="full">
+                                        ปิด
+                                    </Button>
+                                    <Button onClick={() => handleSubmitEdit()} className="text-white bg-[#73664B] ml-3" radius="full" {...(formData.smt_name === "" || formData.un_id === "" || formData.qty_per_unit === 0 || isLoanding ? { isDisabled: true } : { isDisabled: false })}>
                                         {isLoanding ? (<><Spinner size="sm" className='text-white' color="default" /> กำลังบันทึก</>) : "บันทึก"}
                                     </Button>
                                 </div>
