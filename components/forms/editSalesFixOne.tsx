@@ -17,20 +17,9 @@ export default function EditSalesFixOne({
   onOpenChange,
   onClose,
   typesellmenufix,
-  typesellmenumix,
   idFix,
   updateSaleData
 }: EditSellProps) {
-
-  interface dataSaleMenu {
-    sm_id: number;
-    sm_name: string;
-    sm_price: number;
-    status: string;
-    picture: string;
-    qty_per_unit: number;
-    smt_id: number;
-  }
 
   const [dataSm, setDataSm] = useState(null);
   const [dataSmd, setDataSmd] = useState([]);
@@ -267,8 +256,8 @@ export default function EditSalesFixOne({
   }
 
 
-  console.log("dataSmOld", dataSmdOld);
-  console.log("dataSm", dataSmd);
+  // console.log("dataSmOld", dataSmdOld);
+  // console.log("dataSm", dataSmd);
   // console.log(dataSm == dataSmOld)
 
   return (

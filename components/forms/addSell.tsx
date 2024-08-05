@@ -8,9 +8,6 @@ import sell_all from '../../pages/product/sell_all';
 
 export const CustomRadio = (props) => {
   const { children, ...otherProps } = props;
-
-
-
   return (
     <Radio
       {...otherProps}
@@ -63,7 +60,7 @@ export default function AddSell({
 
   const [quantityData, setQuantityData] = useState(0);
   const selectedType = typesellmenufix.find(type => type.smt_id.toString() === sellMenuFix.type.toString());
-  console.log("selectedType",selectedType);
+  console.log("selectedType", selectedType);
   const remainingQuantity = selectedType ? selectedType.qty_per_unit - sellMenuFix.product.reduce((acc, item) => acc + item.qty, 0) : 0;
   const inputRef = useRef(null);
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -757,21 +754,21 @@ export default function AddSell({
                   {sellMenuFix.type !== "" && (
                     <Card>
                       <CardBody className="h-[190px] overflow-auto">
-                          <RadioGroup
-                            name="prodiff"
-                            onChange={handSelectedChange}
-                            value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ id: "0", image: "" })}
-                          >
-                            {doughAllData.map((diff, index) => (
-                                <CustomRadio value={JSON.stringify({ pd_id: diff.pd_id, image: diff.picture })} key={index}>
-                                  <div className="flex justify-center items-center">
-                                    <Avatar radius="sm" src={diff.picture} />
-                                    <p className="justify-center ml-3">{diff.pd_name}</p>
-                                  </div>
-                                </CustomRadio>
-                            ))}
+                        <RadioGroup
+                          name="prodiff"
+                          onChange={handSelectedChange}
+                          value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ id: "0", image: "" })}
+                        >
+                          {doughAllData.map((diff, index) => (
+                            <CustomRadio value={JSON.stringify({ pd_id: diff.pd_id, image: diff.picture })} key={index}>
+                              <div className="flex justify-center items-center">
+                                <Avatar radius="sm" src={diff.picture} />
+                                <p className="justify-center ml-3">{diff.pd_name}</p>
+                              </div>
+                            </CustomRadio>
+                          ))}
 
-                          </RadioGroup>
+                        </RadioGroup>
                       </CardBody>
                     </Card>
                   )}
