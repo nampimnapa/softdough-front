@@ -19,7 +19,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function add() {
+function Add() {
     const router = useRouter(); // Declare router here
     const [addedIngredients, setAddedIngredients] = useState([]);
     const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
@@ -365,18 +365,19 @@ function add() {
                             <div className="max-h-40 overflow-y-auto mb-5">
                                 <table className="w-full">
                                     <tbody className="w-full">
-                                        {detailData.map((detail, index) => (<tr className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                            <td scope="col" className="flex-1 text-center">{detail.ind_name}</td>
-                                            <td scope="col" className="flex-1 text-center">{detail.qty_used_sum}</td>
-                                            <td scope="col" className="flex-1 text-center">{detail.scrap}</td>
-                                            <td scope="col" className="flex-1 text-center">
-                                                <div className="flex items-center justify-center">
-                                                    <button onClick={() => handleDeleteIngredient(index)}>
-                                                        <TrashIcon className="h-5 w-5 text-red-500" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        {detailData.map((detail, index) => (
+                                            <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white flex items-center">
+                                                <td scope="col" className="flex-1 text-center">{detail.ind_name}</td>
+                                                <td scope="col" className="flex-1 text-center">{detail.qty_used_sum}</td>
+                                                <td scope="col" className="flex-1 text-center">{detail.scrap}</td>
+                                                <td scope="col" className="flex-1 text-center">
+                                                    <div className="flex items-center justify-center">
+                                                        <button onClick={() => handleDeleteIngredient(index)}>
+                                                            <TrashIcon className="h-5 w-5 text-red-500" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -396,8 +397,8 @@ function add() {
                                     ยกเลิก</Link></button>
                             <>
                                 {isOpen && (
-                                    <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                                    <Transition appear show={isOpen} as={Fragment}>
+                                        <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                             <Transition.Child
                                                 as={Fragment}
                                                 enter="ease-out duration-300"
@@ -576,8 +577,8 @@ function add() {
                                     ยกเลิก</Link></button>
                             <>
                                 {isOpen && (
-                                    <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                                    <Transition appear show={isOpen} as={Fragment} >
+                                        <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                             <Transition.Child
                                                 as={Fragment}
                                                 enter="ease-out duration-300"
@@ -658,4 +659,4 @@ function add() {
     )
 }
 
-export default add
+export default Add

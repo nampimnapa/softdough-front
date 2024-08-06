@@ -24,7 +24,7 @@ type Staff = {
     date_start: string;
 
 };
-function detailstaff() {
+function Detailstaff() {
     const router = useRouter();
     const { id } = router.query;
     const [staff, setStaff] = useState<Staff>({
@@ -62,8 +62,6 @@ function detailstaff() {
             .then((data) => {
                 setStaff(data);
                 setLoading(false);
-                console.log(staff);
-
             })
             .catch((error) => {
                 console.error('Error:', error);
@@ -487,4 +485,4 @@ function detailstaff() {
 }
 
 
-export default detailstaff;
+export default Detailstaff;

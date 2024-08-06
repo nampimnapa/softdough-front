@@ -19,7 +19,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function recipeedit() {
+function Recipeedit() {
     const router = useRouter();
     const { id } = router.query;
     const [unitOptions, setUnitOptions] = useState([]);
@@ -668,4 +668,4 @@ function recipeedit() {
     )
 }
 
-export default recipeedit
+export default Recipeedit

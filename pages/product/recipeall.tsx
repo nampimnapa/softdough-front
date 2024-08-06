@@ -9,7 +9,7 @@ import { Spinner, Image } from "@nextui-org/react";
 import Head from 'next/head'
 
 
-function recipeall() {
+function Recipeall() {
     const router = useRouter();
     const { id } = router.query;
     const [Recipe, setRecipe] = useState([]);
@@ -159,4 +159,4 @@ function recipeall() {
     )
 }
 
-export default recipeall
+export default Recipeall

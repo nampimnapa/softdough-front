@@ -80,7 +80,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function detail() {
+function Detail() {
    
     const [ind, setIngredientLot] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -152,4 +152,4 @@ function detail() {
     );
 }
 
-export default detail
+export default Detail

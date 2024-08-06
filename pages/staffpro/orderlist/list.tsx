@@ -7,7 +7,7 @@ import { HiOutlineTrash } from "react-icons/hi";
 import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Chip } from "@nextui-org/react";
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
-function list() {
+function List() {
     
 
     const [loading, setLoading] = useState(true);
@@ -135,4 +135,4 @@ function list() {
   )
 }
 
-export default list
+export default List

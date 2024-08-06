@@ -13,7 +13,7 @@ function classNames(...classes) {
 
 let dataSet = null;
 
-function all() {
+function All() {
 
     // ตัวแปรแก็บข้อมูลจาก API
     const productsAPI = [
@@ -270,4 +270,4 @@ function all() {
     )
 }
 
-export default all
+export default All

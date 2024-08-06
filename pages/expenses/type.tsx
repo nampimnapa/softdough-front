@@ -198,7 +198,7 @@ function Type() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan='3' className="text-center text-gray-500 py-4">
+                    <td colSpan={3} className="text-center text-gray-500 py-4">
                       ไม่มีข้อมูลประเภทรายการจ่าย
                     </td>
                   </tr>

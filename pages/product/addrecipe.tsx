@@ -19,7 +19,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function addrecipe() {
+function Addrecipe() {
     const router = useRouter();
     const { id } = router.query;
     const [unitOptions, setUnitOptions] = useState([]);
@@ -602,4 +602,4 @@ function addrecipe() {
     )
 }
 
-export default addrecipe
+export default Addrecipe

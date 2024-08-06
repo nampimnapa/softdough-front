@@ -10,7 +10,7 @@ import Head from 'next/head'
 // import Image from "next/image";
 import ReadSaleMenu from "../../components/modal/readSaleMenu";
 
-function sell_all() {
+function Sell_all() {
     const router = useRouter();
     const { id } = router.query;
     const [Sale, setSale] = useState([]);
@@ -207,4 +207,4 @@ function sell_all() {
     )
 }
 
-export default sell_all
+export default Sell_all

@@ -68,7 +68,6 @@ export default function EditSalesFixTwo({
         throw new Error(`Error fetching unit data: ${response.statusText}`);
       }
       const data = await response.json();
-      console.log(data.pd_id);
       const dateSMLoad = { sm_id: data[0].sm_id, sm_name: data[0].sm_name, sm_price: data[0].sm_price, status: data[0].status, smt_id: data[0].smt_id, qty_per_unit: data[0].qty_per_unit, smt_name: data[0].smt_name, picture: data[0].picture, fix: data[0].fix }
       setDataSm(dateSMLoad)
       setUploadedImage(data[0].picture)
@@ -79,13 +78,8 @@ export default function EditSalesFixTwo({
         setSwitchStatus(false);
       }
       dataarrayDataSMDs.push({ pd_id: data.pd_id, qty: data.qty })
-      // setDataSmd(dataarrayDataSMD);
-      // setDataSmdOld(dataarrayDataSMD);
+
       setSelected(data[0].pd_id)
-
-      // console.log(dataarrayDataSMDs)
-
-
 
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`)
         .then(response => response.json())

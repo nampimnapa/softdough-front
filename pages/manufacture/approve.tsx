@@ -7,7 +7,7 @@ import { HiOutlineTrash } from "react-icons/hi";
 import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Button } from "@nextui-org/react";
 
-function approve() {
+function Approve() {
     const [loading, setLoading] = useState(true);
     const [production, setproduction] = useState([]);
     interface Production {
@@ -175,4 +175,4 @@ function approve() {
     )
 }
 
-export default approve
+export default Approve

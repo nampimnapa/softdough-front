@@ -16,7 +16,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function recipe_edit() {
+function Recipe_edit() {
     const ind =
         [{ ind_id: 1, ind_name: "แป้ง" },
         { ind_id: 2, ind_name: "นม" },
@@ -317,4 +317,4 @@ function recipe_edit() {
     )
 }
 
-export default recipe_edit
+export default Recipe_edit

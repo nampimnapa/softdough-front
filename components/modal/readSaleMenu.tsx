@@ -45,14 +45,10 @@ export default function ReadSaleMenu({
                 throw new Error(`Error fetching unit data: ${response.statusText}`);
             }
             const data = await response.json();
-            console.log("data", data);
-            // setDataSm(data.sm);
             const dateSMLoad = { sm_id: data[0].sm_id, sm_name: data[0].sm_name, sm_price: data[0].sm_price, status: data[0].status, smt_id: data[0].smt_id, qty_per_unit: data[0].qty_per_unit, smt_name: data[0].smt_name, picture: data[0].picture, fix: data[0].fix }
             setDataSm(dateSMLoad)
             setUploadedImage(data[0].picture)
-            // setDataSmd(data.smd);
             setDataSmOld(dateSMLoad);
-            // setDataSmdOld(data.smd);
             if (data[0].status == "o") {
                 setSwitchStatus(true);
             } else if (data[0].status == "c") {

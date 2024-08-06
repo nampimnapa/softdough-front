@@ -9,7 +9,7 @@ function classNames(...classes) {
 
 let dataSet = null;
 
-function all() {
+function All() {
     const router = useRouter();
     const { id } = router.query;
     const [SaleMenu, setSaleMenu] = useState([]);
@@ -712,4 +712,4 @@ function all() {
 }
 
 
-export default all
+export default All

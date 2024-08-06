@@ -13,7 +13,7 @@ const kanit = Kanit({
 
 
 
-function add() {
+function Add() {
     const [isOpen, setIsOpen] = useState(false);
 
     const closeModal = () => {
@@ -194,8 +194,8 @@ function add() {
                             ยกเลิก</Link></button>
                     <>
                         {isOpen && (
-                            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                            <Transition appear show={isOpen} as={Fragment} >
+                                <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`} >
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-out duration-300"
@@ -268,4 +268,4 @@ function add() {
     )
 }
 
-export default add
+export default Add

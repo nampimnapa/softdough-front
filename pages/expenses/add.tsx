@@ -11,9 +11,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function add() {
-    const [message, setMessage] = useState('Loading');
-
+function Add() {
     const [startValue, setStartValue] = useState({
         startDate: null,
         endDate: null
@@ -22,13 +20,16 @@ function add() {
     const [valueForm, setValueForm] = useState(
         {
             st_name: "",
+            st_username: "",
+            st_password: "",
             ept_id: "",
+            st_tel: "",
             ep_note: "",
             ep_sum: 0,
-            ep_status: 1
-            // st_type: "",
-            // st_start: "",
-            // st_status: 1
+            ep_status: 1,
+            st_type: "",
+            st_start: "",
+            st_status: 1
         }
     );
 
@@ -85,7 +86,11 @@ function add() {
             st_name: "",
             st_username: "",
             st_password: "",
+            ept_id: "",
             st_tel: "",
+            ep_note: "",
+            ep_sum: 0,
+            ep_status: 1,
             st_type: "",
             st_start: "",
             st_status: 1
@@ -329,4 +334,4 @@ function add() {
 }
 
 
-export default add
+export default Add

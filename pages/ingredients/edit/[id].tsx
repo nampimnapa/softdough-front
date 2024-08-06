@@ -271,7 +271,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function edit() {
+function Edit() {
     const [isOpen, setIsOpen] = useState(false);
 
     const closeModal = () => {
@@ -370,20 +370,19 @@ function edit() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch staff data based on st_id
+        // Fetch ingredient data
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read/${id}`)
             .then((response) => response.json())
             .then((data) => {
                 setInd(data);
                 setLoading(false);
-                console.log("Ind state:", ind.ind_name, ind.qty_per_unit, ind.qtyminimum, ind.un_ind, ind.un_ind_name, ind.un_purchased, ind.un_purchased_name);  // Log the entire state
-                console.log('hello')
-
             })
             .catch((error) => {
                 console.error('Error:', error);
                 setLoading(false);
             });
+    
+        // Fetch unit data
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
             .then(response => response.json())
             .then(data => {
@@ -392,8 +391,15 @@ function edit() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
-
     }, [id]);
+    
+    // New useEffect for logging
+    useEffect(() => {
+        if (ind) {
+            console.log("Ind state:", ind.ind_name, ind.qty_per_unit, ind.qtyminimum, ind.un_ind, ind.un_ind_name, ind.un_purchased, ind.un_purchased_name);
+            console.log('hello');
+        }
+    }, [ind]);
     // useEffect(() => {
     //     console.log("Ind state updated:", ind);
     // }, [ind]);
@@ -551,8 +557,8 @@ function edit() {
                         ยกเลิก</Link></button>
                 <>
                     {isOpen && (
-                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                            <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                        <Transition appear show={isOpen} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                 <Transition.Child
                                     as={Fragment}
                                     enter="ease-out duration-300"
@@ -624,4 +630,4 @@ function edit() {
     )
 }
 
-export default edit;
+export default Edit;

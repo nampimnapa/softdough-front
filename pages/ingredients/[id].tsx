@@ -87,7 +87,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function detailall() {
+function Detailall() {
     const [isOpen, setIsOpen] = useState(false);
 
     const [ind, setIngredientall] = useState<any>(null);
@@ -178,4 +178,4 @@ function detailall() {
 }
 
 
-export default detailall
+export default Detailall

@@ -9,7 +9,7 @@ const DetailStaff = dynamic(() => import('../../components/forms/detailStaff'), 
     loading: () => <Spinner label="Loading..." color="warning" />,
 });
 
-function detailstaff() {
+function Detailstaff() {
     const [staff, setStaff] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
@@ -28,4 +28,4 @@ function detailstaff() {
     );
 }
 
-export default detailstaff
+export default Detailstaff
