@@ -9,7 +9,7 @@ import { Tabs, Tab, Chip } from "@nextui-org/react";
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
 
 
-function listorder() {
+function Listorder() {
 
 
     const [loading, setLoading] = useState(true);
@@ -153,4 +153,4 @@ function listorder() {
     )
 }
 
-export default listorder
+export default Listorder

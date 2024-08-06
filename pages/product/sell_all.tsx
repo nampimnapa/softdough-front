@@ -1,19 +1,23 @@
 import React, { Fragment, useEffect, useState } from "react";
-import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import Link from "next/link";
-import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import { Kanit } from "next/font/google";
-import { Icon } from '@iconify/react';
+import { MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import { Switch, CheckboxGroup, Tabs, Chip, User, Tab, cn, Input, Avatar, Card, CardHeader, CardBody, Divider, ScrollShadow, Button, Select, SelectItem, CardFooter, Spinner, Image, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Textarea, RadioGroup, Radio, Breadcrumbs, BreadcrumbItem, image } from "@nextui-org/react";
+import { Spinner, useDisclosure, Image } from "@nextui-org/react";
 import AddSell from "../../components/forms/addSell";
 import EditSalesFixOne from "../../components/forms/editSalesFixOne";
 import EditSalesFixTwo from "../../components/forms/editSalesFixTwo";
+import Head from 'next/head'
+// import Image from "next/image";
+import ReadSaleMenu from "../../components/modal/readSaleMenu";
 
-function sell_all() {
+function Sell_all() {
     const router = useRouter();
     const { id } = router.query;
     const [Sale, setSale] = useState([]);
+    const [typesellmenufix, setTypesellmenufix] = useState([]);
+    const [typesellmenumix, setTypesellmenumix] = useState([]);
+    const [statusLoading, setStatusLoading] = useState(false);
+
     interface Sale {
         sm_id: number,
         sm_name: String,
@@ -24,52 +28,29 @@ function sell_all() {
             .then(response => response.json())
             .then(data => {
                 setSale(data);
+                setStatusLoading(true);
             })
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
 
-    }, [id]);
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
+            .then(response => response.json())
+            .then(data2 => {
+                setTypesellmenufix(data2);
+                setTypesellmenumix(data2);
+                // console.log(data2);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
 
-    const typesellmenufix = [
-        {
-            id: "1",
-            name: "กล่อง M",
-            num: 4,
-        },
-        {
-            id: "2",
-            name: "กล่อง L",
-            num: 6,
-        }
-    ]
-
-    const typesellmenumix = [
-        {
-            id: "1",
-            name: "กล่อง M",
-            num: 4,
-        },
-        {
-            id: "2",
-            name: "กล่อง L",
-            num: 6,
-        },
-        {
-            id: "3",
-            name: "เดี่ยว",
-            num: 1,
-        },
-        {
-            id: "4",
-            name: "ดิป",
-            num: 1,
-        },
-    ]
+    }, [id, setSale]);
 
     const { isOpen: isOpenModalAdd, onOpen: onOpenModalAdd, onOpenChange: onOpenChangeModalAdd, onClose: onCloseModelAdd } = useDisclosure();
     const { isOpen: isOpenModalEditOne, onOpen: onOpenModalEditOne, onOpenChange: onOpenChangeModalEditOne, onClose: onCloseModelEditOne } = useDisclosure();
     const { isOpen: isOpenModalEditTwo, onOpen: onOpenModalEditTwo, onOpenChange: onOpenChangeModalEditTwo, onClose: onCloseModelEditTwo } = useDisclosure();
+    const { isOpen: isOpenModalRead, onOpen: onOpenModalRead, onOpenChange: onOpenChangeModalRead, onClose: onCloseModelRead } = useDisclosure();
     const [editFix, setEditFix] = useState("");
 
     const changeFix = (idfix: any, smid: any) => {
@@ -82,10 +63,32 @@ function sell_all() {
         }
     }
 
-    // console.log("Sales : ", Sale)
+    const openRead = (smid: any) => {
+        setEditFix(smid);
+        onOpenModalRead();
+    }
+
+    const updateSaleData = () => {
+        setStatusLoading(false);
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/small`)
+            .then(response => response.json())
+            .then(data => {
+                setSale(data);
+                setStatusLoading(true);
+            })
+            .catch(error => {
+                console.error('Error fetching sale data:', error);
+            });
+    };
+
+    // console.log(Sale);
+
 
     return (
-        <div className="h-screen flex flex-col">
+        <div className="flex flex-col ">
+            <Head>
+                <title>เมนูสำหรับขาย - Softdough</title>
+            </Head>
             <p className='text-[#F2B461] font-medium m-4'>เมนูสำหรับขาย</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75">
@@ -110,57 +113,54 @@ function sell_all() {
                     </button>
                 </div>
             </div>
-            <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">โดนัท</p>
+            <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">เมนูสำหรับขาย</p>
+                {/* card */}
+                {statusLoading ? (
+                    <div className="flex flex-wrap">
+                        {Sale && Sale.length > 0 ? (
+                            Sale.map((sale, index) => (
+                                <div key={index} className="card w-60 bg-base-100 shadow-md mx-2 h-60 ml-5 mb-4 ">
+                                    <figure className="w-full h-3/4">
+                                        <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
+                                    </figure>
+                                    <div className="card-body">
+                                        <div className="flex justity-between">
+                                            <p className="text-mediem text-[#73664B]">
+                                                {sale.sm_name}
+                                            </p>
 
-            {/* card */}
-            <div className="flex flex-wrap ">
-                {Sale && Sale.length > 0 ? (
-                    Sale.map((sale, index) => (
-                        <div key={index} className="card w-60 bg-base-100 shadow-md mx-2 h-60 ml-5 mb-4 ">
-                            <figure className="w-full h-3/4">
-                                <img src={sale.picture} alt="Recipe Image" className="object-cover" />
-                            </figure>
-                            <div className="card-body">
-                                <div className="flex justity-between">
-                                    <p className="text-mediem text-[#73664B]">
-                                        {sale.sm_name}
-                                    </p>
 
+                                            <button type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
+                                                <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                            </button>
 
-                                    <button type="button" onClick={() => changeFix(sale.fix,sale.sm_id)} >
-                                        <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                    </button>
+                                            <button type="submit" onClick={() => openRead(sale.sm_id)}>
+                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
+                                            </button>
 
-                                    <button type="submit" >
-                                        <Link href={`/product/recipeedit/${sale.sm_id}`} className="w-full flex justify-center items-center">
-                                            <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
-                                        </Link>
-                                    </button>
-
-                                </div>
-                                <div className="flex justify-center">
-                                    {/* <div className="flex justify-start">
+                                        </div>
+                                        <div className="flex justify-center">
+                                            {/* <div className="flex justify-start">
                                         <p className="text-sm text-[#73664B]">ราคา : </p>
                                     </div> */}
-                                    <div className="flex ">
-                                        <p className=" text-[#73664B] text-lg">{sale.sm_price} บาท</p>
+                                            <div className="flex ">
+                                                <p className=" text-[#73664B] text-lg">{sale.sm_price} บาท</p>
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
-
+                            ))
+                        ) : (
+                            <div className="flex justify-center items-center w-full">
+                                <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
                             </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="flex justify-center items-center w-full">
-                        <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
+                        )}
+
                     </div>
+                ) : (
+                    <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
                 )}
-
-            </div>
-            <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">ดิป</p>
-
-
-
             {/* Show Model Add Sell */}
             <AddSell
                 isOpen={isOpenModalAdd}
@@ -168,6 +168,7 @@ function sell_all() {
                 onClose={onCloseModelAdd}
                 typesellmenufix={typesellmenufix}
                 typesellmenumix={typesellmenumix}
+                updateSaleData={updateSaleData}
             />
 
             <EditSalesFixOne
@@ -177,6 +178,7 @@ function sell_all() {
                 typesellmenufix={typesellmenufix}
                 typesellmenumix={typesellmenumix}
                 idFix={editFix}
+                updateSaleData={updateSaleData}
             />
 
             <EditSalesFixTwo
@@ -186,9 +188,23 @@ function sell_all() {
                 typesellmenufix={typesellmenufix}
                 typesellmenumix={typesellmenumix}
                 idFix={editFix}
+                updateSaleData={updateSaleData}
+
+            />
+
+            <ReadSaleMenu
+                isOpen={isOpenModalRead}
+                onOpenChange={onOpenChangeModalRead}
+                onClose={onCloseModelRead}
+                typesellmenufix={typesellmenufix}
+                typesellmenumix={typesellmenumix}
+                idFix={editFix}
+                updateSaleData={updateSaleData}
+
+
             />
         </div>
     )
 }
 
-export default sell_all
+export default Sell_all

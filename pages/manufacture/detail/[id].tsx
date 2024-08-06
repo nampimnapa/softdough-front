@@ -18,7 +18,7 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function detailproduction() {
+function Detailproduction() {
     const [isOpen, setIsOpen] = useState(false);
     const [isOpen2, setIsOpen2] = useState(false);
 
@@ -416,8 +416,8 @@ function detailproduction() {
                                     <div className="w-1/2 mt-10 flex justify-start">
                                         <>
                                             {isOpen && (
-                                                <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                                    <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                                                <Transition appear show={isOpen} as={Fragment} >
+                                                    <Dialog as="div"  onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                                         <Transition.Child
                                                             as={Fragment}
                                                             enter="ease-out duration-300"
@@ -488,8 +488,8 @@ function detailproduction() {
                                 // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
                                 <>
                                     {isOpen && (
-                                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                        <Transition appear show={isOpen} as={Fragment} >
+                                            <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -560,8 +560,8 @@ function detailproduction() {
                                 // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
                                 <>
                                     {isOpen && (
-                                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                        <Transition appear show={isOpen} as={Fragment} >
+                                            <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -645,8 +645,8 @@ function detailproduction() {
                                 // {/* // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2' */}
                                 <>
                                     {isOpen && (
-                                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                        <Transition appear show={isOpen} as={Fragment} >
+                                            <Dialog as="div"  onClose={closeModal} className={`relative z-10 ${kanit.className}`} >
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -715,8 +715,8 @@ function detailproduction() {
                             {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (                                // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
                                 <>
                                     {isOpen2 && (
-                                        <Transition appear show={isOpen2} as={Fragment} className={kanit.className}>
-                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                        <Transition appear show={isOpen2} as={Fragment} >
+                                            <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -793,4 +793,4 @@ function detailproduction() {
 }
 
 
-export default detailproduction
+export default Detailproduction

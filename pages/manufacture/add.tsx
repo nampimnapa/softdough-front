@@ -17,7 +17,7 @@ const kanit = Kanit({
 });
 
 
-function add() {
+function Add() {
     const router = useRouter();
     const { id } = router.query;
     const [unitOptions, setUnitOptions] = useState([]);
@@ -327,8 +327,8 @@ function add() {
                     </Link>
                     <>
                         {isOpen && (
-                            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                            <Transition appear show={isOpen} as={Fragment} >
+                                <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-out duration-300"
@@ -402,4 +402,4 @@ function add() {
     )
 }
 
-export default add
+export default Add

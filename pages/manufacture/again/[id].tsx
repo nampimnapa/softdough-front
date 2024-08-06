@@ -47,7 +47,7 @@ interface PdodDetail {
     qty: number;
     status: string;
 }
-function editpdod() {
+function Editpdod() {
     const router = useRouter();
     const { id } = router.query;
     // เก็บที่ fetch มา ดีเทลใหญ่ดีเทลเล็ก
@@ -398,8 +398,8 @@ function editpdod() {
                     </Link>
                     <>
                         {isOpen && (
-                            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                            <Transition appear show={isOpen} as={Fragment} >
+                                <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`} >
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-out duration-300"
@@ -473,4 +473,4 @@ function editpdod() {
     )
 }
 
-export default editpdod
+export default Editpdod

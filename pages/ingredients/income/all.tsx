@@ -151,7 +151,7 @@ import { Kanit } from "next/font/google";
 
 
 
-function ingreincome() {
+function Ingreincome() {
 
     // const [ingrelot, setIngrelot] = useState([
     //     {
@@ -316,4 +316,4 @@ function ingreincome() {
     )
 }
 
-export default ingreincome
+export default Ingreincome

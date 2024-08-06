@@ -8,7 +8,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-function all() {
+function All() {
 
     const allCategories = ['ทั้งหมด', 'ตามล็อต'];
 
@@ -192,7 +192,7 @@ function all() {
                                         </thead>
                                         <tbody>
                                             {Array.isArray(indlot) && indlot.map((ingredients, idx) => (
-                                                <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                     <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
                                                     {ingredients.indl_id_name}</td>
                                                     <td className="px-6 py-1 text-left">{ingredients.ind_name}
@@ -229,7 +229,7 @@ function all() {
     );
 }
 
-export default all
+export default All
 
 
 

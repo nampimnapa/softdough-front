@@ -3,7 +3,7 @@ import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Tab } from '@headlessui/react';
 import Link from "next/link";
 
-function list() {
+function List() {
 
     const [ind, setIngredientall] = useState<any[]>([]);
     const [indlot, setIngredientLot] = useState<any[]>([]);
@@ -75,7 +75,7 @@ function list() {
                     </thead>
                     <tbody>
                         {ind.map((ingredients, idx) => (
-                            <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10 items-center">
+                            <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10 items-center">
                                 <td scope="row" className="px-1 py-1 text-[#73664B] whitespace-nowrap dark:text-white">
                                     {ingredients.checkk === "production" ? ingredients.id : null}
                                 </td>
@@ -111,4 +111,4 @@ function list() {
     )
 }
 
-export default list
+export default List

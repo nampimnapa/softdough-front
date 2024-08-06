@@ -17,7 +17,7 @@ const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
-function recipe_detail() {
+function Recipe_detail() {
     const [isOpen, setIsOpen] = useState(false);
 
     const closeModal = () => {
@@ -114,16 +114,15 @@ function recipe_detail() {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/products/${id}`);
                 const data = await response.json();
-                console.log("data  fatch:", data);
+                console.log("data fetch:", data);
                 setRecipe(data);
-                console.log("data ลงstate:", recipe);
                 setLoading(false);
             } catch (error) {
                 console.error('Error:', error);
                 setLoading(false);
             }
         };
-
+    
         const fetchRecipeDetail = async () => {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/pdset/${id}`);
@@ -133,15 +132,15 @@ function recipe_detail() {
                 console.error('Error fetching ingredient details:', error);
             }
         };
-
-        if (id) { // ตรวจสอบว่า id มีค่าหรือไม่
+    
+        if (id) {
             fetchData();
             fetchRecipeDetail();
         }
     }, [id]);
 
-    console.log("data ลงstate:", recipe);
-    console.log('recipeDetail:', recipeDetail);
+    // console.log("data ลงstate:", recipe);
+    // console.log('recipeDetail:', recipeDetail);
 
     return (
         <div>
@@ -249,8 +248,8 @@ function recipe_detail() {
                             ยกเลิก</Link></button>
                     <>
                         {isOpen && (
-                            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                            <Transition appear show={isOpen} as={Fragment} >
+                                <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-out duration-300"
@@ -322,4 +321,4 @@ function recipe_detail() {
     )
 }
 
-export default recipe_detail
+export default Recipe_detail
