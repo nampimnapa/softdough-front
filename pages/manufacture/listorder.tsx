@@ -128,7 +128,7 @@ function listorder() {
                                                                     order.pdo_status === '4' ? 'text-green-500' : ''
                                                         }`}>
                                                         {/* 3 เสร็จสิ้นแล้วแบบยังไม่เพิ่มวัตถุดิบที่ใช้   4 เสร็จสิ้นแล้วเพิ่มแล้ว */}
-                                                        {order.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : order.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
+                                                        {order.pdo_status === '5' ? 'รออนุมัติ' :order.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : order.pdo_status === '3' ? 'เสร็จสิ้นแล้วยังไม่เพิ่มวัตถุดิบ' : order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center">
 

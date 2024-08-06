@@ -79,6 +79,7 @@ function detailproduction() {
     };
 
     const [isChecked2, setIsChecked2] = useState(false); // State to track checkbox status
+    const [checkedItems2, setCheckedItems2] = useState({}); // State for checked items managed by handleCheckboxChange2
 
     const handleCheckboxChange2 = () => {
         const newIsChecked = !isChecked2; // สลับสถานะ isChecked2
@@ -91,27 +92,43 @@ function detailproduction() {
 
         setIsChecked2(newIsChecked); // ตั้งค่า isChecked2 ใหม่
         setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
-        console.log(newIsChecked)
-        console.log(newCheckedItems)
+        console.log("newIsChecked",newIsChecked)
+        console.log("newCheckedItems",newCheckedItems)
 
     };
 
     const [isChecked3, setIsChecked3] = useState(false); // State to track checkbox status
+    const [checkedItems3, setCheckedItems3] = useState({}); // State for checked items managed by handleCheckboxChange3
 
+    // const handleCheckboxChange3 = () => {
+    //     const newIsChecked = !isChecked3; // สลับสถานะ isChecked2
+
+    //     // สร้างอาร์เรย์ใหม่เพื่อเก็บสถานะของ Checkbox แต่ละอันในตาราง
+    //     const newCheckedItems = {};
+    //     detail.pdodetail.forEach(pdodetail => {
+    //         newCheckedItems[pdodetail.pdod_id] = newIsChecked;
+    //     });
+
+    //     setIsChecked3(newIsChecked); // ตั้งค่า isChecked2 ใหม่
+    //     setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
+    //     console.log(newIsChecked)
+    //     console.log(newCheckedItems)
+    // };
     const handleCheckboxChange3 = () => {
-        const newIsChecked = !isChecked3; // สลับสถานะ isChecked2
-
-        // สร้างอาร์เรย์ใหม่เพื่อเก็บสถานะของ Checkbox แต่ละอันในตาราง
+        const newIsChecked = !isChecked3; // Toggle isChecked3
+    
+        // Create a new array to store the status of each checkbox in the table
         const newCheckedItems = {};
         detail.pdodetail.forEach(pdodetail => {
-            newCheckedItems[pdodetail.pdod_id] = newIsChecked;
+            newCheckedItems[pdodetail.pdod_id] = true; // Set all checkboxes to true
         });
-
-        setIsChecked3(newIsChecked); // ตั้งค่า isChecked2 ใหม่
-        setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
-        console.log(newIsChecked)
-        console.log(newCheckedItems)
+    
+        setIsChecked3(newIsChecked); // Update isChecked3
+        setCheckedItems3(newCheckedItems); // Update the status of each checkbox in the table
+        console.log("newIsChecked", newIsChecked);
+        console.log("newCheckedItems", newCheckedItems);
     };
+    
 
     const handleCheckboxChangeDetail = (pdod_id) => {
         // เปลี่ยนสถานะของ Checkbox แต่ละอันในตาราง
@@ -149,23 +166,23 @@ function detailproduction() {
         }
 
     };
-    const handleConfirmModal = async (id) => {
-        if (!isChecked && detail && detail.pdo_status === '2') {
-            const idpdo = `${id}`;
-            const allChecked = Object.values(checkedItems).every(value => value === true);
-            const pdoStatus = allChecked ? 3 : 5;
 
-            // const requestBody = {
-            //     pdod_ids: checkedIdsAsNumbers,
-            //     pdo_id: idpdo,
-            //     pdo_status: pdoStatus
-            // };
-            // If pdo_status is '2', update the status using API
+    console.log("id", `${id}`)
+    const handleConfirmModal = async () => {
+        if (
+            // !isChecked && detail && 
+            detail.pdo_status === '2') {
+            const idpdo = `${id}`;
+            // const allChecked = Object.values(checkedItems3).every(value => value === true);
+            const pdoStatus = isChecked3 ? 3 : 5;
+
             const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
             const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
             const requestBody = {
                 pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
-                pdo_id: idpdo // Add the pdo_id
+                pdo_id: idpdo, // Add the pdo_id
+                pdo_status: pdoStatus
+
             };
             
             console.log("console.log(requestBody);", requestBody);
@@ -184,6 +201,7 @@ function detailproduction() {
             });
 
             const responseData = await response.json();
+            console.log(requestBody)
 
 
 
@@ -198,7 +216,6 @@ function detailproduction() {
 
 
 
-    console.log("id", `${id}`)
     const sendPdoStatus = async () => {
         // Check the value of pdo_status
         // ตรวจสอบสถานะ pdo_status
@@ -262,10 +279,11 @@ function detailproduction() {
                     <div>
                         <p className={`text-base px-6 py-2 font-bold
                                     ${detail.pdo_status === '3' ? 'text-green-500' :
+                                        detail.pdo_status === '4' ? 'text-green-500' :
                                 detail.pdo_status === '2' ? 'text-yellow-500' :
                                     detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
                             }`}>
-                            {detail.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
+                            {detail.pdo_status === '5' ? 'รออนุมัติ' :detail.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
                         </p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">ใบสั่งผลิต : {detail.pdo_id_name}</p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">วันที่สั่งผลิต : {detail.updated_at}</p>
@@ -602,6 +620,9 @@ function detailproduction() {
                                                                             type="button"
                                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                                             onClick={handleConfirmModal}
+                                                                            // onClick={() => handleConfirmModal(detail.pdo_id)}
+                                                                            // onClick={() => handleConfirmModal(detail.pdo_id_name)}
+
                                                                         >
                                                                             ยืนยัน
                                                                         </button>
