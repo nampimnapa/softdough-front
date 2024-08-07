@@ -15,30 +15,30 @@ function Type() {
 
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/readtype`)
-        .then(response => response.json())
-        .then(data => {
-            setTypeProducts(data);
-        })
-        .catch(error => {
-            console.error('Error fetching unit data:', error);
-        });
+      .then(response => response.json())
+      .then(data => {
+        setTypeProducts(data);
+      })
+      .catch(error => {
+        console.error('Error fetching unit data:', error);
+      });
 
-}, [id]);
+  }, [id]);
 
-//   useEffect(() => {
-//     if (id) {
-//       fetch(${process.env.NEXT_PUBLIC_API_URL}/expenses/readtype)
-//         .then(response => response.json())
-//         .then(data => {
-//           console.log(data); // ตรวจสอบข้อมูลที่ได้รับ
-//           setTypeProducts(data); // กำหนดข้อมูลประเภทสินค้าที่ได้รับมาจาก API
-//         })
-//         .catch(error => {
-//           console.error('Error fetching product data:', error);
-//           setMessage('Error fetching product data');
-//         });
-//     }
-//   }, [id]);
+  //   useEffect(() => {
+  //     if (id) {
+  //       fetch(${process.env.NEXT_PUBLIC_API_URL}/expenses/readtype)
+  //         .then(response => response.json())
+  //         .then(data => {
+  //           console.log(data); // ตรวจสอบข้อมูลที่ได้รับ
+  //           setTypeProducts(data); // กำหนดข้อมูลประเภทสินค้าที่ได้รับมาจาก API
+  //         })
+  //         .catch(error => {
+  //           console.error('Error fetching product data:', error);
+  //           setMessage('Error fetching product data');
+  //         });
+  //     }
+  //   }, [id]);
 
   const changeInput = (id) => {
     setOpenInput(id);

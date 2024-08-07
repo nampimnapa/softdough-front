@@ -10,11 +10,13 @@ import { Tabs, Tab, Button } from "@nextui-org/react";
 function Approve() {
     const [loading, setLoading] = useState(true);
     const [production, setproduction] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+
     interface Production {
         pdo_id: string;
         pdo_id_name: string;
         updated_at: string;
-        pdo_status: number;
+        pdo_status: string;
 
     }
     useEffect(() => {
@@ -31,6 +33,9 @@ function Approve() {
                 setLoading(false);
             });
     }, []);
+    const filteredProduction = production.filter((data) => data.pdo_status === "5");
+    const filtered1 = production.filter((data) => data.pdo_status === "1");
+
     return (
         <div>
             <p className='text-[#F2B461] font-medium m-4'>รออนุมัติ</p>
@@ -90,7 +95,7 @@ function Approve() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {production.map((data) => (
+                                        {filteredProduction.map((data) => (
                                             <tr key={data.pdo_id} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
                                                 <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
                                                     {data.updated_at}
@@ -146,12 +151,15 @@ function Approve() {
                                             </tr>
                                         </thead>
                                         <tbody>
+                                        {filtered1.map((data) => (
 
-                                            <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                            <tr key={data.pdo_id}  className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                 <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
+                                                {data.updated_at}
 
                                                 </td>
-                                                <td className="px-6 py-1 text-left text-[#73664B]">
+                                                <td className="px-6 py-1 text-center text-[#73664B]">
+                                                {data.pdo_id_name}
 
                                                 </td>
                                                 <td className="px-6 py-1 text-[#73664B]">
@@ -162,6 +170,7 @@ function Approve() {
                                                 </td>
 
                                             </tr>
+                                        ))}
 
                                         </tbody>
                                     </table>

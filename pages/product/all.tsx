@@ -249,7 +249,7 @@ function All() {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/smt/${idSmt}`)
             .then(response => response.json())
             .then(data => {
-                if (data.length > 0) { 
+                if (data.length > 0) {
                     setIdSmtEdit(idSmt.toString());
                     setFormData({
                         smt_name: data[0].smt_name,
@@ -258,7 +258,7 @@ function All() {
                     });
                     onOpenEdit();
                 } else {
-                    console.error('No SaleMenu found'); 
+                    console.error('No SaleMenu found');
                 }
             })
             .catch(error => {
@@ -547,7 +547,7 @@ function All() {
                                                     </td>
                                                     <td className="me-2 py-4 flex items-center justify-end text-[#73664B]">
                                                         <button onClick={() => getDstaForEdit(menu.smt_id)} type="button" className="w-full flex justify-center items-center">
-                                                                <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                                            <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
                                                         </button>
 
                                                     </td>

@@ -8,6 +8,27 @@ import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Button } from "@nextui-org/react";
 
 function approve() {
+    const [ind, setIngredientall] = useState<any[]>([]);
+    const [indlot, setIngredientLot] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Fetch staff data on component mount
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/usedIngredients`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setIngredientall(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
+        }, []);
+
+    const filteredProduction = ind.filter((data) => data.status === "1");
+    const filtered1 = ind.filter((data) => data.pdo_status === "1");
 
     return (
         <div>
@@ -42,9 +63,11 @@ function approve() {
                                             <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
                                                 วันที่ทำรายการ
                                             </td>
-                                            <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">รายการที่ใช้
+                                            <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">
+                                                รายการที่ใช้
                                             </td>
-                                            <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">รายละเอียด
+                                            <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">
+                                                รายละเอียด
                                             </td>
                                             <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden ">
                                                 อนุมัติวัตถุดิบที่ใช้
@@ -52,16 +75,18 @@ function approve() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                    {filteredProduction.map((data,idx) => (
+                                        <tr key={idx}  className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                             <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
-
+                                            {data.checkk === "production" ? data.id : null}
                                             </td>
-
                                             <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                            {data.created_at}
 
                                             </td>
 
-                                            <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                            <td className="ms-7 py-1  text-center text-[#73664B] whitespace-nowrap overflow-hidden">
+                                            {data.checkk === "other" ? data.note : data.name}
 
                                             </td>
                                             <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
@@ -71,12 +96,13 @@ function approve() {
                                                         {/* </Link> */}
                                                     </button>
 </td>
-                                            <td className="px-12 py-1 whitespace-nowrap overflow-hidden ">
+                                            <td className="px-12 py-1 whitespace-nowrap overflow-hidden flex justify-center ">
                                                 <Button className="mr-2 bg-red-500 text-white" size="sm">ยกเลิก</Button>
                                                 <Button size="sm" className="bg-green-500 text-white">ยืนยัน</Button>
                                             </td>
 
                                         </tr>
+                                        ))}
 
 
 

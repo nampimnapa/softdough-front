@@ -22,7 +22,7 @@ function List() {
                 console.error('Error:', error);
                 setLoading(false);
             });
-            
+
 
 
     }, []);
@@ -85,15 +85,15 @@ function List() {
                                 <td className="">
                                     {ingredients.checkk === "other" ? ingredients.note : ingredients.name}
                                 </td>
-                               
+
                                 <td className={`h-10 
                                                     ${ingredients.status === '2' ? ' text-green-500' :
-                                                        ingredients.status === '1' ? 'text-yellow-500' :
-                                                                ''
-                                                        }`}>
-                                                        {/* 3 เสร็จสิ้นแล้วแบบยังไม่เพิ่มวัตถุดิบที่ใช้   4 เสร็จสิ้นแล้วเพิ่มแล้ว */}
-                                                        { ingredients.status === '2' ? 'ยืนยันแล้ว' : ingredients.status=== '1' ? 'รอดำเนินการ' : ingredients.status}
-                                                    </td>
+                                        ingredients.status === '1' ? 'text-yellow-500' :
+                                            ''
+                                    }`}>
+                                    {/* 3 เสร็จสิ้นแล้วแบบยังไม่เพิ่มวัตถุดิบที่ใช้   4 เสร็จสิ้นแล้วเพิ่มแล้ว */}
+                                    {ingredients.status === '2' ? 'ยืนยันแล้ว' : ingredients.status === '1' ? 'รอดำเนินการ' : ingredients.status}
+                                </td>
                                 <td className="px-1 py-3  items-center justify-center  ">
                                     <button >
                                         <Link href="#" className="w-full flex justify-center items-center">

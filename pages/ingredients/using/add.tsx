@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState, ChangeEvent } from "react";
 import Link from "next/link";
-
+import { Tabs, Tab, Chip, Select, SelectItem, Spinner, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/react";
 import {
     ChevronLeftIcon,
     MagnifyingGlassIcon,
@@ -246,7 +246,7 @@ function Add() {
     const handleSubmitPro = async () => {
         // Mapping detailData to the required format for the API request
 
-        const ingredientLotDetail = detailData.map((ingredient) => ({
+        const ingredientLotDetail = editedData.map((ingredient) => ({
             pdod_id: ingredient.pdod_id, // Ensure pdod_id exists in DetailData
             ind_id: ingredient.ind_id,
             qty_used_sum: ingredient.qty_used_sum, // Assuming it's already a number
@@ -287,6 +287,46 @@ function Add() {
 
     };
 
+    interface DetailComponentProps {
+        detailData: DetailData[];
+        handleDeleteIngredient: (index: number) => void;
+        onSave: (updatedData: DetailData[]) => void; // Function to handle save operation
+    }
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedData, setEditedData] = useState<DetailData[]>([]);
+
+    // Initialize editedData when detailData changes
+    useEffect(() => {
+        setEditedData(detailData.map(data => ({ ...data })));
+    }, [detailData]);
+
+    const handleEditToggle = () => {
+        if (isEditing) {
+            // Save the edited data when exiting edit mode
+            saveEditedData();
+        }
+        setIsEditing(!isEditing);
+    };
+
+    const handleInputChange = (index: number, field: keyof DetailData, value: string | number) => {
+        const newEditedData = [...editedData];
+        if (newEditedData[index]) {
+            newEditedData[index] = {
+                ...newEditedData[index],
+                [field]: field === 'qty_used_sum' || field === 'scrap' ? Number(value) : value
+            };
+            setEditedData(newEditedData);
+        } else {
+            console.error('Invalid index:', index);
+        }
+    };
+
+
+    const saveEditedData = () => {
+        // Handle saving the updated data directly
+        console.log('Saved Data:', editedData);
+        // You can update the state here or send the data to a server
+    };
 
 
     return (
@@ -350,9 +390,14 @@ function Add() {
                             </div>
                         </div>
                         <p className="mt-4 mb-2  text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
+
                         <div className="flex justify-end">
-                            <Button href={`../using/edit/${selectedId}`} as={Link}
-                                className="ml-auto  text-white bg-[#F2B461] focus:outline-none rounded-full text-sm px-4 py-2  mb-2 ">แก้ไข</Button>
+                            <Button
+                                // href={`../using/edit/${selectedId}`}
+                                // as={Link}
+                                onClick={handleEditToggle}
+
+                                className="ml-auto  text-white bg-[#F2B461] focus:outline-none rounded-full text-sm px-4 py-2  mb-2 ">{isEditing ? "บันทึก" : "แก้ไข"}</Button>
                         </div>
 
                         <div className="flex flex-col">
@@ -364,12 +409,55 @@ function Add() {
                             </div>
                             <div className="max-h-40 overflow-y-auto mb-5">
                                 <table className="w-full">
-                                    <tbody className="w-full">
+                                    {/* <tbody className="w-full">
                                         {detailData.map((detail, index) => (
                                             <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white flex items-center">
                                                 <td scope="col" className="flex-1 text-center">{detail.ind_name}</td>
                                                 <td scope="col" className="flex-1 text-center">{detail.qty_used_sum}</td>
                                                 <td scope="col" className="flex-1 text-center">{detail.scrap}</td>
+                                                <td scope="col" className="flex-1 text-center">
+                                                    <div className="flex items-center justify-center">
+                                                        <button onClick={() => handleDeleteIngredient(index)}>
+                                                            <TrashIcon className="h-5 w-5 text-red-500" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody> */}
+                                    <tbody className="w-full">
+                                        {editedData.map((detail, index) => (
+                                            <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white flex items-center">
+                                                <td scope="col" className="flex-1 text-center">
+                                                    {
+                                                        detail.ind_name
+                                                    }
+                                                </td>
+                                                <td scope="col" className="flex-1 text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            type="number"
+                                                            value={detail.qty_used_sum}
+                                                            defaultValue={detail.qty_used_sum}
+                                                            onChange={(e) => handleInputChange(index, 'qty_used_sum', e.target.value)}
+                                                            className="bg-white border border-gray-300 rounded p-1"
+                                                        />
+                                                    ) : (
+                                                        detail.qty_used_sum
+                                                    )}
+                                                </td>
+                                                <td scope="col" className="flex-1 text-center">
+                                                    {isEditing ? (
+                                                        <input
+                                                            type="number"
+                                                            defaultValue={detail.scrap}
+                                                            onChange={(e) => handleInputChange(index, 'scrap', e.target.value)}
+                                                            className="bg-white border border-gray-300 rounded p-1"
+                                                        />
+                                                    ) : (
+                                                        detail.scrap
+                                                    )}
+                                                </td>
                                                 <td scope="col" className="flex-1 text-center">
                                                     <div className="flex items-center justify-center">
                                                         <button onClick={() => handleDeleteIngredient(index)}>
