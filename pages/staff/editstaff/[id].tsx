@@ -98,6 +98,7 @@ function Detailstaff() {
         } catch (error) {
             console.error('Error updating staff data:', error);
         }
+        console.log(staff)
     };
 
     const checkDataEdit = () => {
@@ -254,35 +255,9 @@ function Detailstaff() {
                             placeholder='ชื่อผู้ใช้งาน'
                             className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-3  sm:text-sm sm:leading-6 focus:outline-none"
                         />
-                        {/* {formErrors.st_username && (
-                            <p className="text-red-500 text-xs mt-1">{formErrors.st_username}</p>
-                        )} */}
+                       
                     </div>
                 </div>
-
-
-                {/* <div className="grid grid-cols-3 items-center ">
-                    <label htmlFor="st_password" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
-                        รหัสผ่าน :</label>
-                    {/* <div className="mt-2 col-span-2">
-                        <input
-                            required
-                            onChange={handleInputChange}
-                            defaultValue={staff.st_password}
-                            type="text"
-                            name="st_password"
-                            id="st_password"
-                            autoComplete="family-name"
-                            placeholder='รหัสผ่าน'
-                            className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-3  sm:text-sm sm:leading-6 focus:outline-none"
-                        />
-                        {/* {formErrors.st_password && (
-                            <p className="text-red-500 text-xs mt-1">{formErrors.st_password}</p>
-                        )}
-                    </div> 
-                </div> */}
-
-
                 <div className="grid grid-cols-3 items-center ">
                     <label htmlFor="st_tel" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                         เบอร์โทร :</label>
@@ -299,9 +274,7 @@ function Detailstaff() {
                             placeholder='เบอร์โทร'
                             className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  placeholder:pl-3  sm:text-sm sm:leading-6 focus:outline-none"
                         />
-                        {/* {formErrors.st_tel && (
-                            <p className="text-red-500 text-xs mt-1">{formErrors.st_tel}</p>
-                        )} */}
+                        
                     </div>
                 </div>
 

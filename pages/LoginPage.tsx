@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import {  EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import React, { useState, ChangeEvent } from 'react';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
-import Link from "next/link";
 import { Input } from "@nextui-org/react";
 
 const kanit = Kanit({
@@ -12,17 +11,27 @@ const kanit = Kanit({
 
 const LoginPage = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const router = useRouter();
   
   const toggleVisibility = () => setIsVisible(!isVisible);
 
-  const handleLogin = async () => {
-    // ทำสิ่งที่คุณต้องการเมื่อกดปุ่มเข้าสู่ระบบ
-    // เช่น ตรวจสอบข้อมูลผู้ใช้และส่งคำร้องขอไปยังเซิร์ฟเวอร์
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === 'username') {
+      setUsername(value);
+    } else if (name === 'password') {
+      setPassword(value);
+    }
+  };
+
+  const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
     try {
       const formData = {
-        st_username: '',
-        st_password: ''
+        username: username,
+        password: password
       };
       
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login/login`, {
@@ -31,6 +40,8 @@ const LoginPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include', // ตรวจสอบว่าใช้ 'include' หรือไม่
+
       });
 
       if (!response.ok) {
@@ -38,7 +49,15 @@ const LoginPage = () => {
       }
 
       // ทำสิ่งที่ต้องการหลังจากเข้าสู่ระบบสำเร็จ
-      router.push('/admin/check'); // ย้ายไปยังหน้าอื่นหลังจากเข้าสู่ระบบสำเร็จ
+      const data = await response.json();
+      console.log(data.message);
+      if (data.message.includes('admin')) {
+        router.push('/expenses/add');
+      } else if (data.message.includes('production')) {
+        router.push('/production/dashboard');
+      } else if (data.message.includes('order')) {
+        router.push('/order/dashboard');
+      }
 
     } catch (error) {
       console.error('เกิดข้อผิดพลาดในการเข้าสู่ระบบ:', error.message);
@@ -48,19 +67,29 @@ const LoginPage = () => {
 
   return (
     <div className={kanit.className}>
-      <div className="hero min-h-screen max-w-screen bg-base-200 ">
+      <div className="hero min-h-screen max-w-screen bg-base-200">
         <div className="hero-content flex-col lg:flex-row-reverse w-full ">
           <div className='card shrink-0 w-full max-w-sm shadow-2xl bg-base-100  animate-fade animate-once animate-ease-linear'>
             <form className="card-body">
               <div className="form-control">
                 <p className='text-center font-bold'>เข้าสู่ระบบ</p>
                 <div className='mt-4'>
-                  <Input type="text" label="ชื่อผู้ใช้งาน" placeholder="" />
+                  <Input 
+                    type="text" 
+                    label="ชื่อผู้ใช้งาน" 
+                    placeholder="" 
+                    name="username"
+                    value={username}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 <div className='mt-4'>
                   <Input
                     label="รหัสผ่าน"
                     placeholder=""
+                    name="password"
+                    value={password}
+                    onChange={handleInputChange}
                     endContent={
                       <button className="focus:outline-none" type="button" onClick={toggleVisibility}>
                         {isVisible ? (
@@ -79,8 +108,7 @@ const LoginPage = () => {
                 </label>
               </div>
               <div className="form-control mt-6">
-                <Link href='./'>
-                <button className="btn btn-info text-white" onClick={handleLogin}>เข้าสู่ระบบ</button></Link>
+                <button className="btn btn-info text-white" onClick={handleLogin}>เข้าสู่ระบบ</button>
               </div>
             </form>
           </div>

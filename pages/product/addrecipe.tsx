@@ -29,10 +29,13 @@ function Addrecipe() {
     const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
 
 
-    
+
     interface Ingredients {
         ind_id: string;
         ind_name: string;
+        un_ind_name: string;
+        un_ind: number;
+
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     interface UnitType {
@@ -46,7 +49,7 @@ function Addrecipe() {
     }
     useEffect(() => {
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -54,6 +57,8 @@ function Addrecipe() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
+
+
 
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
             .then(response => response.json())
@@ -95,33 +100,43 @@ function Addrecipe() {
     // หากไม่พบว่ามีวัตถุดิบและหน่วยที่เลือกอยู่แล้ว โปรแกรมจะเพิ่มวัตถุดิบใหม่เข้าไปในรายการ.
     // ล้างข้อมูลในฟอร์ม: หลังจากที่ทำการเพิ่มวัตถุดิบลงในรายการเรียบร้อยแล้ว โปรแกรมจะล้างค่าที่ผู้ใช้กรอกในฟอร์มเพื่อเตรียมรับข้อมูลวัตถุดิบใหม่
     // รับข้อมูลจากฟอร์ม: รับค่าที่ผู้ใช้กรอกในฟอร์มเช่น วัตถุดิบที่เลือก (ingredientId), ปริมาณ (ingredientQty), และหน่วย (unitId) จากนั้นนำไปใช้ในการสร้างวัตถุดิบใหม่.
-    const handleSubmit = (event) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const ingredientId = parseInt((document.getElementById("ingredients") as HTMLSelectElement).value);
-        const ingredientQty = parseInt((document.getElementById("count") as HTMLSelectElement).value);
-        const unitId = parseInt((document.getElementById("unit") as HTMLSelectElement).value);
-        const existingIngredient = addedIngredients.find((ingredient) => ingredient.id === ingredientId && parseInt(ingredient.unit) === unitId);
 
+        // ดึงค่า ID ของวัตถุดิบและปริมาณ
+        const ingredientId = parseInt((document.getElementById("ingredients") as HTMLSelectElement).value);
+        const ingredientQty = parseInt((document.getElementById("count") as HTMLInputElement).value);
+
+        // ค้นหาวัตถุดิบที่เลือกจาก ingredientsOptions
+        const selectedIngredient = ingredientsOptions.find(ind => ind.ind_id === ingredientId.toString());
+        const unitId = selectedIngredient ? selectedIngredient.un_ind_name : '';
+
+        // ตรวจสอบว่ามีวัตถุดิบที่มี id และ unit ที่ตรงกันใน addedIngredients หรือไม่
+        const existingIngredient = addedIngredients.find(
+            (ingredient) => ingredient.id === ingredientId && ingredient.unit === unitId
+        );
 
         if (existingIngredient) {
-            // If the ingredient already exists, update the quantity
-            setAddedIngredients((prevIngredients) => (
-                prevIngredients.map((ingredient) =>
+            // ถ้าวัตถุดิบมีอยู่แล้ว ให้อัปเดตปริมาณ
+            setAddedIngredients(prevIngredients => (
+                prevIngredients.map(ingredient =>
                     ingredient.id === ingredientId && ingredient.unit === unitId
                         ? { ...ingredient, quantity: ingredient.quantity + ingredientQty }
                         : ingredient
                 )
             ));
         } else {
-            // If the ingredient doesn't exist, add it to the list
-            setAddedIngredients((prevIngredients) => [
+            // ถ้าวัตถุดิบไม่มีใน list ให้เพิ่มใหม่
+            setAddedIngredients(prevIngredients => [
                 ...prevIngredients,
                 { id: ingredientId, quantity: ingredientQty, unit: unitId }
             ]);
         }
-        // Clear the input fields
+
+        // ล้างช่องกรอกข้อมูล
         (document.getElementById("count") as HTMLInputElement).value = "";
     };
+
 
 
     const handleDeleteIngredient = (id) => {
@@ -160,6 +175,7 @@ function Addrecipe() {
     }
 
     const handleProductInputChange = (e) => {
+
         const { name, value } = e.target;
         setProduct((prevProduct) => ({
             ...prevProduct,
@@ -214,53 +230,9 @@ function Addrecipe() {
     };
 
     const [message, setMessage] = useState('Loading');
-    // const convertToBase64 = (file) => {
-    //     return new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.readAsDataURL(file);
-    //         reader.onload = () => {
-    //             resolve(reader.result);
-    //         };
-    //         reader.onerror = (error) => {
-    //             reject(error);
-    //         };
-    //     });
-    // };
-    // const convertToBase64 = (file) => {
-    //     if (!(file instanceof Blob)) {
-    //         throw new Error("File parameter must be a Blob object");
-    //     }
-    //     return new Promise((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.readAsDataURL(file);
-    //         reader.onload = () => {
-    //             resolve(reader.result);
-    //         };
-    //         reader.onerror = (error) => {
-    //             reject(error);
-    //         };
-    //     });
-    // };
-    // const convertToBase64 = (file) => {
-    //     return new Promise((resolve, reject) => {
-    //         if (!(file instanceof Blob)) {
-    //             reject(new Error('Parameter is not of type Blob'));
-    //         }
 
-    //         const reader = new FileReader();
-    //         reader.readAsDataURL(file);
-    //         reader.onload = () => {
-    //             resolve(reader.result);
-    //         };
-    //         reader.onerror = (error) => {
-    //             reject(error);
-    //         };
-    //     });
-    // };
 
     const handleNextClick = async () => {
-
-
         if (currentPage !== "item2") {
             handleItemClick("item2");
         }
@@ -324,6 +296,28 @@ function Addrecipe() {
 
 
     };
+
+    // const [selectedIngredientId, setSelectedIngredientId] = useState<string>('');
+    const [selectedId, setSelectedId] = useState<string>('');
+
+    const handleIngredientChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedId = event.target.value;
+        setSelectedId(selectedId);
+
+        console.log("Selected ID:", selectedId);
+
+        // ตรวจสอบประเภทข้อมูล
+        const selectedIdNumber = Number(selectedId); // แปลง selectedId เป็น number
+
+        // การค้นหาและแสดงผลใน console
+        console.log("Ingredients Options:", ingredientsOptions);
+        console.log("Selected Ingredient:",
+            ingredientsOptions.find(ind => Number(ind.ind_id) === selectedIdNumber)?.un_ind_name || 'ไม่พบข้อมูล'
+        );
+    };
+
+
+
 
     console.log(recipe);
 
@@ -457,17 +451,23 @@ function Addrecipe() {
                     <div>
                         <p className="text-[#73664B] mx-6 my-2">สูตรอาหาร</p>
                         <form>
+                            {/* {ingredientsOptions.map((ind: Ingredients) => ( */}
                             <div className="grid grid-cols-4">
                                 <div className="flex items-center justify-center">
                                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ:</p>
-                                    <select id="ingredients"
-                                        className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6">
+                                    <select
+                                        id="ingredients"
+                                        value={selectedId}
+                                        onChange={handleIngredientChange}
+                                        className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6"
+                                    >
                                         {ingredientsOptions.map((ind: Ingredients) => (
                                             <option key={ind.ind_id} value={ind.ind_id}>
                                                 {ind.ind_name}
                                             </option>
                                         ))}
                                     </select>
+
                                 </div>
                                 <div className=" flex items-center justify-center">
                                     <p className="text-sm px-5 py-2 text-[#73664B] flex justify-center ">ปริมาณ:</p>
@@ -481,14 +481,10 @@ function Addrecipe() {
                                 </div>
                                 <div className=" flex items-center justify-center">
                                     <p className="text-sm px-6 py-2 text-[#73664B] flex justify-center ">หน่วย:</p>
-                                    <select id="unit"
-                                        className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6">
-                                        {unitOptions.map((unit: UnitType) => (
-                                            <option key={unit.un_id} value={unit.un_id}>
-                                                {unit.un_name}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    {
+                                        // ค้นหาวัตถุดิบที่เลือกจาก ingredientsOptions และแสดง un_ind_name
+                                        ingredientsOptions.find(ind => Number(ind.ind_id) === Number(selectedId))?.un_ind_name || 'ไม่พบข้อมูล'
+                                    }
                                 </div>
                                 <div className="scale-75 w-1/2 h-auto flex justify-center">
                                     <button
@@ -497,6 +493,7 @@ function Addrecipe() {
                                         value="เพิ่มวัตถุดิบ"
                                         className="text-lg text-white border  bg-[#F2B461] rounded-full py-2 px-2 ">เพิ่มวัตถุดิบ</button></div>
                             </div>
+                            {/* // ))} */}
                         </form>
                         <div className="mx-6 mt-3">
                             <div className="flex flex-col">
@@ -509,21 +506,37 @@ function Addrecipe() {
                                 <div className="max-h-40 overflow-y-auto mb-5">
                                     <table className="w-full">
                                         <tbody className="w-full">
-                                            {addedIngredients.slice().reverse().map((ingredient) => (
-                                                <tr key={ingredient.id} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
-                                                    <td scope="col" className="flex-1 text-center">{ingredientsOptions.find((i) => parseInt(i.ind_id) === ingredient.id)?.ind_name}</td>
-                                                    <td scope="col" className="flex-1 text-center">{ingredient.quantity}</td>
-                                                    <td scope="col" className="flex-1 text-center">{unitOptions.find((u) => parseInt(u.un_id) === ingredient.unit)?.un_name}</td>
-                                                    <td scope="col" className="flex-1 text-center">
-                                                        <div className="flex items-center justify-center">
-                                                            <button onClick={() => handleDeleteIngredient(ingredient.id)}>
-                                                                <TrashIcon className="h-5 w-5 text-red-500" />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))}
+                                            {addedIngredients.slice().reverse().map((ingredient) => {
+                                                // ค้นหาวัตถุดิบที่ตรงกับ id
+                                                const ingredientOption = ingredientsOptions.find((i) => parseInt(i.ind_id) === ingredient.id);
+
+                                                // ค้นหาหน่วยที่ตรงกับ unit ของวัตถุดิบ
+                                                const unitOption = ingredientsOptions.find((u) => u.un_ind === ingredient.unit);
+
+                                                return (
+                                                    <tr key={ingredient.id} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                                        <td scope="col" className="flex-1 text-center">
+                                                            {ingredientOption ? ingredientOption.ind_name : 'ไม่พบข้อมูล'}
+                                                        </td>
+                                                        <td scope="col" className="flex-1 text-center">
+                                                            {ingredient.quantity}
+                                                        </td>
+                                                        <td scope="col" className="flex-1 text-center">
+                                                        
+                                                            {unitOption ? unitOption.un_ind_name : 'ไม่พบข้อมูล'}
+                                                        </td>
+                                                        <td scope="col" className="flex-1 text-center">
+                                                            <div className="flex items-center justify-center">
+                                                                <button onClick={() => handleDeleteIngredient(ingredient.id)}>
+                                                                    <TrashIcon className="h-5 w-5 text-red-500" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
                                         </tbody>
+
                                     </table>
                                 </div>
                             </div>

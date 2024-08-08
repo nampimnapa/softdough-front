@@ -86,7 +86,7 @@ function Recipeall() {
                 console.error('Error fetching unit data:', error);
             });
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -136,7 +136,7 @@ function Recipeall() {
         un_id: ""
     })
 
-    const [ convertData, setConvertData] = useState({
+    const [convertData, setConvertData] = useState({
         convert_before: 0,
         convert_before_type: "teaspoon",
         convert_after_type: "",
@@ -225,7 +225,8 @@ function Recipeall() {
             ...prevState,
             [name]: value
         })
-    )}
+        )
+    }
 
     console.log("convert", convertData)
 
@@ -251,10 +252,14 @@ function Recipeall() {
                     </button>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
-                    <button onClick={() => onOpen()} className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex">
+                <Link href={`./addrecipe`}>
+                    <button
+                        // onClick={() => onOpen()}
+                        className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex">
                         <PlusIcon className="h-5 w-5 text-white mr-2" />
                         เพิ่ม
                     </button>
+                    </Link>
                 </div>
             </div>
 
@@ -463,7 +468,7 @@ function Recipeall() {
                                             onChange={handleIngredientsFood}
                                         />
 
-                                        <Popover placement="bottom" isOpen={isOpenPop} onOpenChange={(open) => setIsOpenPop(open)} showArrow offset={10} style={{ fontFamily: 'kanit' }}  backdrop="opaque">
+                                        <Popover placement="bottom" isOpen={isOpenPop} onOpenChange={(open) => setIsOpenPop(open)} showArrow offset={10} style={{ fontFamily: 'kanit' }} backdrop="opaque">
                                             <PopoverTrigger>
                                                 <Button isIconOnly className="ml-2" variant="light" isDisabled={ingredientsFood.ind_id === "" ? true : false}>
                                                     <IoCalculator className="text-2xl" />
@@ -514,7 +519,7 @@ function Recipeall() {
                                                         </div>
 
                                                         <div className="flex justify-end mt-3">
-                                                            <Button className="bg-[#C5B182] text-white mr-2" onPress={()=> setIsOpenPop(false)}>
+                                                            <Button className="bg-[#C5B182] text-white mr-2" onPress={() => setIsOpenPop(false)}>
                                                                 ปิด
                                                             </Button>
                                                             <Button className="text-white bg-[#736648]">

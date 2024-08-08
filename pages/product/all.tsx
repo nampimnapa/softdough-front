@@ -30,7 +30,7 @@ function All() {
     }
     useEffect(() => {
         setStatusLoading(false)
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);
@@ -622,7 +622,7 @@ function All() {
 
                                 <div className="flex justify-end mt-4">
                                     <Button onClick={handeClear} className="bg-[#C5B182] text-white" variant="flat" onPress={onClose} radius="full">
-                                        ปิด
+                                        ยกเลิก
                                     </Button>
                                     <Button onClick={() => handleSubmit()} className="text-white bg-[#73664B] ml-3" radius="full" {...(formData.smt_name === "" || formData.un_id === "" || formData.qty_per_unit === 0 || isLoanding ? { isDisabled: true } : { isDisabled: false })}>
                                         {isLoanding ? (<><Spinner size="sm" className='text-white' color="default" /> กำลังบันทึก</>) : "บันทึก"}

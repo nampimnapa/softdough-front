@@ -57,7 +57,7 @@ function List() {
                     <thead >
                         <tr className="text-white  font-normal  bg-[#908362]  ">
                             <td scope="col" className="px-1 py-3 ">
-                                ล็อตผลิต
+                                ใบสั่งผลิต
                             </td>
                             <td scope="col" className="px-6 py-3 ">
                                 วันที่ทำรายการ
