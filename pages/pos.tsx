@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import Link from "next/link";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input,RadioGroup, Radio } from "@nextui-org/react";
 // import { , } from '@headlessui/react'
-import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, } from '@headlessui/react';
+import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, Transition } from '@headlessui/react';
 import { Tabs, Tab, } from "@nextui-org/react";
+import { Spinner, useDisclosure, Image } from "@nextui-org/react";
 
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
@@ -35,6 +36,18 @@ function pos() {
     const [typesellmenufix, setTypesellmenufix] = useState([]);
     const [typesellmenumix, setTypesellmenumix] = useState([]);
     const [statusLoading, setStatusLoading] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
+    const closeModal = () => {
+        setIsOpen(false);
+    };
+
+    const openModal = () => {
+        setIsOpen(true);
+    };
+    const handleCancel = () => {
+        closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
+    };
 
     interface Sale {
         sm_id: number,
@@ -142,25 +155,42 @@ function pos() {
                                         >
                                             <div className="second-tab-layout mx-1">
                                                 <div className="relative overflow-x-auto ">
-                                                    <table className="w-full text-sm text-center text-gray-500">
-                                                        <thead className="">
-                                                            <tr className="text-white  font-normal  bg-[#908362]  ">
-                                                                <td scope="col" className="px-6 py-3 ">
-                                                                    วันที่ผลิต
-                                                                </td>
-                                                                <td scope="col" className="px-12 py-3 ">
-                                                                    ใบสั่งผลิต
-                                                                </td>
-                                                                <td scope="col" className="px-6 py-3">
-                                                                    รายละเอียด
-                                                                </td>
-                                                                <td scope="col" className="px-6 py-3">
-                                                                    อนุมัติดำเนินการผลิต
-                                                                </td>
-                                                            </tr>
-                                                        </thead>
+                                                    {statusLoading ? (
+                                                        <div className="flex flex-wrap">
+                                                            {Sale && Sale.length > 0 ? (
+                                                                Sale.map((sale, index) => (
+                                                                    <div key={index}
+                                                                        onClick={() => openModal(sale)}
+                                                                        className="card w-40 max-w-xs  bg-base-100 shadow-md mx-2 h-48 ml-1 mb-4 ">
+                                                                        <figure className="w-full h-3/4">
+                                                                            <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
+                                                                        </figure>
+                                                                        <div className="card-body ">
+                                                                            <div className="flex justity-between">
+                                                                                <p className="text-mediem text-[#73664B] text-center">
+                                                                                    {sale.sm_name}
+                                                                                </p>
+                                                                            </div>
+                                                                            <div className="flex justify-center">
 
-                                                    </table>
+                                                                                <div className="flex ">
+                                                                                    <p className=" text-[#F2B461] text-lg">{sale.sm_price} บาท</p>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <div className="flex justify-center items-center w-full">
+                                                                    <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
+                                                                </div>
+                                                            )}
+
+                                                        </div>
+                                                    ) : (
+                                                        <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
+                                                    )}
                                                 </div>
                                             </div>
                                         </Tab>
@@ -302,6 +332,94 @@ function pos() {
                     </div>
                 </main>
             </div>
+            <div className="flex justify-start">
+                <div className="w-1/2  mt-10  flex justify-start " >
+                    <Link href="/manufacture/listorder">
+                        <Button href="/manufacture/listorder"
+                            onClick={handleCancel}
+                            type="button"
+                            className=" text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
+                            ยกเลิก</Button>
+                    </Link>
+                    <>
+                        {isOpen && (
+                            <Transition appear show={isOpen} as={Fragment} >
+                                <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                    <Transition.Child
+                                        as={Fragment}
+                                        enter="ease-out duration-300"
+                                        enterFrom="opacity-0"
+                                        enterTo="opacity-100"
+                                        leave="ease-in duration-200"
+                                        leaveFrom="opacity-100"
+                                        leaveTo="opacity-0"
+                                    >
+                                        <div className="fixed inset-0 bg-black/25" />
+                                    </Transition.Child>
+
+                                    <div className="fixed inset-0 overflow-y-auto">
+                                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                            <Transition.Child
+                                                as={Fragment}
+                                                enter="ease-out duration-300"
+                                                enterFrom="opacity-0 scale-95"
+                                                enterTo="opacity-100 scale-100"
+                                                leave="ease-in duration-200"
+                                                leaveFrom="opacity-100 scale-100"
+                                                leaveTo="opacity-0 scale-95"
+                                            >
+                                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                    {/* <Dialog.Title
+                                                        as="h3"
+                                                        className="text-lg font-medium leading-6 text-[73664B]"
+                                                    >
+                                                        
+                                                    </Dialog.Title> */}
+                                                    <div className="">
+                                                        <p className="text-lg text-[#73664B] font-medium">
+                                                            ดิปซอส <span className='text-sm text-[#73664B] font-normal'>เลือกได้ 1 รสชาติ</span>
+                                                        </p>
+                                                        <RadioGroup                                                         >
+                                                            <Radio value="buenos-aires" >ดิป นมฮอกไกโด</Radio>
+                                                            <Radio value="sydney">ดิป ช็อกโกแลต</Radio>
+                                                            <Radio value="san-francisco">ดิป ชาเขียว</Radio>
+                                                            <Radio value="london">ดิป ป๊อกกี้</Radio>
+                                                            <Radio value="tokyo">ดิป ชาไทย</Radio>
+                                                        </RadioGroup>
+                                                    </div>
+                                                    {/*  choose */}
+                                                    <div className="flex justify-end">
+                                                        <div className="inline-flex justify-end">
+                                                            <button
+                                                                type="button"
+                                                                className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={closeModal}
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+
+                                                            <button
+                                                                type="button"
+                                                                className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            // onClick={handleConfirm}
+                                                            ><Link href="#">
+                                                                    ยืนยัน
+                                                                </Link></button>
+                                                        </div>
+                                                    </div>
+                                                </Dialog.Panel>
+                                            </Transition.Child>
+                                        </div>
+                                    </div>
+                                </Dialog>
+                            </Transition>
+                        )
+                        }
+                    </>
+                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</Button>
+                </div >
+            </div>
+
         </div>
 
 

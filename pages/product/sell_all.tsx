@@ -106,7 +106,6 @@ function Sell_all() {
                     </button>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
-
                     <button onClick={onOpenModalAdd} className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex">
                         <PlusIcon className="h-5 w-5 text-white mr-2" />
                         เพิ่ม

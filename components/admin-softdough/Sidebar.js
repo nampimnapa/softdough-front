@@ -50,15 +50,15 @@ const sellDropdown = [
 ];
 // โปรโมชัน
 const promotionDropdown = [
-  { title: "โปรโมชันส่วนลด", href: "/ingredients/instore" },
-  { title: "โปรโมชันของแถม", href: "/ingredients/all" }
+  { title: "โปรโมชันส่วนลด", href: "/promotion/discountall" },
+  { title: "โปรโมชันของแถม", href: "/promotion/freeall" }
 ];
 // รายการจ่่าย
 const payDropdown = [
   { title: "ประเภทรายการจ่าย", href: "/expenses/type" },
   { title: "เพิ่มรายการจ่าย", href: "/expenses/add" },
-  { title: "รายการจ่ายทั้งหมด", href: "/ingredients/instore" },
-  { title: "รออนุมัติ", href: "/ingredients/all" }
+  { title: "รายการจ่ายทั้งหมด", href: "/expenses/all" },
+  { title: "รออนุมัติ", href: "/expenses/approve" }
 ];
 // พนักงาน
 const staffDropdown = [
@@ -67,9 +67,9 @@ const staffDropdown = [
 ];
 // ตั้งค่า
 const settingDropdown = [
-  { title: "รอบการขาย", href: "/ingredients/instore" },
-  { title: "ที่อยู่", href: "/ingredients/all" },
-  { title: "ประเภทการขาย", href: "/ingredients/instore" },
+  { title: "รอบการขาย", href: "/setting/roundsell" },
+  { title: "ที่อยู่", href: "/setting/address" },
+  { title: "ประเภทการขาย", href: "/setting/selltype" },
   { title: "หน่วยวัตถุดิบ", href: "/setting/unit" }
 ];
 
