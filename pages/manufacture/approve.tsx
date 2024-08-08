@@ -8,6 +8,10 @@ import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Button } from "@nextui-org/react";
 
 function Approve() {
+    const [message, setMessage] = useState('Loading');
+    const router = useRouter();
+    const { id } = router.query;
+
     const [loading, setLoading] = useState(true);
     const [production, setproduction] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
@@ -33,6 +37,47 @@ function Approve() {
                 setLoading(false);
             });
     }, []);
+    const handleStatusChange = async (id) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        });
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        if (responseData.status === 200) {
+            setMessage('Data update successfully');
+            // router.push('/product/all');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+    };
+    const handle = async (id) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus3/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        });
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        if (responseData.status === 200) {
+            setMessage('Data update successfully');
+            // router.push('/product/all');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+    };
+
+
+
     const filteredProduction = production.filter((data) => data.pdo_status === "5");
     const filtered1 = production.filter((data) => data.pdo_status === "1");
 
@@ -108,11 +153,14 @@ function Approve() {
                                                 </td>
                                                 <td className="px-12 py-1 whitespace-nowrap overflow-hidden">
                                                     <Button className="mr-2 bg-red-500 text-white" size="sm">ยกเลิก</Button>
-                                                    <Button size="sm" className="bg-green-500 text-white">ยืนยัน</Button>
+                                                    <Button
+                                                        onClick={() => handle(data.pdo_id)}
+                                                        size="sm"
+                                                        className="bg-green-500 text-white">ยืนยัน</Button>
                                                 </td>
                                             </tr>
                                         ))}
-                                   
+
                                     </tbody>
                                 </table>
                             </div>
@@ -151,26 +199,27 @@ function Approve() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                        {filtered1.map((data) => (
+                                            {filtered1.map((data) => (
+                                                <tr key={data.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                    <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
+                                                        {data.updated_at}
 
-                                            <tr key={data.pdo_id}  className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
-                                                {data.updated_at}
+                                                    </td>
+                                                    <td className="px-6 py-1 text-center text-[#73664B]">
+                                                        {data.pdo_id_name}
 
-                                                </td>
-                                                <td className="px-6 py-1 text-center text-[#73664B]">
-                                                {data.pdo_id_name}
+                                                    </td>
+                                                    <td className="px-6 py-1 text-[#73664B]">
 
-                                                </td>
-                                                <td className="px-6 py-1 text-[#73664B]">
+                                                    </td>
+                                                    <td className="px-6 py-1 text-[#73664B]">
+                                                        <Button size="sm"
+                                                            onClick={() => handleStatusChange(data.pdo_id)}
+                                                            className="bg-green-500 text-white">รับทราบ</Button>
+                                                    </td>
 
-                                                </td>
-                                                <td className="px-6 py-1 text-[#73664B]">
-                                                    <Button size="sm" className="bg-green-500 text-white">รับทราบ</Button>
-                                                </td>
-
-                                            </tr>
-                                        ))}
+                                                </tr>
+                                            ))}
 
                                         </tbody>
                                     </table>

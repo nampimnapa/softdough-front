@@ -177,7 +177,7 @@ function Add() {
 
         const requestData = {
             ingredient_Used: {
-                status: isChecked ? 2 : 1,
+                status:  1,
                 note: noteValue, // ใช้ค่าที่แปลงเป็น HTMLInputElement
             },
             ingredient_Used_detail: ingredientLotDetail
@@ -422,11 +422,11 @@ function Add() {
                                                                 as="h3"
                                                                 className="text-lg font-medium leading-6 text-[73664B]"
                                                             >
-                                                                ยืนยันการเพิ่มวัตถุดิบเข้าร้าน
+                                                                ยืนยันการเพิ่มวัตถุดิบที่ใช้ตามใบสั่งผลิต
                                                             </Dialog.Title>
                                                             <div className="mt-2">
                                                                 <p className="text-sm text-[#73664B]">
-                                                                    คุณต้องการเพิ่มวัตถุดิบเข้าร้านหรือไม่
+                                                                    คุณต้องการเพิ่มวัตถุดิบที่ใช้ตามใบสั่งผลิตหรือไม่
                                                                 </p>
                                                             </div>
                                                             {/*  choose */}
@@ -557,13 +557,7 @@ function Add() {
                                 </div>
                             </div>
                         </div>
-                        <div className="">
-                            {/* เช็คคือยืนยันการใช้งาน */}
-                            <Checkbox radius="sm" color="warning" checked={isChecked} onChange={handleCheckboxChange} className="text-sm text-[#73664B]">
-                                ยืนยันการเพิ่มวัตถุดิบที่ใช้ทันที
-                            </Checkbox>
-                        </div>
-
+                        
                         < div className="mt-8 " >
                             <button>
                                 <Link href="/ingredients/using/list"
@@ -602,11 +596,11 @@ function Add() {
                                                                 as="h3"
                                                                 className="text-lg font-medium leading-6 text-[73664B]"
                                                             >
-                                                                ยืนยันการเพิ่มวัตถุดิบเข้าร้าน
+                                                                ยืนยันการเพิ่มวัตถุดิบที่ใช้
                                                             </Dialog.Title>
                                                             <div className="mt-2">
                                                                 <p className="text-sm text-[#73664B]">
-                                                                    คุณต้องการเพิ่มวัตถุดิบเข้าร้านหรือไม่
+                                                                    คุณต้องการเพิ่มวัตถุดิบใช้ใช่หรือไม่
                                                                 </p>
                                                             </div>
                                                             {/*  choose */}
@@ -624,7 +618,7 @@ function Add() {
                                                                         type="button"
                                                                         className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                                         onClick={handleSubmit2}
-                                                                    ><Link href="/ingredients/using/list">
+                                                                    ><Link href="/staffpro/indused/list">
                                                                             ยืนยัน
                                                                         </Link></button>
                                                                 </div>

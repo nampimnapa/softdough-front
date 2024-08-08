@@ -5,10 +5,82 @@ import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from
 import { Kanit } from "next/font/google";
 import { HiOutlineTrash } from "react-icons/hi";
 import { FiSave } from "react-icons/fi";
-import { Tabs, Tab, Chip } from "@nextui-org/react";
-import { Card, CardBody, CardHeader } from "@nextui-org/react";
+import { Tabs, Tab, Button } from "@nextui-org/react";
 
-function waiting() {
+function Approve() {
+    const [message, setMessage] = useState('Loading');
+    const router = useRouter();
+    const { id } = router.query;
+
+    const [loading, setLoading] = useState(true);
+    const [production, setproduction] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
+
+    interface Production {
+        pdo_id: string;
+        pdo_id_name: string;
+        updated_at: string;
+        pdo_status: string;
+
+    }
+    useEffect(() => {
+        // Fetch staff data on component mount
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/readall`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setproduction(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
+    }, []);
+    const handleStatusChange = async (id) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        });
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        if (responseData.status === 200) {
+            setMessage('Data update successfully');
+            // router.push('/product/all');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+    };
+    const handle = async (id) => {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus3/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        });
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        if (responseData.status === 200) {
+            setMessage('Data update successfully');
+            // router.push('/product/all');
+        } else {
+            setMessage(responseData.message || 'Error occurred');
+        }
+    };
+
+
+
+    const filteredProduction = production.filter((data) => data.pdo_status === "5");
+    const filtered1 = production.filter((data) => data.pdo_status === "1");
+
     return (
         <div>
             <p className='text-[#F2B461] font-medium m-4'>รอดำเนินการผลิต</p>
@@ -28,62 +100,63 @@ function waiting() {
                     </button>
                 </form>
             </div>
-            <div className="flex w-full flex-col ">
-
-                <div className="relative overflow-x-auto mx-4 ">
-                    <table className="w-full text-sm text-center text-gray-500 ">
-                        <thead >
-                            <tr className="text-white  font-normal  bg-[#908362] ">
-                                <td scope="col" className="px-6 py-3">
-                                    วันที่สั่งผลิต
-                                </td>
-                                <td scope="col" className="px-6 py-3">
-                                    ใบสั่งผลิต
-                                </td>
-                                <td scope="col" className="px-6 py-3">
-                                    รายละเอียด
-                                </td>
-                                <td scope="col" className="px-6 py-3">
-                                    ดำเนินการผลิต
-                                </td>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <tr
-                                className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10"
-                            >
-                                <td
-                                    scope="row"
-                                    className="px-6 py-1 text-gray-900 whitespace-nowrap dark:text-white"
-                                >
-
-                                </td>
-                                <td className="px-6 py-1"></td>
-                                {/* // order.status === 'ยกเลิกแล้ว' ? ' text-red-600' : */}
-                                {/* order.pdo_status === 'เสร็จสิ้น' ? ' text-green-600' : */}
-                                <td >
-                                    <Link
-                                        href=""
-                                        className="w-full flex justify-center items-center">
-                                        <button type="submit">
-                                            <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182]" /></button>
-                                    </Link>
-                                </td>
-                                <td className="px-6 py-4 flex items-center justify-center">
+            <div className="w-full">
+                <div className="flex w-full flex-col">
 
 
+                    <div className="second-tab-layout mx-4">
 
-                                </td>
-                            </tr>
+                        <div className="relative overflow-x-auto ">
+                            <table className="w-full text-sm text-center text-gray-500">
+                                <thead className="">
+                                    <tr className="text-white  font-normal  bg-[#908362]  ">
+                                        <td scope="col" className="px-6 py-3 ">
+                                            วันที่ผลิต
+                                        </td>
+                                        <td scope="col" className="px-12 py-3 ">
+                                            ใบสั่งผลิต
+                                        </td>
+                                        <td scope="col" className="px-6 py-3">
+                                            รายละเอียด
+                                        </td>
+                                        <td scope="col" className="px-6 py-3">
+                                            อนุมัติดำเนินการผลิต
+                                        </td>
 
-                        </tbody>
-                    </table>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filtered1.map((data) => (
+                                        <tr key={data.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                            <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
+                                                {data.updated_at}
+
+                                            </td>
+                                            <td className="px-6 py-1 text-center text-[#73664B]">
+                                                {data.pdo_id_name}
+
+                                            </td>
+                                            <td className="px-6 py-1 text-[#73664B]">
+
+                                            </td>
+                                            <td className="px-6 py-1 text-[#73664B]">
+                                                <Button size="sm"
+                                                    onClick={() => handleStatusChange(data.pdo_id)}
+                                                    className="bg-green-500 text-white">รับทราบ</Button>
+                                            </td>
+
+                                        </tr>
+                                    ))}
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
-
             </div>
         </div>
     )
 }
 
-export default waiting
+export default Approve

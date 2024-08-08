@@ -31,8 +31,7 @@ function Add() {
         ep_date: "",
         ept_id: "",
         ep_note: "",
-        ep_sum: 0,
-        ep_status: 1
+        ep_sum: ""
     });
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -87,11 +86,10 @@ function Add() {
             ep_date: "",
             ept_id: "",
             ep_note: "",
-            ep_sum: 0,
-            ep_status: 0
+            ep_sum: ""
             //เทสส่งไปก่อน
         });
-        setIsChecked(false); // Reset checkbox status
+        // setIsChecked(false); // Reset checkbox status
     };
 
     // const saveData = async () => {
@@ -207,7 +205,7 @@ function Add() {
                         </div>
                     </div>
                     <div className="grid grid-cols-4 items-center justify-center">
-                        <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left mr-5">
+                        <label className=" text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left mr-5">
                             ประเภทรายการจ่าย:
                         </label>
                         <div className="mt-2 col-span-3">
@@ -259,18 +257,7 @@ function Add() {
                             />
                         </div>
                     </div>
-                    <div className="mt-4 flex ">
-                        <Checkbox
-                            radius="sm"
-                            color="warning"
-                            isSelected={isChecked}
-                            onChange={handleCheckboxChange}
-                            className="text-sm text-[#73664B]"
-                        >
-                            {/* ตอนแรกไม่ใช้ label */}
-                            <label className="text-sm text-[#73664B]">ยืนยันการเพิ่มรายการจ่ายทันที</label>
-                        </Checkbox>
-                    </div>
+                   
                 </div>
             </div>
 
@@ -286,7 +273,7 @@ function Add() {
                     <>
                         {isOpen && (
                             <Transition appear show={isOpen} as={Fragment}>
-                                <Dialog as="div" className="relative z-10" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Dialog as="div" className="relative z-10" onClose={closeModal}>
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-out duration-300"

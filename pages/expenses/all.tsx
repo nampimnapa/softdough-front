@@ -324,11 +324,11 @@ function StaffIndex() {
                         <table className="w-full text-sm text-center text-gray-500">
                             <thead>
                                 <tr className="text-white font-normal bg-[#908362]">
-                                    <th scope="col" className="px-6 py-3">วัน/เดือน/ปี</th>
-                                    <th scope="col" className="px-6 py-3">ประเภทรายการจ่าย</th>
-                                    <th scope="col" className="px-6 py-3">รายละเอียด</th>
-                                    <th scope="col" className="px-6 py-3">จำนวนเงิน</th>
-                                    <th scope="col" className="px-6 py-3">พนักงาน</th>
+                                    <td scope="col" className="px-6 py-3">วัน/เดือน/ปี</td>
+                                    <td scope="col" className="px-6 py-3">ประเภทรายการจ่าย</td>
+                                    <td scope="col" className="px-6 py-3">รายละเอียด</td>
+                                    <td scope="col" className="px-6 py-3">จำนวนเงิน</td>
+                                    <td scope="col" className="px-6 py-3">พนักงาน</td>
                                 </tr>
                             </thead>
                             <tbody>
