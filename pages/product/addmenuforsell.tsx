@@ -81,7 +81,7 @@ function addmenuforsell() {
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/unit`)
             .then(response => response.json())
             .then(data => {
                 setUnitOptions(data);

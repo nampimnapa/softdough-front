@@ -16,6 +16,7 @@ import {
   QueueListIcon,
   ArrowRightOnRectangleIcon,
   UserCircleIcon
+  
 } from "@heroicons/react/24/outline";
 import { Icon } from '@iconify/react';
 
@@ -24,8 +25,8 @@ import { Icon } from '@iconify/react';
 const ingredientDropdown = [
   { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/income/all" },
   { title: "วัตถุดิบทั้งหมด", href: "/ingredients/all" },
-  { title: "วัตถุดิบที่ใช้", href: "/ingredients/using" },
-  { title: "รออนุมัติ", href: "/ingredients/pending" },
+  { title: "วัตถุดิบที่ใช้", href: "/ingredients/using/list" },
+  { title: "รออนุมัติ", href: "/ingredients/approve" },
 ];
 // สินค้า
 const productDropdown = [
@@ -49,15 +50,15 @@ const sellDropdown = [
 ];
 // โปรโมชัน
 const promotionDropdown = [
-  { title: "โปรโมชันส่วนลด", href: "/ingredients/instore" },
-  { title: "โปรโมชันของแถม", href: "/ingredients/all" }
+  { title: "โปรโมชันส่วนลด", href: "/promotion/discountall" },
+  { title: "โปรโมชันของแถม", href: "/promotion/freeall" }
 ];
 // รายการจ่่าย
 const payDropdown = [
-  { title: "ประเภทรายการจ่าย", href: "/ingredients/instore" },
-  { title: "เพิ่มรายการจ่าย", href: "/ingredients/all" },
-  { title: "รายการจ่ายทั้งหมด", href: "/ingredients/instore" },
-  { title: "รออนุมัติ", href: "/ingredients/all" }
+  { title: "ประเภทรายการจ่าย", href: "/expenses/type" },
+  { title: "เพิ่มรายการจ่าย", href: "/expenses/add" },
+  { title: "รายการจ่ายทั้งหมด", href: "/expenses/all" },
+  { title: "รออนุมัติ", href: "/expenses/approve" }
 ];
 // พนักงาน
 const staffDropdown = [
@@ -67,7 +68,7 @@ const staffDropdown = [
 // ตั้งค่า
 const settingDropdown = [
   { title: "รอบการขาย", href: "/ingredients/instore" },
-  { title: "ที่อยู่", href: "/ingredients/all" },
+  { title: "ที่อยู่", href: "/setting/address" },
   { title: "ประเภทการขาย", href: "/ingredients/instore" },
   { title: "บรรจุภัณฑ์", href: "/ingredients/all" }
 ];

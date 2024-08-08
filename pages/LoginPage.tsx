@@ -40,7 +40,7 @@ const LoginPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-        // credentials: 'include', // ตรวจสอบว่าใช้ 'include' หรือไม่
+        credentials: 'include', // ตรวจสอบว่าใช้ 'include' หรือไม่
 
       });
 

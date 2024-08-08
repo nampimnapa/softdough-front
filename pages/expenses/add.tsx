@@ -109,34 +109,81 @@ function Add() {
     //         setIsOpen(false);
     //     }
     // }
+
+    //เคยได้
+    // const saveData = async () => {
+    //     try {
+    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/add`, {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             },
+    //             credentials: 'include', // ตรวจสอบว่าใช้ 'include' หรือไม่
+    //             body: JSON.stringify(valueForm),
+
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+    //         }
+
+    //         const responseData = await response.json();
+    //         console.log(responseData);
+    //         console.log('ValueForm:', valueForm);
+
+    //         if (responseData.message === 'success') {
+    //             console.log('บันทึกข้อมูลสำเร็จ');
+    //             setIsOpen(false);
+    //         }
+    //     } catch (error) {
+    //         console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error.message);
+    //     }
+    // };
+
     const saveData = async () => {
         try {
+            console.log("Sending data:", valueForm); // ตรวจสอบข้อมูลที่ส่ง
+
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/add`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // ตรวจสอบว่าใช้ 'include' หรือไม่
+                credentials: 'include',
                 body: JSON.stringify(valueForm),
             });
 
+            console.log("Response status:", response.status); // ตรวจสอบสถานะของคำตอบ
+            handleCancelClick()
             if (!response.ok) {
-                throw new Error('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                const errorData = await response.text(); // รับข้อมูลข้อผิดพลาดจากคำตอบ
+                throw new Error(`เกิดข้อผิดพลาดในการบันทึกข้อมูล: ${errorData}`);
             }
 
             const responseData = await response.json();
-            console.log(responseData);
+            console.log("Response data:", responseData);
 
             if (responseData.message === 'success') {
                 console.log('บันทึกข้อมูลสำเร็จ');
                 setIsOpen(false);
             }
         } catch (error) {
-            console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล:', error.message);
+            console.error('เกิดข้อผิดพลาดในการบันทึกข้อมูล2:', error.message);
         }
     };
 
 
+
+    const handleValueChange = (newValue) => {
+        console.log("newValue:", newValue);
+        setStartValue(newValue);
+
+        // Assuming newValue is in the format { startDate: "2024-03-15", endDate: "2024-03-16" }
+        setValueForm((prevForm) => ({
+            ...prevForm,
+            ep_date: newValue.startDate,
+        }));
+    };
 
 
 
@@ -145,35 +192,42 @@ function Add() {
             <p className='text-[#F2B461] font-medium m-4' >เพิ่มรายการจ่าย</p>
             <div className="flex justify-center">
                 <div className="mt-5 w-1/2 ">
-                    <div className="grid grid-cols-4 items-center mt-3 ">
-                        <label className="mr- block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left">
+                    <div className="grid grid-cols-4 items-center ">
+                        <label className="text-sm font-medium leading-6 text-[#73664B] text-left flex items-center ">
                             วันที่ :</label>
-                        <Datepicker
-                            useRange={false}
-                            asSingle={true}
-                            value={startValue}
-                            onChange={handleValueChangeDate}
-                        />
+                        <div className="col-span-2" >
+                            <Datepicker
+                                // className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}
+                                useRange={false}
+                                asSingle={true}
+                                value={startValue}
+                                onChange={handleValueChange}
+                            // name="st_start"
+                            />
+                        </div>
                     </div>
                     <div className="grid grid-cols-4 items-center justify-center">
-                        <label className="block text-sm font-medium leading-6 text-[#73664B] mt-3 text-left">
+                        <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
                             ประเภทรายการจ่าย:
                         </label>
-                        <select
-                            id="ept_id"
-                            name="ept_id"
-                            value={valueForm.ept_id}
-                            onChange={handleInputChange}
-                            className="bg-[#E3D8BF] w-full block rounded-md border py-1 text-[#73664B] shadow-sm sm:text-sm sm:leading-6"
-                            defaultValue=""
-                        >
-                            <option value="" disabled hidden>เลือกประเภทการจ่าย</option>
-                            {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind) => (
-                                <option key={ind.ept_id} value={ind.ept_id}>
-                                    {ind.ept_name}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="mt-2 col-span-3">
+                            <select
+                                id="ept_id"
+                                name="ept_id"
+                                value={valueForm.ept_id}
+                                onChange={handleInputChange}
+                                className="bg-[#E3D9C0] w-full block rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
+                                defaultValue=""
+                            >
+                                <option value="" disabled hidden>เลือกประเภทการจ่าย</option>
+                                {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind) => (
+                                    <option key={ind.ept_id} value={ind.ept_id}>
+                                        {ind.ept_name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
                     </div>
                     <div className="grid grid-cols-4 items-center ">
                         <label className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-left ">
@@ -213,7 +267,8 @@ function Add() {
                             onChange={handleCheckboxChange}
                             className="text-sm text-[#73664B]"
                         >
-                            ยืนยันการเพิ่มวัตถุดิบที่ใช้ทันที
+                            {/* ตอนแรกไม่ใช้ label */}
+                            <label className="text-sm text-[#73664B]">ยืนยันการเพิ่มรายการจ่ายทันที</label>
                         </Checkbox>
                     </div>
                 </div>

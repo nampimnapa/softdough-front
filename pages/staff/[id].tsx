@@ -77,7 +77,9 @@ function detailstaff() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/staff/read/${id}`);
+                const response = await fetch(`http://localhost:8080/staff/read/${id}`, {
+                    credentials: 'include' // Ensure cookies are sent with the request
+                });
                 const data = await response.json();
                 setStaff(data);  // ตั้งค่า ind ใหม่ทุกครั้งที่ fetchData ถูกเรียก
                 setLoading(false);
@@ -118,11 +120,11 @@ function detailstaff() {
                 <div>
                     <p className="text-sm px-6 py-2 text-[#73664B]">ชื่อพนักงาน : {staff.st_name}</p>
                     <p className="text-sm px-6 py-2 text-[#73664B]">ชื่อผู้ใช้งาน : {staff.st_username}</p>
-                    <p className="text-sm px-6 py-2 text-[#73664B]">รหัสผ่าน : {staff.st_password}</p>
+                    {/* <p className="text-sm px-6 py-2 text-[#73664B]">รหัสผ่าน : {staff.st_password}</p> */}
                     <p className="text-sm px-6 py-2 text-[#73664B]">เบอร์โทร : {staff.st_tel}</p>
                     <p className="text-sm px-6 py-2 text-[#73664B]">แผนก : {staff.st_type === '1' ? 'ผลิต' : 'ขาย'}</p>
                     <p className="text-sm px-6 py-2 text-[#73664B]">วันที่เข้าทำงาน : {staff.date_start}</p>
-                    <p className="text-sm px-6 py-2 text-[#73664B]">สถานะ : {staff.st_status === '1' ? 'ทำงาน' : 'ลาออก'}</p>
+                    <p className="text-sm px-6 py-2 text-[#73664B]">สถานะ : {staff.st_status === '1' ? 'ทำงาน' : staff.st_status === '2' ? 'ลาออก' : 'เป็นแอดมิน'}</p>
                     {staff.st_status === 2 && (
                         <p className="text-sm px-6 py-2 text-[#73664B]">วันที่ลาออก: {staff.date_end}</p>
                     )}
@@ -139,7 +141,7 @@ function detailstaff() {
                         <Link href={`/staff/editstaff/${staff.st_id}`} 
                         type="button"
                         className="mx-auto text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
-                                แก้ไขพนักงาo
+                                แก้ไขพนักงาน
                         </Link>
                     </button>
                 )}
