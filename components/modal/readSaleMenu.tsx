@@ -202,7 +202,7 @@ export default function ReadSaleMenu({
                                                     </td>
                                                     <td className="px-6 py-1 text-[#73664B]">
                                                         <div className='flex justify-start items-center'>
-                                                            <Avatar src={doughAllData.find(dough => dough.pd_id == menu.pd_id)?.picture || `/images/logo.svg`} radius="sm" className='mr-5'/>
+                                                            <Avatar src={doughAllData.find(dough => dough.pd_id == menu.pd_id)?.picture || `/images/logo.svg`} radius="sm" className='mr-5' />
                                                             {doughAllData.find(dough => dough.pd_id == menu.pd_id)?.pd_name}
                                                         </div>
                                                     </td>

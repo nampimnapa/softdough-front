@@ -272,24 +272,24 @@ function Addrecipe() {
             // }))));
 
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/addProductWithRecipe`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(productData),
+            // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/addProductWithRecipe`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(productData),
 
-            });
-            const responseData = await response.json();
-            console.log(responseData)
+            // });
+            // const responseData = await response.json();
+            // console.log(responseData)
 
-            if (responseData.status === 200) {
+            // if (responseData.status === 200) {
 
-                setMessage('Data added successfully');
-                router.push('/product/recipeall');
-            } else {
-                setMessage(responseData.message || 'Error occurred');
-            }
+            //     setMessage('Data added successfully');
+            //     router.push('/product/recipeall');
+            // } else {
+            //     setMessage(responseData.message || 'Error occurred');
+            // }
         }
 
 
