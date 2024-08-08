@@ -737,7 +737,6 @@ function Recipeall() {
                                                                 ))}
                                                             </Select>
                                                         </div>
-                                                        {ingredientsOptions.find(unit => unit.ind_id == ingredientsFood.ind_id)?.un_ind_name}
                                                         <div className="flex justify-end mt-3">
                                                             <Button className="bg-[#C5B182] text-white mr-2" onPress={()=> setIsOpenPop(false)}>
                                                                 ปิด
@@ -762,15 +761,7 @@ function Recipeall() {
                                         isDisabled
                                         selectedKeys={ingredientsFood.ind_id ? [ingredientsFood.un_id] : []}
                                     >
-                                        {ingredientsFood.ind_id === "" ? (
-                                            <SelectItem key="placeholder">เลือกวัตถุดิบก่อน</SelectItem>
-                                        ) : (
-                                            unitOptions.map(type => (
-                                                <SelectItem key={type.un_id} value={type.un_id}>
-                                                    {type.un_name}
-                                                </SelectItem>
-                                            ))
-                                        )}
+                                        <SelectItem key={ingredientsFood.un_id}>{ingredientsOptions.find(ingreds => ingreds.ind_id == ingredientsFood.ind_id)?.un_ind_name}</SelectItem>
                                     </Select>
 
                                     <Button className="text-white bg-[#F2B461]" size="md" onClick={handleSubmitIngredient} isDisabled={ingredientsFood.ind_id == '' || ingredientsFood.ingredients_qty == null || ingredientsFood.ingredients_qty == 0 ? true : false}>
