@@ -22,7 +22,7 @@ function List() {
                 console.error('Error:', error);
                 setLoading(false);
             });
-            
+
 
 
     }, []);
@@ -44,20 +44,20 @@ function List() {
                         ค้นหา
                     </button>
                 </form>
-                <div className="mr-4 scale-90 flex items-center">
+                {/* <div className="mr-4 scale-90 flex items-center">
                     <Link href={`./add`}>
                         <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
                             <PlusIcon className="h-5 w-5 text-white mr-2" />
                             เพิ่ม
                         </button></Link>
-                </div>
+                </div> */}
             </div>
             <div className="relative overflow-x-auto mx-5 mt-5">
                 <table className="w-full text-sm text-center text-gray-500 overflow-x-auto">
                     <thead >
                         <tr className="text-white  font-normal  bg-[#908362]  ">
                             <td scope="col" className="px-1 py-3 ">
-                                ล็อตผลิต
+                                ใบสั่งผลิต
                             </td>
                             <td scope="col" className="px-6 py-3 ">
                                 วันที่ทำรายการ
@@ -85,15 +85,15 @@ function List() {
                                 <td className="">
                                     {ingredients.checkk === "other" ? ingredients.note : ingredients.name}
                                 </td>
-                               
+
                                 <td className={`h-10 
                                                     ${ingredients.status === '2' ? ' text-green-500' :
-                                                        ingredients.status === '1' ? 'text-yellow-500' :
-                                                                ''
-                                                        }`}>
-                                                        {/* 3 เสร็จสิ้นแล้วแบบยังไม่เพิ่มวัตถุดิบที่ใช้   4 เสร็จสิ้นแล้วเพิ่มแล้ว */}
-                                                        { ingredients.status === '2' ? 'ยืนยันแล้ว' : ingredients.status=== '1' ? 'รอดำเนินการ' : ingredients.status}
-                                                    </td>
+                                        ingredients.status === '1' ? 'text-yellow-500' :
+                                            ''
+                                    }`}>
+                                    {/* 3 เสร็จสิ้นแล้วแบบยังไม่เพิ่มวัตถุดิบที่ใช้   4 เสร็จสิ้นแล้วเพิ่มแล้ว */}
+                                    {ingredients.status === '2' ? 'ยืนยันแล้ว' : ingredients.status === '1' ? 'รอดำเนินการ' : ingredients.status}
+                                </td>
                                 <td className="px-1 py-3  items-center justify-center  ">
                                     <button >
                                         <Link href="#" className="w-full flex justify-center items-center">

@@ -98,7 +98,7 @@ function Add() {
     }
     const [selectedId, setSelectedId] = useState<string>('');
     const [detailData, setDetailData] = useState<DetailData[]>([]);
-    const [unitOptions, setUnitOptions] = useState<UnitType[]>([]);
+    const [unitOptions, setUnitOptions] = useState([]);
     const { id } = router.query;
 
 
@@ -163,7 +163,9 @@ function Add() {
     //     setSelectedPdoIdName(value);
 
     // };
-    const filteredUnitOptions = unitOptions.filter(unit => [3].includes(Number(unit.pdo_status)));
+    // const filteredUnitOptions = unitOptions.filter(unit => [3].includes(Number(unit.pdo_status)));
+    const filteredUnitOptions = unitOptions.filter(unit => unit.pdo_status === undefined || [3].includes(Number(unit.pdo_status)));
+
 
     const handleSubmit2 = async () => {
         const ingredientLotDetail = addedIngredients.map((ingredient) => ({
