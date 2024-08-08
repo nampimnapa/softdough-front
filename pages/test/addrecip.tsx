@@ -53,6 +53,48 @@ const UnitConversion = () => {
 
     console.log(toUnit)
 
+    const data = [
+        {
+            "pd_name": "ฟักทอง",
+            "pd_qtyminimum": 1,
+            "status": "A",
+            "picture": "/images/logo.svg",
+            "pdc_id": 1,
+            "recipe": {
+                "qtylifetime": 1,
+                "produced_qty": 1,
+                "un_id": 1
+            },
+            "recipedetail": [
+                {
+                    "ind_id": 1,
+                    "ingredients_qty": 2,
+                    "un_id": 1
+                }
+            ]
+        },
+        
+        {
+            "pd_name": "ฟักทอง",
+            "pd_qtyminimum": "1",
+            "status": "A",
+            "picture": "/images/logo.svg",
+            "pdc_id": "Cet1",
+            "recipe": {
+                "qtylifetime": 1,
+                "produced_qty": 1,
+                "un_id": 1
+            },
+            "recipedetail": [
+                {
+                    "ind_id": "1",
+                    "ingredients_qty": "2",
+                    "un_id": "1"
+                }
+            ]
+        }
+    ]
+
     return (
         <div>
             <h1>Unit Conversion</h1>
