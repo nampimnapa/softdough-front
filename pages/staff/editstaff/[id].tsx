@@ -59,6 +59,7 @@ function detailstaff() {
     useEffect(() => {
         fetch(`http://localhost:8080/staff/read/${id}`, {
             credentials: 'include' // Ensure cookies are sent with the request
+
         })
             .then((response) => response.json())
             .then((data) => {
@@ -91,6 +92,8 @@ function detailstaff() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(staff),
+                credentials: 'include' // Ensure cookies are sent with the request
+
             });
 
             const responseData = await response.json();

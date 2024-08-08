@@ -56,7 +56,7 @@ const LoginPage = () => {
       } else if (data.message.includes('production')) {
         router.push('/production/dashboard');
       } else if (data.message.includes('order')) {
-        router.push('/order/dashboard');
+        router.push('/staffsell/test');
       }
 
     } catch (error) {
