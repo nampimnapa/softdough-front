@@ -46,6 +46,7 @@ function Recipeall() {
     const [statusLoading, setStatusLoading] = useState(false);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit, onClose: onCloseEdit } = useDisclosure();
+    const { isOpen: isOpenRead, onOpen: onOpenRead, onOpenChange: onOpenChangeRead, onClose: onCloseRead } = useDisclosure();
     const [unitOptions, setUnitOptions] = useState([]);
     const [productCat, setProductCat] = useState([]);
     const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
@@ -570,6 +571,27 @@ function Recipeall() {
         }
     }
 
+    // อ่านสูตรอาหาร
+    const handleRead = async (idedit) => {
+        console.log(idedit)
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/pdset/${idedit}`)
+            .then(response => response.json())
+            .then(data => {
+                setEditProduct(data);
+                setIngredientsFoodSaveEdit(data.recipedetail);
+                setUploadedImage(data.picture);
+                if(data.status == "A"){
+                    setSwitchStatus(true)
+                }else if(data.status == "N"){
+                    setSwitchStatus(false)
+                }
+                onOpenRead();
+            })
+
+
+
+    }
+
     // console.log("editProduct: ", editProduct)
     // console.log("convert", convertData)
     // console.log("ingredientsFoodSave", ingredientsFoodSave)
@@ -656,10 +678,10 @@ function Recipeall() {
                                                             <Icon icon="system-uicons:reset" className="my-1 mx-1 text-sm text-[#DACB46] font-bold" />
                                                         </button>
                                                     </div>
-                                                    <button className="flex justify-end">
-                                                        <Link href={`./recipedetail/${recipe.pd_id}`}>
+                                                    <button className="flex justify-end" onClick={() => handleRead(recipe.pd_id)}>
+                                                        {/* <Link href={`./recipedetail/${recipe.pd_id}`}> */}
                                                             <div className="badge badge-outline">สูตรอาหาร</div>
-                                                        </Link>
+                                                        {/* </Link> */}
                                                     </button>
                                                 </div>
                                             </div>
@@ -1302,6 +1324,178 @@ function Recipeall() {
                                 </Button>
                                 <Button className="text-white bg-[#736648]" onClick={() => handleSubmitEdit()}>
                                     บันทึก
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+
+            {/* Model Read */}
+            <Modal isOpen={isOpenRead} onOpenChange={onOpenChangeRead} isDismissable={false} isKeyboardDismissDisabled={true} size="3xl">
+                <ModalContent>
+                    {(onCloseRead) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1 text-[#F2B461]" style={{ fontFamily: 'kanit' }}>แก้ไขสูตรอาหาร</ModalHeader>
+                            <ModalBody style={{ fontFamily: 'kanit' }}>
+                                <div className='flex'>
+                                    <div className='mr-5 '>
+                                        <Card isFooterBlurred radius="lg" className="border-none max-w-[400px] max-h-[400px]">
+                                            <Image
+                                                alt="Product"
+                                                className="w-[250px] object-cover h-[250px]"
+                                                height={400}
+                                                sizes={`(max-width: 768px) ${400}px, ${400}px`}
+                                                src={uploadedImage || "/images/logo.svg"}
+                                                width={400}
+                                            />
+                                            
+                                        </Card>
+                                    </div>
+
+                                    <div className="w-2/3">
+                                        <Select
+                                            isDisabled
+                                            label="ประเภทสินต้า"
+                                            className="mb-3 bg-fourth text-primary"
+                                            size="sm"
+                                            color="primary"
+                                            name="pdc_id"
+                                            selectedKeys={[editProduct.pdc_name]}
+                                            value={productCat.find(cat => cat.pdc_name == editProduct.pdc_name)?.pdc_id}
+                                        >
+                                            {productCat.map(type => (
+                                                <SelectItem key={type.pdc_name} value={type.pdc_id}>
+                                                    {type.pdc_name}
+                                                </SelectItem>
+                                            ))}
+                                        </Select>
+                                        <Input
+                                            isReadOnly
+                                            type="text"
+                                            label="ชื่อสินค้า"
+                                            size="sm"
+                                            width="100%"
+                                            className="mb-3 bg-fourth text-primary"
+                                            color="primary"
+                                            name="pd_name"
+                                            value={editProduct.pd_name}
+                                        />
+                                        <Input
+                                            isReadOnly
+                                            type="number"
+                                            label="จำนวนสินค้าขั้นต่ำ"
+                                            size="sm"
+                                            width="100%"
+                                            className="mb-3 bg-fourth text-primary"
+                                            color="primary"
+                                            name="pd_qtyminimum"
+                                            value={editProduct.pd_qtyminimum.toString()}
+                                        />
+                                        <Select
+                                            isDisabled
+                                            label="หน่วยสินค้า"
+                                            className="mb-3 bg-fourth text-primary"
+                                            size="sm"
+                                            color="primary"
+                                            name="pd_unit"
+                                            selectedKeys={[editProduct.un_name]}
+                                        >
+                                            {unitOptions.map(type => (
+                                                <SelectItem key={type.un_name} value={type.un_id}>
+                                                    {type.un_name}
+                                                </SelectItem>
+                                            ))}
+                                        </Select>
+
+                                        <Input
+                                            isReadOnly
+                                            type="number"
+                                            label="สูตรอาหารผลิตได้"
+                                            size="sm"
+                                            width="100%"
+                                            className="mb-3 bg-fourth text-primary"
+                                            color="primary"
+                                            name="qtylifetime"
+                                            value={editProduct.qtylifetime.toString()}
+                                        />
+
+                                        <Input
+                                            isReadOnly
+                                            type="number"
+                                            label="จำนวนวันที่อยู่ได้ของสินค้า"
+                                            size="sm"
+                                            width="100%"
+                                            className="mb-3 bg-fourth text-primary"
+                                            color="primary"
+                                            name="produced_qty"
+                                            value={editProduct.produced_qty.toString()}
+                                        />
+
+                                        <Switch
+                                            isDisabled
+                                            isSelected={switchStatus}
+                                            onChange={changeStatus}
+                                            classNames={{
+                                                base: "inline-flex flex-row-reverse w-full max-w-md bg-content1 hover:bg-content2 items-center justify-between cursor-pointer rounded-lg gap-2 p-2 mb-3 border-2 border-transparent data-[selected=true]:border-primary",
+                                                wrapper: "p-0 h-4 overflow-visible",
+                                                thumb: "w-6 h-6 border-2 shadow-lg group-data-[hover=true]:border-primary group-data-[selected=true]:ml-6 group-data-[pressed=true]:w-7 group-data-[selected]:group-data-[pressed]:ml-4",
+                                            }}
+                                        >
+                                            <div className="flex flex-col gap-1">
+                                                <p className="text-small text-primary">สถานะสินค้า: {switchStatus ? "เปิดใช้งาน" : "ปิดใช้งาน"}</p>
+                                                <p className="text-tiny text-default-400">
+                                                    {switchStatus ? "สูตรอาหารจะแสดงให้ใช้งาน" : "สูตรอาหารจะไม่แสดงให้ใช้งาน"}
+                                                </p>
+                                            </div>
+                                        </Switch>
+                                    </div>
+                                </div>
+                                <p className="font-medium text-[#C5B182]  border-b-1 border-b-[#C5B182] ">รายละเอียดวัตถุดิบ</p>
+                                
+
+                                <div className="h-[200px] overflow-x-auto ">
+                                    <table className="w-full text-sm text-center text-gray-500">
+                                        <thead className="">
+                                            <tr className="text-white  font-normal  bg-[#908362]  ">
+                                                <td scope="col" className="px-6 py-3 ">
+                                                    วัตถุดิบ
+                                                </td>
+                                                <td scope="col" className="px-6 py-3">
+                                                    ปริมาณ
+                                                </td>
+                                                <td scope="col" className="px-6 py-3">
+                                                    หน่วย
+                                                </td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {ingredientsFoodEdit == null || ingredientsFoodEdit.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={4} className="py-3">ไม่พบวัตถุดิบ</td>
+                                                </tr>
+                                            ) : ingredientsFoodEdit.map((ing, index) => (
+                                                <tr key={index} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                    <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap">
+                                                        {ingredientsOptions.find(ingredient => ingredient.ind_id == ing.ind_id)?.ind_name}
+                                                    </td>
+                                                    <td className="px-6 py-1 text-[#73664B]">
+                                                        {ing.ingredients_qty}
+                                                    </td>
+                                                    <td className="px-6 py-1 text-[#73664B]">
+                                                        {ingredientsOptions.find(ingreds => ingreds.ind_id == ing.ind_id)?.un_ind_name}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button className="bg-[#C5B182] text-white" onPress={onCloseRead}>
+                                    ปิด
                                 </Button>
                             </ModalFooter>
                         </>
