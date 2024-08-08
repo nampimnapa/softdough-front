@@ -801,7 +801,7 @@ function Recipeall() {
                                                         {ing.ingredients_qty}
                                                     </td>
                                                     <td className="px-6 py-1 text-[#73664B]">
-                                                        {unitOptions.find(unit => unit.un_id == ing.un_id)?.un_name}
+                                                    {ingredientsOptions.find(ingreds => ingreds.ind_id == ing.ind_id)?.un_ind_name}
                                                     </td>
                                                     <td>
                                                         <Button isIconOnly variant="light" onClick={() => removeIngredient(ing.ind_id)}>
