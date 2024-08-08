@@ -10,12 +10,41 @@ import { Divider, Popover, PopoverTrigger, PopoverContent, Tooltip, Input, Selec
 import Head from 'next/head'
 
 
+const conversionFactors = {
+    "กรัม": 1,
+    "กิโลกรัม": 1000,
+    "มิลลิลิตร": 1,
+    "ลิตร": 1000,
+    "ลูกบาศก์เซนติเมตร": 1,
+    "ลูกบาศก์เมตร": 1000000,
+    "ออนซ์": 30,
+    "ช้อนโต๊ะ": 15,
+    "ช้อนชา": 5,
+    "ถ้วยตวง": 240,
+    "1/4 ช้อนชา": 1.25,
+    "1/2 ช้อนชา": 2.5,
+    "1/4 ถ้วยตวง": 60,
+    "1/3 ถ้วยตวง": 80,
+    "1/2 ถ้วยตวง": 120,
+    "1 ถ้วยตวง": 240
+};
+
+function convert(value, fromUnit, toUnit) {
+    if (!(fromUnit in conversionFactors) || !(toUnit in conversionFactors)) {
+        throw new Error('Conversion factor for the provided units is not defined.');
+    }
+
+    const fromFactor = conversionFactors[fromUnit];
+    const toFactor = conversionFactors[toUnit];
+    return value * (fromFactor / toFactor);
+}
+
 function Recipeall() {
     const router = useRouter();
     const { id } = router.query;
     const [Recipe, setRecipe] = useState([]);
     const [statusLoading, setStatusLoading] = useState(false);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const [unitOptions, setUnitOptions] = useState([]);
     const [productCat, setProductCat] = useState([]);
     const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
@@ -23,10 +52,24 @@ function Recipeall() {
     const [imageUpload, setImageUpload] = useState(null);
     const [Ingredientall, setIngredientall] = React.useState([]);
     const [isOpenPop, setIsOpenPop] = React.useState(false);
-    const unit = [
-        { key: "teaspoon", label: "ช้อนชา" },
-        { key: "tablespoon", label: "ช้อนโต๊ะ" },
-    ]
+
+    // สูตรการคำนวณ //
+    const UnitDetail = [
+        { id: 1, name: "กรัม" },
+        { id: 2, name: "กิโลกรัม" },
+        { id: 3, name: "มิลลิลิตร" },
+        { id: 4, name: "ลิตร" },
+        { id: 5, name: "ออนซ์" },
+        { id: 6, name: "ช้อนโต๊ะ" },
+        { id: 7, name: "ช้อนชา" },
+        { id: 8, name: "ถ้วยตวง" }
+    ];
+
+    const [quantity, setQuantity] = useState(0);
+    const [fromUnit, setFromUnit] = useState(UnitDetail[0].name);
+    const [toUnit, setToUnit] = useState(UnitDetail[1].name);
+    const [result, setResult] = useState("0");
+    //////////////
 
     interface Recipe {
         pd_name: String,
@@ -132,17 +175,18 @@ function Recipeall() {
 
     const [ingredientsFood, setIngredientsFood] = useState({
         ind_id: "",
-        ingredients_qty: 0,
+        ingredients_qty: null,
         un_id: ""
     })
 
-    const [ convertData, setConvertData] = useState({
+    const [convertData, setConvertData] = useState({
         convert_before: 0,
-        convert_before_type: "teaspoon",
+        convert_before_type: "ช้อนชา",
         convert_after_type: "",
         convert_after: 0
     })
 
+    // Upload image
     const handleFileChange = (event) => {
         const fileObj = event.target.files && event.target.files[0];
         if (!fileObj) {
@@ -186,6 +230,7 @@ function Recipeall() {
         inputRef.current.click();
     };
 
+    // Delete image
     const handleClickDelete = () => {
         setProduct(prevState => ({
             ...prevState,
@@ -195,6 +240,7 @@ function Recipeall() {
         setImageUpload(null);
     }
 
+    // input recipe
     const handleProductInputChangeFix = (e) => {
         const { name, value } = e.target;
         setProduct(prevState => ({
@@ -203,6 +249,7 @@ function Recipeall() {
         }));
     };
 
+    // Add ingredients
     const handleIngredientsFood = (e) => {
         const { name, value } = e.target;
         setIngredientsFood(prevState => ({
@@ -219,15 +266,57 @@ function Recipeall() {
         }
     }
 
+    // แปลงค่า
     const handleConvert = (e) => {
         const { name, value } = e.target;
         setConvertData(prevState => ({
             ...prevState,
             [name]: value
         })
-    )}
+        )
+        if(name == "convert_before"){
+            const convertedValue = convert(value, convertData.convert_before_type, unitOptions.find(unit => unit.un_id == ingredientsFood.ind_id)?.un_name);
+            setResult(convertedValue.toString());
+        }else{
+            const convertedValue = convert(convertData.convert_before, value, unitOptions.find(unit => unit.un_id == ingredientsFood.ind_id)?.un_name);
+            setResult(convertedValue.toString());
+        }
 
-    console.log("convert", convertData)
+    }
+
+    // ย้ายค่าไปใส่ช่องเพื่อเพิ่มวัตถุดิบ
+    const handleConvertAfter = () => {
+        setIngredientsFood(prevState => ({
+            ...prevState,
+            "ingredients_qty": parseFloat(result)
+        }));
+        setIsOpenPop(false)
+    }
+
+    // ล้างค่าในเครื่องแปลง
+    const handleConvertCencel = () => {
+        setConvertData({
+            convert_before: 0,
+            convert_before_type: "ช้อนชา",
+            convert_after_type: "",
+            convert_after: 0
+        })
+        setResult("0");
+        setIsOpenPop(false)
+    }
+
+    // ปิด Modal
+    const handleModalClose = () => {
+        setIngredientsFood({
+            ind_id: "",
+            ingredients_qty: null,
+            un_id: ""
+        })
+        onClose()
+    }
+
+    // console.log("convert", convertData)
+    console.log("result",ingredientsFood)
 
     return (
         <div className="overflow-auto flex flex-col">
@@ -453,7 +542,7 @@ function Recipeall() {
                                     <div className="flex items-center col-span-2">
                                         <Input
                                             isRequired
-                                            type="text"
+                                            type="number"
                                             label="ปริมาณ"
                                             size="sm"
                                             width="100%"
@@ -461,9 +550,10 @@ function Recipeall() {
                                             color="primary"
                                             name="ingredients_qty"
                                             onChange={handleIngredientsFood}
+                                            value={ ingredientsFood.ingredients_qty == null ? "" : ingredientsFood.ingredients_qty}
                                         />
 
-                                        <Popover placement="bottom" isOpen={isOpenPop} onOpenChange={(open) => setIsOpenPop(open)} showArrow offset={10} style={{ fontFamily: 'kanit' }}  backdrop="opaque">
+                                        <Popover placement="bottom" isOpen={isOpenPop} onOpenChange={(open) => setIsOpenPop(open)} showArrow offset={10} style={{ fontFamily: 'kanit' }} backdrop="opaque">
                                             <PopoverTrigger>
                                                 <Button isIconOnly className="ml-2" variant="light" isDisabled={ingredientsFood.ind_id === "" ? true : false}>
                                                     <IoCalculator className="text-2xl" />
@@ -485,16 +575,16 @@ function Recipeall() {
                                                                 value={convertData.convert_before_type}
                                                                 name="convert_before_type"
                                                                 onChange={handleConvert}
-                                                                defaultSelectedKeys={["teaspoon"]}
+                                                                defaultSelectedKeys={["ช้อนชา"]}
                                                             >
-                                                                {unit.map((item) => (
-                                                                    <SelectItem key={item.key} value={item.key}>{item.label}</SelectItem>
+                                                                {UnitDetail.map((item) => (
+                                                                    <SelectItem key={item.name} value={item.name}>{item.name}</SelectItem>
                                                                 ))}
                                                             </Select>
                                                         </div>
 
                                                         <div className="mt-2 flex w-full">
-                                                            <Input onChange={handleConvert} name="convert_after" size="sm" label="ค่าที่แปลงแล้ว" defaultValue="0" readOnly type="number" className=" bg-fourth text-primary" color="primary" />
+                                                            <Input value={result !== null ? result : "0"} onValueChange={setResult} name="convert_after" size="sm" label="ค่าที่แปลงแล้ว"  readOnly type="number" className=" bg-fourth text-primary" color="primary" />
                                                             <Select
                                                                 label="หน่วยแปลง"
                                                                 color="primary"
@@ -502,11 +592,11 @@ function Recipeall() {
                                                                 className="max-w-md bg-fourth text-primary ml-2"
                                                                 size="sm"
                                                                 isDisabled
-                                                                selectedKeys={ingredientsFood.ind_id ? [ingredientsFood.un_id] : []}
+                                                                selectedKeys={ingredientsFood.ind_id ? [unitOptions.find(unit => unit.un_id == ingredientsFood.ind_id)?.un_name] : []}
                                                                 onChange={handleConvert}
                                                             >
                                                                 {unitOptions.map(type => (
-                                                                    <SelectItem key={type.un_id} value={type.un_id}>
+                                                                    <SelectItem key={type.un_name} value={type.un_name}>
                                                                         {type.un_name}
                                                                     </SelectItem>
                                                                 ))}
@@ -514,10 +604,10 @@ function Recipeall() {
                                                         </div>
 
                                                         <div className="flex justify-end mt-3">
-                                                            <Button className="bg-[#C5B182] text-white mr-2" onPress={()=> setIsOpenPop(false)}>
+                                                            <Button className="bg-[#C5B182] text-white mr-2" onPress={() => handleConvertCencel()}>
                                                                 ปิด
                                                             </Button>
-                                                            <Button className="text-white bg-[#736648]">
+                                                            <Button className="text-white bg-[#736648]" onClick={() => handleConvertAfter()}>
                                                                 แทนที่
                                                             </Button>
                                                         </div>
@@ -556,7 +646,7 @@ function Recipeall() {
 
                             </ModalBody>
                             <ModalFooter>
-                                <Button className="bg-[#C5B182] text-white" onPress={onClose}>
+                                <Button className="bg-[#C5B182] text-white" onPress={() => handleModalClose()}>
                                     ปิด
                                 </Button>
                                 <Button className="text-white bg-[#736648]" onPress={onClose}>
