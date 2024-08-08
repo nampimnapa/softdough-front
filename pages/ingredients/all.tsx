@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Tab } from '@headlessui/react';
 import Link from "next/link";
+import Head from 'next/head'
 
 
 function classNames(...classes) {
@@ -45,6 +46,9 @@ function All() {
 
     return (
         <div className="h-screen  bg-white">
+            <Head>
+                <title>วัตถุดิบทั้งหมด - Softdough</title>
+            </Head>
             <p className='text-[#F2B461] font-medium m-4'>วัตถุดิบทั้งหมด</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75  ">
@@ -143,7 +147,7 @@ function All() {
                                                     ${ingredients.status === '2' ? 'text-green-500'
                                                         : ingredients.status === '1' ? 'text-red-500'
                                                             : ingredients.status === '0' ? 'text-red-500' : ''}`}>
-                                                                 {ingredients.status === '1' ? 'ซื้อเพิ่ม' :ingredients.status === '2' ? 'ปกติ' : ingredients.status === '0' ? 'ไม่มี' : ingredients.status}
+                                                    {ingredients.status === '1' ? 'ซื้อเพิ่ม' : ingredients.status === '2' ? 'ปกติ' : ingredients.status === '0' ? 'ไม่มี' : ingredients.status}
 
                                                 </td>
                                                 <td className="px-6 py-4 flex items-center justify-center  ">
@@ -194,7 +198,7 @@ function All() {
                                             {Array.isArray(indlot) && indlot.map((ingredients, idx) => (
                                                 <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                     <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
-                                                    {ingredients.indl_id_name}</td>
+                                                        {ingredients.indl_id_name}</td>
                                                     <td className="px-6 py-1 text-left">{ingredients.ind_name}
                                                     </td>
                                                     <td className="px-6 py-1">{ingredients.stock_quantity}

@@ -74,6 +74,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import ingreincome from "../all";
+import Head from 'next/head'
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -81,7 +82,7 @@ const kanit = Kanit({
 });
 
 function Detail() {
-   
+
     const [ind, setIngredientLot] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [indde, setIngredientsde] = useState<any[]>([]);
@@ -93,7 +94,7 @@ function Detail() {
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlot/${id}`);
                 const data = await response.json();
-                setIngredientLot(data); 
+                setIngredientLot(data);
                 setLoading(false);
             } catch (error) {
                 console.error('Error:', error);
@@ -116,7 +117,10 @@ function Detail() {
     console.log(indde);
 
     return (
-        <div className='h-screen'>
+        <div className=''>
+            <Head>
+                <title>วัตถุดิบเข้าร้าน - Softdough</title>
+            </Head>
             <button className='my-3 mx-5 '>
                 <Link href="/ingredients/income/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />

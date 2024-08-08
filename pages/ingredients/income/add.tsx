@@ -12,7 +12,7 @@ import { Kanit } from "next/font/google";
 import Datepicker from "react-tailwindcss-datepicker";
 import { useRouter } from "next/router";
 import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
-
+import Head from 'next/head'
 const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
@@ -120,6 +120,9 @@ function Add() {
 
     return (
         <div className="">
+            <Head>
+                <title>เพิ่มวัตถุดิบเข้าร้าน - Softdough</title>
+            </Head>
             <button className='my-3 mx-5 '>
                 <Link href="/ingredients/income/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
@@ -233,7 +236,7 @@ function Add() {
                 <>
                     {isOpen && (
                         <Transition appear show={isOpen} as={Fragment} >
-                            <Dialog as="div"  onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                 <Transition.Child
                                     as={Fragment}
                                     enter="ease-out duration-300"
