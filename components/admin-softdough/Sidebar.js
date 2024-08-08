@@ -16,7 +16,7 @@ import {
   QueueListIcon,
   ArrowRightOnRectangleIcon,
   UserCircleIcon
-  
+
 } from "@heroicons/react/24/outline";
 import { Icon } from '@iconify/react';
 
@@ -70,7 +70,7 @@ const settingDropdown = [
   { title: "รอบการขาย", href: "/ingredients/instore" },
   { title: "ที่อยู่", href: "/ingredients/all" },
   { title: "ประเภทการขาย", href: "/ingredients/instore" },
-  { title: "บรรจุภัณฑ์", href: "/ingredients/all" }
+  { title: "หน่วยวัตถุดิบ", href: "/setting/unit" }
 ];
 
 const Sidebar = ({ children, className }) => {
@@ -120,7 +120,7 @@ const Sidebar = ({ children, className }) => {
             startIcon={<Icon icon="solar:donut-outline" className="h-5 w-5 inherit"
             />}
             endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />
-          }
+            }
           >
             {productDropdown.map((item, index) => (
               <React.Fragment key={index}>
@@ -139,7 +139,7 @@ const Sidebar = ({ children, className }) => {
             title="การผลิต"
             startIcon={<Icon icon="tabler:tools-kitchen-2"
               className="h-5 w-5 inherit" />}
-            endIcon={<ChevronDownIcon className="h-5 w-5 inherit"/>}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {manufactureDropdown.map((item, index) => (
               <React.Fragment key={index}>
@@ -267,7 +267,7 @@ const Sidebar = ({ children, className }) => {
         </nav>
 
         <main className="flex-grow bg-white w-full overflow-y-auto">{children}</main>
-        
+
       </div>
     </div>
 
