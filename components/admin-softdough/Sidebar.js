@@ -67,9 +67,9 @@ const staffDropdown = [
 ];
 // ตั้งค่า
 const settingDropdown = [
-  { title: "รอบการขาย", href: "/ingredients/instore" },
+  { title: "รอบการขาย", href: "/setting/roundsell" },
   { title: "ที่อยู่", href: "/setting/address" },
-  { title: "ประเภทการขาย", href: "/ingredients/instore" },
+  { title: "ประเภทการขาย", href: "/setting/selltype" },
   { title: "บรรจุภัณฑ์", href: "/ingredients/all" }
 ];
 

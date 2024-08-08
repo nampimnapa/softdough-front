@@ -25,21 +25,6 @@ function type() {
 
 }, [id]);
 
-//   useEffect(() => {
-//     if (id) {
-//       fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/readtype`)
-//         .then(response => response.json())
-//         .then(data => {
-//           console.log(data); // ตรวจสอบข้อมูลที่ได้รับ
-//           setTypeProducts(data); // กำหนดข้อมูลประเภทสินค้าที่ได้รับมาจาก API
-//         })
-//         .catch(error => {
-//           console.error('Error fetching product data:', error);
-//           setMessage('Error fetching product data');
-//         });
-//     }
-//   }, [id]);
-
   const changeInput = (id) => {
     setOpenInput(id);
     setIsEditing(true);
@@ -107,28 +92,9 @@ function type() {
 
   return (
     <div className="h-screen">
-      <p className='text-[#F2B461] font-medium m-4'>ประเภทรายการจ่าย</p>
+      <p className='text-[#F2B461] font-medium m-4'>ประเภทรายการขาย</p>
       <div className="flex justify-between">
-        <form className="flex items-center w-full transform scale-75">
-          <div className="relative w-1/2">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <MagnifyingGlassIcon className="h-6 w-6 text-[#C5B182]" />
-            </div>
-            <input
-              type="text"
-              id="simple-search"
-              className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-              placeholder="ค้นหา"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="p-2 ms-2 text-sm rounded-full text-white bg-[#C5B182] border hover:bg-[#5E523C]"
-          >
-            ค้นหา
-          </button>
-        </form>
+        
       </div>
       <div className="w-full">
         <div className="flex w-full flex-col">
@@ -146,12 +112,17 @@ function type() {
               <thead>
                 <tr className="text-white font-normal bg-[#908362]">
                   <th scope="col" className="px-3 py-3 w-64">
-                    ลำดับ
+                    เมนู
                   </th>
                   <th scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
-                    ชื่อประเภทรายการจ่าย
+                    หน้าร้าน
                   </th>
-                  <th scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden"></th>
+                  <th scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
+                    Line Man
+                  </th>
+                  <th scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
+                    Grab                  
+                </th>
                 </tr>
               </thead>
               <tbody>
