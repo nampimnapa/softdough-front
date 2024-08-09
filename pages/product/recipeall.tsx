@@ -776,7 +776,7 @@ function Recipeall() {
                                             color="primary"
                                             name="pd_name"
                                             onChange={handleProductInputChangeFix}
-                                            value={editProduct?.pd_name}
+                                            // value={editProduct?.pd_name}
                                         />
                                         <Input
                                             isRequired
@@ -1004,7 +1004,7 @@ function Recipeall() {
             </Modal>
 
 
-            {/* Model Add */}
+            {/* Model Edit */}
             <Modal isOpen={isOpenEdit} onOpenChange={onOpenChangeEdit} isDismissable={false} isKeyboardDismissDisabled={true} size="3xl">
                 <ModalContent>
                     {(onCloseEdit) => (
