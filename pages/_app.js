@@ -35,6 +35,7 @@
 
 import SidebarAdmin from "../components/admin-softdough/Sidebar";
 import SidebarStaff from "../components/staffpro/Sidebar";
+import SidebarStaff1 from "../components/staffsell/Sidebar";
 import "../styles/globals.css";
 import React from "react";
 import { Kanit } from "next/font/google";
@@ -45,12 +46,13 @@ const kanit = Kanit({
   subsets: ["thai", "latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
-const adminPaths = ['/ingredients', '/dashboard', '/setting', '/manufacture', '/product', '/staff', '/expenses'];
+const adminPaths = ['/ingredients', '/dashboard', '/setting', '/manufacture', '/product', '/staff', '/expenses', '/promotion'];
 const staffPaths = ['/staffpro'];
+const staffPaths1 = ['/staffsell'];
 export default function App({ Component, pageProps }) {
   const { pathname } = useRouter();
 
-
+  const showStaffSidebar1 = staffPaths1.some(path => pathname.startsWith(path));
   const showStaffSidebar = staffPaths.some(path => pathname.startsWith(path));
   const showAdminSidebar = adminPaths.some(path => pathname.startsWith(path));
 
@@ -63,6 +65,12 @@ export default function App({ Component, pageProps }) {
           <SidebarStaff className={kanit.className}>
             <Component {...pageProps} />
           </SidebarStaff>
+
+        ) : showStaffSidebar1 ? (  // Then check admin sidebar
+          <SidebarStaff1 className={kanit.className}>
+            <Component {...pageProps} />
+          </SidebarStaff1>
+
         ) : showAdminSidebar ? (  // Then check admin sidebar
           <SidebarAdmin className={kanit.className}>
             <Component {...pageProps} />

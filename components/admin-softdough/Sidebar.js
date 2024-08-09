@@ -92,7 +92,7 @@ const Sidebar = ({ children, className }) => {
           {/* ภาพรวม */}
           <MenuLink
             isActive={isActive === "ภาพรวม"}
-            href="/dashboard"
+            href="/dashboard/dashboard"
             title="ภาพรวม"
             startIcon={<ChartPieIcon className="h-5 w-5 inherit " />}
             handleActive={handleActive} />
