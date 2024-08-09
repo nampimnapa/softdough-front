@@ -86,6 +86,7 @@ const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
+import Head from 'next/head'
 
 function Detailall() {
     const [isOpen, setIsOpen] = useState(false);
@@ -140,6 +141,9 @@ function Detailall() {
 
     return (
         <div className='h-screen'>
+            <Head>
+                <title>วัตถุดิบทั้งหมด - Softdough</title>
+            </Head>
             <button className='my-3 mx-5 '>
                 <Link href="/ingredients/all" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />

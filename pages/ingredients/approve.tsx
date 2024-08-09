@@ -11,6 +11,8 @@ const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
+import Head from 'next/head'
+
 
 function approve() {
     const [ind, setIngredientall] = useState<any[]>([]);
@@ -88,6 +90,9 @@ function approve() {
     };
     return (
         <div>
+            <Head>
+                <title>รออนุมัติ - Softdough</title>
+            </Head>
             <p className='text-[#F2B461] font-medium m-4'>รออนุมัติ</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75  ">

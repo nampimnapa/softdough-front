@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Tab } from '@headlessui/react';
 import Link from "next/link";
+import Head from 'next/head'
 
 function List() {
 
@@ -28,6 +29,9 @@ function List() {
     }, []);
     return (
         <div>
+            <Head>
+                <title>วัตถุดิบที่ใช้ - Softdough</title>
+            </Head>
             <p className='text-[#F2B461] font-medium m-4'>วัตถุดิบที่ใช้</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75  ">

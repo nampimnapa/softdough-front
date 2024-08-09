@@ -147,7 +147,7 @@ import Link from "next/link";
 import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
-
+import Head from 'next/head'
 
 
 
@@ -223,6 +223,9 @@ function Ingreincome() {
 
     return (
         <div className='h-screen'>
+            <Head>
+                <title>วัตถุดิบเข้าร้าน - Softdough</title>
+            </Head>
             <p className='text-[#F2B461] font-medium m-4'>วัตถุดิบเข้าร้าน</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75  ">

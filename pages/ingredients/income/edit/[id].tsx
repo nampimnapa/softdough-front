@@ -16,6 +16,8 @@ const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
+import Head from 'next/head'
+
 function Index() {
     const router = useRouter();
     const { id } = router.query;
@@ -258,6 +260,9 @@ function Index() {
 
     return (
         <div className=''>
+            <Head>
+                <title>วัตถุดิบเข้าร้าน - Softdough</title>
+            </Head>
             <button className='my-3 mx-5 ' onClick={checkCencel}>
                 <div className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
@@ -285,7 +290,7 @@ function Index() {
                             <div className="flex items-center justify-center mr-5">
                                 <p className="text-sm  text-[#73664B] flex justify-center items-center w-full">จำนวน : </p>
                                 <input
-                                required
+                                    required
                                     min="1"
                                     // onChange={handleCancelClick}
                                     type="number"
