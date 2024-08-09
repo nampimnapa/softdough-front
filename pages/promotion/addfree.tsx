@@ -603,20 +603,20 @@ const AddPromotion: React.FC = () => {
         // Convert selectedKeys and selectedKeys1 to arrays of numbers
         const smbuyIds = Array.from(selectedKeys).map(id => parseInt(id, 10));
         const smfreeIds = Array.from(selectedKeys1).map(id => parseInt(id, 10));
-    
+
         // Create promotiondetail with smbuy_id and smfree_id as arrays
         const details = {
             smbuy_id: smbuyIds,
             smfree_id: smfreeIds
         };
-    
+
         const newFormData = {
             ...formData,
             promotiondetail: [details] // Wrap details in an array to match the required format
         };
-    
+
         console.error('newFormData', newFormData);
-    
+
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/promotion/addfree`, {
                 method: 'POST',
@@ -625,16 +625,16 @@ const AddPromotion: React.FC = () => {
                 },
                 body: JSON.stringify(newFormData),
             });
-    
+
             const responseData = await response.json();
-    
+
             if (responseData.message === 'success') {
                 setMessage('Data added successfully');
                 router.push('/promotion/freeall');
                 console.log('Selected Keys:', Array.from(selectedKeys));
                 console.log('Selected Keys1:', Array.from(selectedKeys1));
                 console.log('Details:', details);
-    
+
             } else {
                 setMessage(responseData.message || 'Error occurred');
                 openModal();
@@ -645,7 +645,7 @@ const AddPromotion: React.FC = () => {
             openModal();
         }
     };
-    
+
 
 
 
@@ -766,6 +766,8 @@ const AddPromotion: React.FC = () => {
                             {/* <div className="flex-none w-1/3"> */}
 
                             <Select
+                                                            size="xs"
+
                                 selectionMode="multiple"
                                 placeholder="เลือกสินค้า"
                                 selectedKeys={selectedKeys}
@@ -837,6 +839,7 @@ const AddPromotion: React.FC = () => {
                         <div className="flex flex-col" style={{ width: '80%' }}>
 
                             <Select
+                                size="xs"
                                 selectionMode="multiple"
                                 placeholder="เลือกสินค้า"
                                 selectedKeys={selectedKeys1}

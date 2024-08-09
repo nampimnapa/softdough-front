@@ -42,7 +42,7 @@ const Sidebar = ({ children, className }) => {
                 <div className="flex flex-col">
                     <MenuLink
                         isActive={isActive === "สินค้า"}
-                        href="/dashboard"
+                        href="#"
                         title="สินค้า"
                         startIcon={<Icon icon="solar:donut-outline" className="h-5 w-5 inherit"
                         />}
@@ -55,25 +55,25 @@ const Sidebar = ({ children, className }) => {
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "รายการขายสินค้า"}
-                        href="/staffpro/addusedind"
+                        href="#"
                         title="รายการขายสินค้า"
                         startIcon={<QueueListIcon className="h-5 w-5 inherit" />}
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "สต๊อกสินค้า"}
-                        href="/staffpro/stockind/stockind"
+                        href="#"
                         title="สต๊อกสินค้า"
                         startIcon={<CubeIcon className="h-5 w-5 inherit " />}
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "เพิ่มเงินเข้าธนาคาร"}
-                        href="/staffpro/orderlist/list"
+                        href="#"
                         title="เพิ่มเงินเข้าธนาคาร"
                         startIcon={<WalletIcon class="h-5 w-5 inherit" />}
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "เงินเข้าธนาคาร"}
-                        href="/staffpro/indused/list"
+                        href="#"
                         title="เงินเข้าธนาคาร"
                         startIcon={<BuildingLibraryIcon class="h-5 w-5 inherit" />}
                         handleActive={handleActive} />

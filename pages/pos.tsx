@@ -334,13 +334,7 @@ function pos() {
             </div>
             <div className="flex justify-start">
                 <div className="w-1/2  mt-10  flex justify-start " >
-                    <Link href="/manufacture/listorder">
-                        <Button href="/manufacture/listorder"
-                            onClick={handleCancel}
-                            type="button"
-                            className=" text-white bg-[#C5B182] focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-6">
-                            ยกเลิก</Button>
-                    </Link>
+                    
                     <>
                         {isOpen && (
                             <Transition appear show={isOpen} as={Fragment} >
@@ -416,7 +410,6 @@ function pos() {
                         )
                         }
                     </>
-                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">เสร็จสิ้น</Button>
                 </div >
             </div>
 
