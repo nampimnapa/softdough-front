@@ -3,14 +3,16 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import Link from "next/link";
-import { Button, Input,RadioGroup, Radio } from "@nextui-org/react";
+import { Button, Input, RadioGroup, Radio } from "@nextui-org/react";
 // import { , } from '@headlessui/react'
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, Transition } from '@headlessui/react';
 import { Tabs, Tab, } from "@nextui-org/react";
 import { Spinner, useDisclosure, Image } from "@nextui-org/react";
+import { Card, CardBody, CardFooter } from "@nextui-org/react";
 
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
+    PencilSquareIcon,
     ChartPieIcon,
     ChevronDownIcon,
     ChevronUpIcon,
@@ -21,7 +23,7 @@ import {
     CurrencyDollarIcon,
     QueueListIcon,
     ArrowRightOnRectangleIcon,
-    UserCircleIcon, MagnifyingGlassIcon
+    UserCircleIcon, MagnifyingGlassIcon, TrashIcon
 
 } from "@heroicons/react/24/outline";
 const kanit = Kanit({
@@ -37,14 +39,15 @@ function pos() {
     const [typesellmenumix, setTypesellmenumix] = useState([]);
     const [statusLoading, setStatusLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedSale, setSelectedSale] = useState(null);
+    const [selectedItems, setSelectedItems] = useState([]);
 
     const closeModal = () => {
         setIsOpen(false);
+        setSelectedSale(null);
+
     };
 
-    const openModal = () => {
-        setIsOpen(true);
-    };
     const handleCancel = () => {
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
@@ -54,6 +57,23 @@ function pos() {
         sm_name: String,
         sm_price: number,
     }
+
+    const handleAddToCart = () => {
+        if (selectedSale) {
+            const newItem = {
+                ...selectedSale,
+                quantity: quantity    // You can replace '1' with any quantity logic if needed
+            };
+            setSelectedItems((prevItems) => [...prevItems, newItem]);
+            closeModal();
+        }
+    };
+
+
+    const handleRemoveItem = (index) => {
+        setSelectedItems((prevItems) => prevItems.filter((_, i) => i !== index));
+    };
+
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/small`)
             .then(response => response.json())
@@ -79,9 +99,45 @@ function pos() {
     }, [id, setSale]);
     const [open, setOpen] = useState(true)
 
+    const [quantity, setQuantity] = useState(1); // Initial quantity set to 1
+
+    const incrementQuantity = () => {
+        setQuantity(prevQuantity => prevQuantity + 1);
+    };
+
+    const decrementQuantity = () => {
+        setQuantity(prevQuantity => Math.max(prevQuantity - 1, 1)); // Ensure quantity doesn't go below 1
+    };
+
+    const openModal = (sale) => {
+        setIsOpen(true);
+        setSelectedSale(sale);
+        setQuantity(1); // Reset quantity to 1 whenever a new item is selected
+    };
+    const handleIncreaseQuantity = (id) => {
+        setSelectedItems((prevItems) =>
+            prevItems.map((item) =>
+                item.sm_id === id ? { ...item, quantity: item.quantity + 1 } : item
+            )
+        );
+    };
+
+    const handleDecreaseQuantity = (id) => {
+        setSelectedItems((prevItems) =>
+            prevItems.map((item) =>
+                item.sm_id === id && item.quantity > 1
+                    ? { ...item, quantity: item.quantity - 1 }
+                    : item
+            )
+        );
+    };
+    const calculateTotalPrice = () => {
+        return selectedItems.reduce((total, item) => total + item.sm_price * item.quantity, 0);
+    };
+    
     return (
         <div className={kanit.className}>
-            <div className="flex flex-col w-screen h-screen">
+            <div className="flex flex-col  h-screen">
                 {/* nav ส่วนบน */}
                 <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1">
                     <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -156,30 +212,30 @@ function pos() {
                                             <div className="second-tab-layout mx-1">
                                                 <div className="relative overflow-x-auto ">
                                                     {statusLoading ? (
-                                                        <div className="flex flex-wrap">
+                                                        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
                                                             {Sale && Sale.length > 0 ? (
                                                                 Sale.map((sale, index) => (
-                                                                    <div key={index}
+                                                                    <Card key={index}
                                                                         onClick={() => openModal(sale)}
+                                                                        shadow="sm" isPressable onPress={() => console.log("item pressed")}
                                                                         className="card w-40 max-w-xs  bg-base-100 shadow-md mx-2 h-48 ml-1 mb-4 ">
-                                                                        <figure className="w-full h-3/4">
-                                                                            <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
-                                                                        </figure>
-                                                                        <div className="card-body ">
-                                                                            <div className="flex justity-between">
-                                                                                <p className="text-mediem text-[#73664B] text-center">
-                                                                                    {sale.sm_name}
-                                                                                </p>
-                                                                            </div>
-                                                                            <div className="flex justify-center">
+                                                                        <CardBody className="overflow-visible p-0">
+                                                                            <Image
+                                                                                // shadow="sm"
+                                                                                // radius="lg"
+                                                                                width="100%"
+                                                                                alt={sale.picture}
+                                                                                className="w-full object-cover h-[140px]"
+                                                                                src={sale.picture}
+                                                                            />
+                                                                        </CardBody>
+                                                                        <CardFooter className="text-small justify-between">
+                                                                            <p className='text-[#73664B]'>{sale.sm_name}</p>
+                                                                            <p className=" text-[#F2B461]">{sale.sm_price} บาท</p>
 
-                                                                                <div className="flex ">
-                                                                                    <p className=" text-[#F2B461] text-lg">{sale.sm_price} บาท</p>
-                                                                                </div>
-                                                                            </div>
+                                                                        </CardFooter>
+                                                                    </Card>
 
-                                                                        </div>
-                                                                    </div>
                                                                 ))
                                                             ) : (
                                                                 <div className="flex justify-center items-center w-full">
@@ -263,35 +319,79 @@ function pos() {
                                     <div className="mt-8">
                                         <div className="flow-root">
                                             <ul role="list" className="-my-6 divide-y divide-gray-200">
-                                                {Sale.map((product) => (
-                                                    <li key={product.id} className="flex py-6">
-                                                        <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                                {selectedItems.map((product, index) => (
+
+                                                    <li key={index} className="flex py-6">
+                                                        <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                                             <img
-                                                                alt={product.imageAlt}
-                                                                src={product.imageSrc}
+                                                                alt={product.picture}
+                                                                src={product.picture}
                                                                 className="h-full w-full object-cover object-center"
                                                             />
                                                         </div>
-
                                                         <div className="ml-4 flex flex-1 flex-col">
                                                             <div>
                                                                 <div className="flex justify-between text-base font-medium text-gray-900">
-                                                                    <h3>
-                                                                        <a href={product.href}>{product.name}</a>
-                                                                    </h3>
-                                                                    <p className="ml-4">{product.price}</p>
+                                                                    <p>
+                                                                        <a href={product.href}>{product.sm_name}</a>
+                                                                    </p>
+                                                                    <p className="ml-4">{product.sm_price * product.quantity} บาท</p>
                                                                 </div>
-                                                                <p className="mt-1 text-sm text-gray-500">{product.color}</p>
+                                                                <p className="mt-1 text-sm text-gray-500">x ดิป</p>
                                                             </div>
-                                                            <div className="flex flex-1 items-end justify-between text-sm">
-                                                                <p className="text-gray-500">Qty {product.quantity}</p>
+                                                            <div className="flex flex-1 items-end justify-between text-sm ">
+                                                                <p className="text-gray-500">จำนวน </p>
+                                                                <div className="flex items-center w-3/5">
+                                                                    <button
+                                                                        onClick={() => handleDecreaseQuantity(product.sm_id)}
 
+                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                    >
+                                                                        <svg
+                                                                            className="text-[#73664B]"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            width="1em"
+                                                                            height="1em"
+                                                                            viewBox="0 0 256 256"
+                                                                        >
+                                                                            <path
+                                                                                fill="currentColor"
+                                                                                d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                            />
+                                                                        </svg>
+                                                                    </button>
+                                                                    <span className="w-4 text-center mx-2">{product.quantity}</span>
+                                                                    <button
+                                                                        onClick={() => handleIncreaseQuantity(product.sm_id)}
+
+                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
+
+                                                                    >
+                                                                        <svg
+                                                                            className="text-[#73664B]"
+                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                            width="1em"
+                                                                            height="1em"
+                                                                            viewBox="0 0 256 256"
+                                                                        >
+                                                                            <path
+                                                                                fill="currentColor"
+                                                                                d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                            />
+                                                                        </svg>
+                                                                    </button>
+
+
+
+                                                                </div>
                                                                 <div className="flex">
                                                                     <button
                                                                         type="button"
-                                                                        className="font-medium text-indigo-600 hover:text-indigo-500"
+                                                                        className="font-medium "
+                                                                        onClick={() => handleRemoveItem(index)}
+
                                                                     >
-                                                                        Remove
+                                                                        <TrashIcon className="h-5 w-5 text-red-500" />
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -316,7 +416,7 @@ function pos() {
                                     </div>
                                     <div className="flex justify-between text-base font-medium text-gray-900">
                                         <p>รวมสุทธิ</p>
-                                        <p>$262.00</p>
+                                        <p>{calculateTotalPrice()} บาท</p>
                                     </div>
                                     <div className="mt-6">
                                         <Button
@@ -332,47 +432,67 @@ function pos() {
                     </div>
                 </main>
             </div>
-            <div className="flex justify-start">
-                <div className="w-1/2  mt-10  flex justify-start " >
-                    
-                    <>
-                        {isOpen && (
-                            <Transition appear show={isOpen} as={Fragment} >
-                                <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
-                                    <Transition.Child
-                                        as={Fragment}
-                                        enter="ease-out duration-300"
-                                        enterFrom="opacity-0"
-                                        enterTo="opacity-100"
-                                        leave="ease-in duration-200"
-                                        leaveFrom="opacity-100"
-                                        leaveTo="opacity-0"
-                                    >
-                                        <div className="fixed inset-0 bg-black/25" />
-                                    </Transition.Child>
+            {/* <div className="flex justify-start"> */}
+            <div className="w-1/2  mt-10  flex justify-start " >
 
-                                    <div className="fixed inset-0 overflow-y-auto">
-                                        <div className="flex min-h-full items-center justify-center p-4 text-center">
-                                            <Transition.Child
-                                                as={Fragment}
-                                                enter="ease-out duration-300"
-                                                enterFrom="opacity-0 scale-95"
-                                                enterTo="opacity-100 scale-100"
-                                                leave="ease-in duration-200"
-                                                leaveFrom="opacity-100 scale-100"
-                                                leaveTo="opacity-0 scale-95"
-                                            >
-                                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                                    {/* <Dialog.Title
-                                                        as="h3"
-                                                        className="text-lg font-medium leading-6 text-[73664B]"
-                                                    >
-                                                        
-                                                    </Dialog.Title> */}
-                                                    <div className="">
+                <>
+                    {isOpen && (
+                        <Transition appear show={isOpen} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-black/25" />
+                                </Transition.Child>
+
+                                <div className="fixed inset-0 overflow-y-auto">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 scale-95"
+                                            enterTo="opacity-100 scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 scale-100"
+                                            leaveTo="opacity-0 scale-95"
+                                        >
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                {/* <Dialog.Title
+                                                    as="h3"
+                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                >
+                                                    {selectedSale.sm_name}
+                                                </Dialog.Title> */}
+                                                <div className='flex'>
+                                                    <Card shadow="sm" >
+                                                        <CardBody className="overflow-visible p-0">
+                                                            <Image
+                                                                shadow="sm"
+                                                                radius="lg"
+                                                                width={200}
+
+                                                                src={selectedSale.picture}
+                                                                className=" object-cover h-[140px]"
+                                                            />
+                                                        </CardBody>
+                                                        <CardFooter className="text-small justify-between">
+                                                            <p className='text-[#73664B]'>{selectedSale.sm_name}</p>
+                                                            <p className=" text-[#F2B461]">{selectedSale.sm_price}</p>
+                                                        </CardFooter>
+                                                    </Card>
+
+
+                                                    <div className="ml-6">
                                                         <p className="text-lg text-[#73664B] font-medium">
                                                             ดิปซอส <span className='text-sm text-[#73664B] font-normal'>เลือกได้ 1 รสชาติ</span>
                                                         </p>
+                                                        {/* ต้อง fetch มา เมนูสำหรับขาย ไทป์ดิป */}
                                                         <RadioGroup                                                         >
                                                             <Radio value="buenos-aires" >ดิป นมฮอกไกโด</Radio>
                                                             <Radio value="sydney">ดิป ช็อกโกแลต</Radio>
@@ -380,40 +500,82 @@ function pos() {
                                                             <Radio value="london">ดิป ป๊อกกี้</Radio>
                                                             <Radio value="tokyo">ดิป ชาไทย</Radio>
                                                         </RadioGroup>
-                                                    </div>
-                                                    {/*  choose */}
-                                                    <div className="flex justify-end">
-                                                        <div className="inline-flex justify-end">
+                                                        <div>
+                                                            <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
+
                                                             <button
-                                                                type="button"
-                                                                className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                                onClick={closeModal}
+                                                                onClick={decrementQuantity}
+
+                                                                className="mt-2 btn btn-square bg-[#D9CAA7] btn-xs "
                                                             >
-                                                                ยกเลิก
+                                                                <svg
+                                                                    className="text-[#73664B]"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    width="1em"
+                                                                    height="1em"
+                                                                    viewBox="0 0 256 256"
+                                                                >
+                                                                    <path
+                                                                        fill="currentColor"
+                                                                        d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                    />
+                                                                </svg>
                                                             </button>
-
+                                                            <span className="w-4 text-center mx-2">{quantity}</span>
                                                             <button
-                                                                type="button"
-                                                                className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            // onClick={handleConfirm}
-                                                            ><Link href="#">
-                                                                    ยืนยัน
-                                                                </Link></button>
-                                                        </div>
-                                                    </div>
-                                                </Dialog.Panel>
-                                            </Transition.Child>
-                                        </div>
-                                    </div>
-                                </Dialog>
-                            </Transition>
-                        )
-                        }
-                    </>
-                </div >
-            </div>
+                                                                onClick={incrementQuantity}
 
+                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+
+                                                            >
+                                                                <svg
+                                                                    className="text-[#73664B]"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    width="1em"
+                                                                    height="1em"
+                                                                    viewBox="0 0 256 256"
+                                                                >
+                                                                    <path
+                                                                        fill="currentColor"
+                                                                        d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                    />
+                                                                </svg>
+                                                            </button></div>
+                                                    </div>
+                                                </div>
+                                                {/*  choose */}
+                                                <div className="flex justify-end mt-5">
+                                                    <div className="inline-flex justify-end">
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={closeModal}
+                                                        >
+                                                            ยกเลิก
+                                                        </button>
+
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={handleAddToCart}
+                                                        ><Link href="#">
+                                                                ยืนยัน
+                                                            </Link></button>
+                                                    </div>
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                    )
+                    }
+                </>
+            </div >
         </div>
+
+        // </div>
 
 
     )
