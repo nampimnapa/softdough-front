@@ -448,13 +448,14 @@ export default function AddSell({
                         onClick={() => { addData(1, "selltype") }}
                         disabledKeys={["not"]}
                       >
-                        {typesellmenumix.some(type => type.qty_per_unit > 1) ? (
+                        {
+                        typesellmenumix.some(type => type.qty_per_unit > 1) ? (
                           typesellmenumix.map((type) => (
-                            type.qty_per_unit > 1 && (
+                           
                               <SelectItem key={type.smt_id} value={type.smt_id}>
                                 {type.smt_name}
                               </SelectItem>
-                            )
+                            
                           ))
                         ) : (
                           <SelectItem key="not" value="not">
@@ -689,7 +690,7 @@ export default function AddSell({
                       >
                         {typesellmenumix.some(type => type.qty_per_unit == 1) ? (
                           typesellmenumix.map((type) => (
-                            type.qty_per_unit == 1 && (
+                            type.qty_per_unit > 1 && (
                               <SelectItem key={type.smt_id} value={type.smt_id}>
                                 {type.smt_name}
                               </SelectItem>

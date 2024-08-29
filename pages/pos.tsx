@@ -4,7 +4,6 @@ import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import Link from "next/link";
 import { Button, Input, RadioGroup, Radio } from "@nextui-org/react";
-// import { , } from '@headlessui/react'
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, Transition } from '@headlessui/react';
 import { Tabs, Tab, } from "@nextui-org/react";
 import { Spinner, useDisclosure, Image } from "@nextui-org/react";
@@ -22,7 +21,6 @@ import {
     UserGroupIcon,
     CurrencyDollarIcon,
     QueueListIcon,
-    ArrowRightOnRectangleIcon,
     UserCircleIcon, MagnifyingGlassIcon, TrashIcon
 
 } from "@heroicons/react/24/outline";
@@ -35,12 +33,17 @@ function pos() {
     const router = useRouter();
     const { id } = router.query;
     const [Sale, setSale] = useState([]);
+    const [Promotion, setPromotion] = useState([]);
+
     const [typesellmenufix, setTypesellmenufix] = useState([]);
     const [typesellmenumix, setTypesellmenumix] = useState([]);
     const [statusLoading, setStatusLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
+    const [selectedPromotion, setSelectedPromotion] = useState(null);
+    const [selectedPromotionfree, setSelectedPromotionfree] = useState(null);
+    const [hasFreeItems, setHasFreeItems] = useState(true);
 
     const closeModal = () => {
         setIsOpen(false);
@@ -51,11 +54,16 @@ function pos() {
     const handleCancel = () => {
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
+    interface Promotion {
+        dc_name: string,
+        dc_diccountprice: number,
 
+    }
     interface Sale {
         sm_id: number,
         sm_name: String,
         sm_price: number,
+        smt_id: number,
     }
 
     const handleAddToCart = () => {
@@ -85,7 +93,7 @@ function pos() {
                 console.error('Error fetching unit data:', error);
             });
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/promotion/readdis`)
             .then(response => response.json())
             .then(data2 => {
                 setTypesellmenufix(data2);
@@ -95,6 +103,26 @@ function pos() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/promotion/readdis`)
+            .then(response => response.json())
+            .then(promo => {
+                setPromotion(promo);
+                setStatusLoading(true);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/promotion/readfree`)
+            .then(response => response.json())
+            .then(promofree => {
+                setSelectedPromotionfree(promofree);
+                setStatusLoading(true);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
 
     }, [id, setSale]);
     const [open, setOpen] = useState(true)
@@ -109,11 +137,7 @@ function pos() {
         setQuantity(prevQuantity => Math.max(prevQuantity - 1, 1)); // Ensure quantity doesn't go below 1
     };
 
-    const openModal = (sale) => {
-        setIsOpen(true);
-        setSelectedSale(sale);
-        setQuantity(1); // Reset quantity to 1 whenever a new item is selected
-    };
+
     const handleIncreaseQuantity = (id) => {
         setSelectedItems((prevItems) =>
             prevItems.map((item) =>
@@ -132,9 +156,96 @@ function pos() {
         );
     };
     const calculateTotalPrice = () => {
+        const totalPrice = selectedItems.reduce((total, item) => total + item.sm_price * item.quantity, 0);
+        const discount = selectedPromotion ? selectedPromotion.dc_diccountprice : 0;
+        return totalPrice - discount;
+    };
+    const calculateTotalPriceBeforeDiscount = (selectedItems) => {
         return selectedItems.reduce((total, item) => total + item.sm_price * item.quantity, 0);
     };
-    
+
+    const filteredSales = Sale.filter((sale) => sale.smt_id === 4);
+
+    // ส่วน promotion ส่วนลด
+    const handlePromotionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedPromoName = event.target.value;
+        const selectedPromo = Promotion.find(promo => promo.dc_name === selectedPromoName);
+        setSelectedPromotion(selectedPromo || null);
+    };
+
+    const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
+
+    const handleSaleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedSaleId(event.target.value);
+    };
+
+
+    const selectedSaleName = filteredSales.find(sale => sale.sm_id.toString() === selectedSaleId)?.sm_name;
+
+    // Check if selectedPromotion is defined and has details
+    // Function to get the free item names for a given saleId
+    const getFreeItemNames = (saleId) => {
+        if (!selectedPromotionfree || !selectedPromotionfree.length) {
+            return [];
+        }
+
+        // Flatten the details and filter by the saleId
+        const freeItems = selectedPromotionfree.flatMap(promotion =>
+            promotion.detail
+        ).filter(detail => detail.smbuy_id === saleId);
+
+        // Return an array of free item names
+        return freeItems.map(item => item.smfree_id);
+    };
+
+    // Check if promotion is available based on free items
+    const isPromotionAvailable = (saleId) => {
+        const freeItemIds = getFreeItemNames(saleId); // Get free item ids for the given saleId
+
+        // Check if there are any free items available for this saleId
+        return freeItemIds.length > 0;
+    };
+    const getFreeItemIds = () => {
+        if (!selectedPromotionfree || !selectedPromotionfree.length) {
+            return [];
+        }
+
+        // Flatten the details and extract smfree_id
+        return selectedPromotionfree.flatMap(promotion =>
+            promotion.detail.map(detail => detail.smfree_id)
+        );
+    };
+
+    const freeItemIds = getFreeItemIds();
+
+    const isRadioDisabled = (sm_id) => {
+        // Check if the current sm_id is in the list of free item IDs
+        return !freeItemIds.includes(sm_id);
+    };
+
+
+
+    const openModal = (sale) => {
+        setIsOpen(true);
+        setSelectedSale(sale);
+        setQuantity(1); // Reset quantity to 1 whenever a new item is selected
+        console.log('Clicked Sale:', sale);
+        const freeItemName = getFreeItemNames(sale.sm_id);
+        console.log('Free Item Name:', freeItemName);
+    };
+
+    // ฟังก์ชันเปิด modal
+    // const openModal = (sale) => {
+    //     if (isPromotionAvailable(sale.sm_id)) {
+    //         setIsOpen(true);
+    //         setSelectedSale(sale);
+    //         setQuantity(1); // Reset quantity to 1 whenever a new item is selected
+    //     } else {
+    //         alert("This item does not have any promotions.");
+    //     }
+    // };
+
+
     return (
         <div className={kanit.className}>
             <div className="flex flex-col  h-screen">
@@ -239,7 +350,7 @@ function pos() {
                                                                 ))
                                                             ) : (
                                                                 <div className="flex justify-center items-center w-full">
-                                                                    <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
+                                                                    <p className="text-sm text-gray-400">ไม่มีข้อมูล</p>
                                                                 </div>
                                                             )}
 
@@ -337,7 +448,7 @@ function pos() {
                                                                     </p>
                                                                     <p className="ml-4">{product.sm_price * product.quantity} บาท</p>
                                                                 </div>
-                                                                <p className="mt-1 text-sm text-gray-500">x ดิป</p>
+                                                                <p className="mt-1 text-sm text-gray-500"> {selectedSaleName ? `x ${selectedSaleName}` : 'x ดิป'}</p>
                                                             </div>
                                                             <div className="flex flex-1 items-end justify-between text-sm ">
                                                                 <p className="text-gray-500">จำนวน </p>
@@ -409,14 +520,28 @@ function pos() {
                                             id="countries"
                                             className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
                                             name="sell"
+                                            onChange={handlePromotionChange}
+
                                         >
-                                            <option>ขายหน้าร้าน</option>
-                                            <option>เดลิเวอรี่</option>
+                                            <option value="">เลือกโปรโมชัน</option>
+                                            {Promotion.map((promotion, index) => (
+                                                <option key={index} value={promotion.dc_name}>
+                                                    {promotion.dc_name}
+                                                </option>
+                                            ))}
                                         </select>
+                                    </div>
+                                    <div className="flex justify-between text-sm   text-[#73664B]">
+                                        <p>ยอดรวม</p>
+                                        <p>{calculateTotalPriceBeforeDiscount(selectedItems).toFixed(2)} บาท</p>
+                                    </div>
+                                    <div className="flex justify-between text-sm  text-[#73664B]">
+                                        <p>ส่วนลด</p>
+                                        <p>- {selectedPromotion ? selectedPromotion.dc_diccountprice.toFixed(2) : '0.00'} บาท</p>
                                     </div>
                                     <div className="flex justify-between text-base font-medium text-gray-900">
                                         <p>รวมสุทธิ</p>
-                                        <p>{calculateTotalPrice()} บาท</p>
+                                        <p>{calculateTotalPrice().toFixed(2)} บาท</p>
                                     </div>
                                     <div className="mt-6">
                                         <Button
@@ -492,13 +617,22 @@ function pos() {
                                                         <p className="text-lg text-[#73664B] font-medium">
                                                             ดิปซอส <span className='text-sm text-[#73664B] font-normal'>เลือกได้ 1 รสชาติ</span>
                                                         </p>
-                                                        {/* ต้อง fetch มา เมนูสำหรับขาย ไทป์ดิป */}
-                                                        <RadioGroup                                                         >
-                                                            <Radio value="buenos-aires" >ดิป นมฮอกไกโด</Radio>
-                                                            <Radio value="sydney">ดิป ช็อกโกแลต</Radio>
-                                                            <Radio value="san-francisco">ดิป ชาเขียว</Radio>
-                                                            <Radio value="london">ดิป ป๊อกกี้</Radio>
-                                                            <Radio value="tokyo">ดิป ชาไทย</Radio>
+                                                        {/* ต้อง fetch มา เมนูสำหรับขาย ไทป์ดิป 4 */}
+                                                        <RadioGroup
+
+                                                            value={selectedSaleId}
+                                                            onChange={handleSaleChange}>
+                                                            {filteredSales.map((sale) => (
+
+                                                                <Radio
+                                                                isDisabled={isRadioDisabled(sale.sm_id)}
+                                                                key={sale.sm_id}
+                                                                    value={sale.sm_id.toString()}
+                                                                >
+                                                                    {sale.sm_name}
+                                                                </Radio>
+
+                                                            ))}
                                                         </RadioGroup>
                                                         <div>
                                                             <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
