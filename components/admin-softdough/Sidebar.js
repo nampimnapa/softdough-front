@@ -69,7 +69,7 @@ const staffDropdown = [
 const settingDropdown = [
   { title: "รอบการขาย", href: "/setting/roundsell" },
   { title: "ที่อยู่", href: "/setting/address" },
-  { title: "ประเภทการขาย", href: "/setting/selltype" },
+  { title: "ประเภทการขาย", href: "/setting/ordertype" },
   { title: "บรรจุภัณฑ์", href: "/ingredients/all" }
 ];
 
