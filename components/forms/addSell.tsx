@@ -320,6 +320,7 @@ export default function AddSell({
         setSubmitRequested(false);
         sell_all
         onClose();
+        clearData()
       }
     }, 0);
   };
@@ -352,7 +353,7 @@ export default function AddSell({
   }, [sellMenuFix, submitRequested]);
 
   // console.log(sellMenuFix);
-  // console.log(doughAllData)
+  console.log(doughAllData)
 
 
   return (
@@ -531,13 +532,34 @@ export default function AddSell({
                               name="type"
                               onChange={(e) => handleProductChange(index, e.target.value)}
                             >
-                              {doughAllData.map((prod) => (
+                              {/* {doughAllData.map((prod) => (
                                 prod.pdc_id === 1 ? (
                                   <SelectItem key={prod.pd_id} value={prod.pd_id}>
                                     {prod.pd_name}
                                   </SelectItem>
                                 ) : null
-                              ))}
+                              ))} */}
+                              {
+                                selectedType.qty_per_unit > 1 ?
+                                (
+                                  
+                                  doughAllData.map((prod) => (
+                                    prod.pdc_id === 1 ? (
+                                      <SelectItem key={prod.pd_id} value={prod.pd_id}>
+                                        {prod.pd_name}
+                                      </SelectItem>
+                                    ) : null
+                                  ))
+                                ) : (
+                                  doughAllData.map((prod) => (
+                                    prod.pdc_id === 2 ? (
+                                      <SelectItem key={prod.pd_id} value={prod.pd_id}>
+                                        {prod.pd_name}
+                                      </SelectItem>
+                                    ) : null
+                                ))
+                                )
+                              }
 
                             </Select>
                           </div>
@@ -752,7 +774,7 @@ export default function AddSell({
                   </div>
 
 
-                  {sellMenuFix.type !== "" && (
+                  {/* {sellMenuFix.type !== "" && (
                     <Card>
                       <CardBody className="h-[190px] overflow-auto">
                         <RadioGroup
@@ -772,7 +794,96 @@ export default function AddSell({
                         </RadioGroup>
                       </CardBody>
                     </Card>
-                  )}
+                  )} */}
+
+<Card {...(sellMenuFix.type == "" ? { isDisabled: true } : { isDisabled: false })}>
+                    <CardHeader className=" flex justify-between">
+                      <p className="text-xs items-end justify-end text-[#73664B]">จำนวนสินค้าทั้งหมด : {sellMenuFix.product.length}</p>
+                      <p className="text-xs items-end justify-end text-[#73664B]">จำนวนชิ้นคงเหลือ : {remainingQuantity}</p>
+                    </CardHeader>
+                    <Divider />
+                    <CardBody className="h-[150px] overflow-auto">
+                      {sellMenuFix.product.map((product, index) => (
+                        <div key={index} className="flex items-center w-full mt-3">
+                          <div className="flex h-min items-center w-3/4">
+                            <Select
+                              isRequired
+                              label="ประเภทเมนูสำหรับขาย"
+                              className="max-w-xs bg-fourth text-primary label-primary"
+                              size="sm"
+                              color="primary"
+                              name="type"
+                              onChange={(e) => handleProductChange(index, e.target.value)}
+                            >
+                              {doughAllData.map((prod) => (
+                                prod.pdc_id === 1 ? (
+                                  <SelectItem key={prod.pd_id} value={prod.pd_id}>
+                                    {prod.pd_name}
+                                  </SelectItem>
+                                ) : null
+                              ))}
+
+                            </Select>
+                          </div>
+                          <div className="flex w-full">
+                            <p className="text-sm px-2 pl-10 w-2/3 items-end justify-end py-2 text-[#73664B]">จำนวนชิ้น :</p>
+                            <div className="flex items-center w-3/5">
+                              <button
+                                className="btn btn-square bg-[#D9CAA7] btn-sm"
+                                onClick={() => handleQuantityChange(index, -1)}
+                                disabled={sellMenuFix.product[index].id === "" || product.qty === 0}
+                              >
+                                <svg
+                                  className="text-[#73664B]"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="1em"
+                                  height="1em"
+                                  viewBox="0 0 256 256"
+                                >
+                                  <path
+                                    fill="currentColor"
+                                    d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                  />
+                                </svg>
+                              </button>
+                              <span className="w-4 text-center mx-2">{product.qty}</span>
+                              <button
+                                className="btn btn-square bg-[#D9CAA7] btn-sm"
+                                onClick={() => handleQuantityChange(index, 1)}
+                                disabled={sellMenuFix.product[index].id === "" || remainingQuantity === 0}
+
+                              >
+                                <svg
+                                  className="text-[#73664B]"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="1em"
+                                  height="1em"
+                                  viewBox="0 0 256 256"
+                                >
+                                  <path
+                                    fill="currentColor"
+                                    d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                  />
+                                </svg>
+                              </button>
+
+                              <CiTrash
+                                className="text-red-500 text-3xl ml-5"
+                                onClick={() => handleDelete(index)}
+                              />
+
+                            </div>
+
+                          </div>
+                        </div>
+                      ))}
+                      <div className="flex justify-center my-2">
+                        <Button radius="full" size="sm" {...(sellMenuFix.type === "" || remainingQuantity === 0 ? { isDisabled: true } : { isDisabled: false })} className="text-white bg-[#73664B]" onClick={handleAddProduct}>
+                          เลือกสินค้าเพิ่มเติม
+                        </Button>
+                      </div>
+                    </CardBody>
+                  </Card>
 
 
 

@@ -68,24 +68,24 @@ function all() {
 
                     return (
                         <Link href={`/promotion/${ingredients.pm_id}`} >
-                        <div key={ingredients.pm_id} className="card bg-base-100 shadow-[0px_0px_7px_0px_#EEE8DA]">
-                            <div className="card-body p-4">
-                                <div className="flex flex-row items-center justify-between">
-                                    <div className="card-title text-[#F2B461]">{ingredients.pm_name}</div>
-                                    {/* <Link href={`/promotion/editdis/${ingredients.pm_id}`} className="flex justify-end">
+                            <div key={ingredients.pm_id} className="card bg-base-100 shadow-[0px_0px_7px_0px_#EEE8DA]">
+                                <div className="card-body p-4">
+                                    <div className="flex flex-row items-center justify-between">
+                                        <div className="card-title text-[#F2B461]">{ingredients.pm_name}</div>
+                                        {/* <Link href={`/promotion/editdis/${ingredients.pm_id}`} className="flex justify-end">
                                         <PencilSquareIcon className="h-5 w-5 text-[#73664B] ml-auto" />
                                     </Link> */}
-                                    {/* <Link href={`/promotion/${ingredients.pm_id}`} className="flex justify-end">
+                                        {/* <Link href={`/promotion/${ingredients.pm_id}`} className="flex justify-end">
                                         <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
                                     </Link> */}
-                                    
+
+                                    </div>
+                                    <p className="text-[#73664B] text-sm">ประเภทสินค้าที่ซื้อ : {smbuyTypes}</p>
+                                    <p className="text-[#73664B] text-sm">ประเภทสินค้าที่แถม : {smfreeTypes}</p>
+                                    <p className="text-[#73664B] text-sm">เริ่มโปรโมชั่น : {ingredients.pm_datestart}</p>
+                                    <p className="text-[#73664B] text-sm">สิ้นสุดโปรโมชั่น : {ingredients.pm_dateend}</p>
                                 </div>
-                                <p className="text-[#73664B] text-sm">ประเภทสินค้าที่ซื้อ : {smbuyTypes}</p>
-                                <p className="text-[#73664B] text-sm">ประเภทสินค้าที่แถม : {smfreeTypes}</p>
-                                <p className="text-[#73664B] text-sm">เริ่มโปรโมชั่น : {ingredients.pm_datestart}</p>
-                                <p className="text-[#73664B] text-sm">สิ้นสุดโปรโมชั่น : {ingredients.pm_dateend}</p>
                             </div>
-                        </div>
                         </Link>
                     );
                 })}

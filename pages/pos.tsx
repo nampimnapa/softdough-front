@@ -70,7 +70,8 @@ function pos() {
         if (selectedSale) {
             const newItem = {
                 ...selectedSale,
-                quantity: quantity    // You can replace '1' with any quantity logic if needed
+                quantity: quantity,
+                id: selectedSaleId
             };
             setSelectedItems((prevItems) => [...prevItems, newItem]);
             closeModal();
@@ -81,7 +82,12 @@ function pos() {
     const handleRemoveItem = (index) => {
         setSelectedItems((prevItems) => prevItems.filter((_, i) => i !== index));
     };
+    const [todayDate, setTodayDate] = useState('');
 
+    useEffect(() => {
+        const today = new Date().toLocaleDateString(); // Format as needed
+        setTodayDate(today);
+    }, []);
     useEffect(() => {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/small`)
             .then(response => response.json())
@@ -164,6 +170,8 @@ function pos() {
         return selectedItems.reduce((total, item) => total + item.sm_price * item.quantity, 0);
     };
 
+    console.log(selectedItems)
+
     const filteredSales = Sale.filter((sale) => sale.smt_id === 4);
 
     // ส่วน promotion ส่วนลด
@@ -175,15 +183,18 @@ function pos() {
 
     const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
 
+    const [selectedSaleNames, setSelectedSaleNames] = useState<string | null>(null); // เก็บชื่อของสินค้าที่ถูกเลือกทั้งหมดในรูปแบบอาร์เรย์
+
     const handleSaleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedSaleId(event.target.value);
-    };
 
+        // เก็บข้อมูลสินค้าใหม่ที่ถูกเลือก
+        // const newSelectedItem = { id: event.target.value };
+        // setSelectedItems((prevItems) => [...prevItems, newSelectedItem]);
+    };
 
     const selectedSaleName = filteredSales.find(sale => sale.sm_id.toString() === selectedSaleId)?.sm_name;
 
-    // Check if selectedPromotion is defined and has details
-    // Function to get the free item names for a given saleId
     const getFreeItemNames = (saleId) => {
         if (!selectedPromotionfree || !selectedPromotionfree.length) {
             return [];
@@ -198,31 +209,16 @@ function pos() {
         return freeItems.map(item => item.smfree_id);
     };
 
-    // Check if promotion is available based on free items
-    const isPromotionAvailable = (saleId) => {
-        const freeItemIds = getFreeItemNames(saleId); // Get free item ids for the given saleId
-
-        // Check if there are any free items available for this saleId
-        return freeItemIds.length > 0;
-    };
-    const getFreeItemIds = () => {
-        if (!selectedPromotionfree || !selectedPromotionfree.length) {
-            return [];
+    const isRadioDisabled = (sm_id) => {
+        if (!selectedSale) {
+            return true; // If no sale is selected, disable all radios
         }
 
-        // Flatten the details and extract smfree_id
-        return selectedPromotionfree.flatMap(promotion =>
-            promotion.detail.map(detail => detail.smfree_id)
-        );
-    };
+        const freeItemIds = getFreeItemNames(selectedSale.sm_id); // Get free item IDs for the currently selected sale
 
-    const freeItemIds = getFreeItemIds();
-
-    const isRadioDisabled = (sm_id) => {
-        // Check if the current sm_id is in the list of free item IDs
+        // Disable if the current sm_id is NOT in the list of free item IDs
         return !freeItemIds.includes(sm_id);
     };
-
 
 
     const openModal = (sale) => {
@@ -246,6 +242,8 @@ function pos() {
     // };
 
 
+
+    const today = new Date();
     return (
         <div className={kanit.className}>
             <div className="flex flex-col  h-screen">
@@ -367,31 +365,83 @@ function pos() {
                                             key="promotion"
                                             title={
                                                 <div className="flex items-center space-x-2">
-                                                    <span>โปรโมชัน</span>
+                                                    <span>โปรโมชันของแถมวันนี้</span>
                                                 </div>
                                             }
                                         >
                                             <div className="second-tab-layout mx-1">
                                                 <div className="relative overflow-x-auto ">
-                                                    <table className="w-full text-sm text-center text-gray-500">
-                                                        <thead className="">
-                                                            <tr className="text-white  font-normal  bg-[#908362]  ">
-                                                                <td scope="col" className="px-6 py-3 ">
-                                                                    วันที่ผลิต
-                                                                </td>
-                                                                <td scope="col" className="px-12 py-3 ">
-                                                                    ใบสั่งผลิต
-                                                                </td>
-                                                                <td scope="col" className="px-6 py-3">
-                                                                    รายละเอียด
-                                                                </td>
-                                                                <td scope="col" className="px-6 py-3">
-                                                                    อนุมัติดำเนินการผลิต
-                                                                </td>
-                                                            </tr>
-                                                        </thead>
+                                                    <div className="m-4 grid grid-cols-3 gap-3">
+                                                        {Array.isArray(selectedPromotionfree) && selectedPromotionfree.map((ingredients, idx) => {
+                                                            const endDate = new Date(ingredients.pm_dateend);
 
-                                                    </table>
+                                                            // Skip rendering if endDate is before today
+                                                            if (endDate < today) {
+                                                                return null;
+                                                            }
+                                                            // Extract unique smbuytype and smfreetype values
+                                                            const smbuyTypes = [...new Set(ingredients.detail.map(detail => detail.smbuytype))].join(', ');
+                                                            const smfreeTypes = [...new Set(ingredients.detail.map(detail => detail.smfreetype))].join(', ');
+
+                                                            return (
+                                                                <Link href={`/promotion/${ingredients.pm_id}`} >
+                                                                    <div key={ingredients.pm_id} className="card bg-base-100 shadow-[0px_0px_7px_0px_#EEE8DA]">
+                                                                        <div className="card-body p-4">
+                                                                            <div className="flex flex-row items-center justify-between">
+                                                                                <div className="card-title text-[#F2B461]">{ingredients.pm_name}</div>
+
+                                                                            </div>
+                                                                            <p className="text-[#73664B] text-sm">ประเภทสินค้าที่ซื้อ : {smbuyTypes}</p>
+                                                                            <p className="text-[#73664B] text-sm">ประเภทสินค้าที่แถม : {smfreeTypes}</p>
+                                                                            <p className="text-[#73664B] text-sm">เริ่มโปรโมชั่น : {ingredients.pm_datestart}</p>
+                                                                            <p className="text-[#73664B] text-sm">สิ้นสุดโปรโมชั่น : {ingredients.pm_dateend}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </Link>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Tab>
+                                        <Tab
+                                            key="promotion1"
+                                            title={
+                                                <div className="flex items-center space-x-2">
+                                                    <span>โปรโมชันลดราคาวันนี้</span>
+                                                </div>
+                                            }
+                                        >
+                                            <div className="third-tab-layout mx-1">
+                                                <div className="relative overflow-x-auto ">
+                                                    <div className="m-4 grid grid-cols-3 gap-3">
+                                                        {Array.isArray(Promotion) && Promotion.map((promotion) => {
+                                                            const endDate = new Date(promotion.dateend);
+
+                                                            // Skip rendering if endDate is before today
+                                                            if (endDate < today) {
+                                                                return null;
+                                                            }
+
+                                                            return (
+                                                                <div key={promotion.dc_id} className="card bg-base-100 shadow-[0px_0px_7px_0px_#EEE8DA]">
+                                                                    <div className="card-body p-4">
+                                                                        <div className="flex flex-row items-center justify-between">
+                                                                            <div className="card-title text-[#F2B461]">{promotion.dc_name}</div>
+                                                                            <Link href={`/promotion/editdis/${promotion.dc_id}`} className="flex justify-end">
+                                                                                <PencilSquareIcon className="h-5 w-5 text-[#73664B] ml-auto" />
+                                                                            </Link>
+                                                                        </div>
+                                                                        <p className="text-[#73664B] text-sm">รายละเอียด: {promotion.dc_detail}</p>
+                                                                        <p className="text-[#73664B] text-sm">ราคาส่วนลด: {promotion.dc_diccountprice} บาท</p>
+                                                                        <p className="text-[#73664B] text-sm">เริ่มโปรโมชั่น: {promotion.datestart}</p>
+                                                                        <p className="text-[#73664B] text-sm">สิ้นสุดโปรโมชั่น: {promotion.dateend}</p>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Tab>
@@ -399,9 +449,7 @@ function pos() {
                                 </div>
                             </div>
                             {/* Repeat or add more content to make the left section scrollable */}
-                            <div className="mt-4">
 
-                            </div>
                         </div>
                     </div>
 
@@ -414,7 +462,7 @@ function pos() {
                                         <p className="text-lg font-medium text-[#73664B]">คำสั่งซื้อ</p>
                                     </div>
                                     <div className="flex items-start justify-between mt-2">
-                                        <p className="font-normal text-[#73664B]">วันที่</p>
+                                        <p className="font-normal text-[#73664B]">วันที่ : {todayDate}</p>
                                     </div>
                                     <div className="flex items-start justify-between mt-2 ">
                                         <select
@@ -448,7 +496,12 @@ function pos() {
                                                                     </p>
                                                                     <p className="ml-4">{product.sm_price * product.quantity} บาท</p>
                                                                 </div>
-                                                                <p className="mt-1 text-sm text-gray-500"> {selectedSaleName ? `x ${selectedSaleName}` : 'x ดิป'}</p>
+                                                                <p className="mt-1 text-sm text-gray-500">
+                                                                    {filteredSales.find((sale) => sale.sm_id.toString() === product.id)?.sm_name
+                                                                        ? `x ${filteredSales.find((sale) => sale.sm_id.toString() === product.id)?.sm_name}`
+                                                                        : 'x ดิป'}
+                                                                </p>
+
                                                             </div>
                                                             <div className="flex flex-1 items-end justify-between text-sm ">
                                                                 <p className="text-gray-500">จำนวน </p>
@@ -523,10 +576,10 @@ function pos() {
                                             onChange={handlePromotionChange}
 
                                         >
-                                            <option value="">เลือกโปรโมชัน</option>
+                                            <option value="" >ไม่มีโปรโมชัน</option>
                                             {Promotion.map((promotion, index) => (
                                                 <option key={index} value={promotion.dc_name}>
-                                                    {promotion.dc_name}
+                                                    {promotion.dc_name} ,    {promotion.dc_diccountprice}
                                                 </option>
                                             ))}
                                         </select>
@@ -618,22 +671,19 @@ function pos() {
                                                             ดิปซอส <span className='text-sm text-[#73664B] font-normal'>เลือกได้ 1 รสชาติ</span>
                                                         </p>
                                                         {/* ต้อง fetch มา เมนูสำหรับขาย ไทป์ดิป 4 */}
-                                                        <RadioGroup
-
-                                                            value={selectedSaleId}
-                                                            onChange={handleSaleChange}>
+                                                        <RadioGroup value={selectedSaleId} onChange={handleSaleChange}>
                                                             {filteredSales.map((sale) => (
-
                                                                 <Radio
-                                                                isDisabled={isRadioDisabled(sale.sm_id)}
-                                                                key={sale.sm_id}
+                                                                    isDisabled={isRadioDisabled(sale.sm_id)} // Check each radio's sm_id against the current free items
+                                                                    key={sale.sm_id}
                                                                     value={sale.sm_id.toString()}
                                                                 >
                                                                     {sale.sm_name}
                                                                 </Radio>
-
                                                             ))}
                                                         </RadioGroup>
+
+
                                                         <div>
                                                             <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
 
