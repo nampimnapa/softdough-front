@@ -42,7 +42,7 @@ function pos() {
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedPromotion, setSelectedPromotion] = useState(null);
-    const [selectedPromotionfree, setSelectedPromotionfree] = useState(null);
+    const [selectedPromotionfree, setSelectedPromotionfree] = useState<PromoFree | null>(null);
     const [hasFreeItems, setHasFreeItems] = useState(true);
 
     const closeModal = () => {
@@ -65,6 +65,23 @@ function pos() {
         sm_price: number,
         smt_id: number,
     }
+    interface PromoFreeDetail {
+        smbuy_id: number;
+        smfree_id: number;
+        smbuy_idnamet: string;
+        smfree_idnamet: string;
+        smbuytype: string;
+        smfreetype: string;
+    }
+
+    interface PromoFree {
+        pm_id: number;
+        pm_name: string;
+        pm_datestart: string;
+        pm_dateend: string;
+        detail: PromoFreeDetail[];
+    }
+
 
     const handleAddToCart = () => {
         if (selectedSale) {
@@ -83,6 +100,7 @@ function pos() {
         setSelectedItems((prevItems) => prevItems.filter((_, i) => i !== index));
     };
     const [todayDate, setTodayDate] = useState('');
+    const [smfreeIdNameMap, setSmfreeIdNameMap] = useState<Map<number, string>>(new Map());
 
     useEffect(() => {
         const today = new Date().toLocaleDateString(); // Format as needed
@@ -124,7 +142,16 @@ function pos() {
             .then(promofree => {
                 setSelectedPromotionfree(promofree);
                 setStatusLoading(true);
+                // สร้างแผนที่ smfree_id กับชื่อ
+                const idNameMap = new Map<number, string>();
+                promofree.flatMap(promotion => promotion.detail).forEach(item => {
+                    idNameMap.set(item.smfree_id, item.smfree_idnamet);
+                });
+                setSmfreeIdNameMap(idNameMap);
+                console.log('smfreeIdNameMap:', idNameMap); // ตรวจสอบค่าของ smfreeIdNameMap
+
             })
+
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
@@ -170,9 +197,9 @@ function pos() {
         return selectedItems.reduce((total, item) => total + item.sm_price * item.quantity, 0);
     };
 
-    console.log(selectedItems)
 
-    const filteredSales = Sale.filter((sale) => sale.smt_id === 4);
+
+    // const filteredSales = Sale.filter((sale) => sale.smt_id === 4);
 
     // ส่วน promotion ส่วนลด
     const handlePromotionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -193,32 +220,47 @@ function pos() {
         // setSelectedItems((prevItems) => [...prevItems, newSelectedItem]);
     };
 
-    const selectedSaleName = filteredSales.find(sale => sale.sm_id.toString() === selectedSaleId)?.sm_name;
+    // const selectedSaleName = filteredSales.find(sale => sale.sm_id.toString() === selectedSaleId)?.sm_name;
 
-    const getFreeItemNames = (saleId) => {
-        if (!selectedPromotionfree || !selectedPromotionfree.length) {
+    // const getFreeItemNames = (saleId) => {
+    //     if (!selectedPromotionfree || !selectedPromotionfree.length) {
+    //         return [];
+    //     }
+
+    //     // Flatten the details and filter by the saleId
+    //     const freeItems = selectedPromotionfree.flatMap(promotion =>
+    //         promotion.detail
+    //     ).filter(detail => detail.smbuy_id === saleId);
+
+    //     // Return an array of free item names
+    //     return freeItems.map(item => item.smfree_id);
+    // };
+    const getFreeItemNames = (saleId: number) => {
+        if (!selectedPromotionfree) {
             return [];
         }
 
-        // Flatten the details and filter by the saleId
+        // ดึงข้อมูลรายการฟรีที่ตรงกับ saleId
         const freeItems = selectedPromotionfree.flatMap(promotion =>
             promotion.detail
         ).filter(detail => detail.smbuy_id === saleId);
+        console.log('Free Items:', freeItems); // ตรวจสอบค่าของ freeItems
 
-        // Return an array of free item names
+        // ส่งกลับเป็น smfree_id
         return freeItems.map(item => item.smfree_id);
     };
 
-    const isRadioDisabled = (sm_id) => {
-        if (!selectedSale) {
-            return true; // If no sale is selected, disable all radios
-        }
+    // const isRadioDisabled = (sm_id) => {
+    //     if (!selectedSale) {
+    //         return true; // If no sale is selected, disable all radios
+    //     }
 
-        const freeItemIds = getFreeItemNames(selectedSale.sm_id); // Get free item IDs for the currently selected sale
+    //     const freeItemIds = getFreeItemNames(selectedSale.sm_id); // Get free item IDs for the currently selected sale
 
-        // Disable if the current sm_id is NOT in the list of free item IDs
-        return !freeItemIds.includes(sm_id);
-    };
+    //     // Disable if the current sm_id is NOT in the list of free item IDs
+    //     return !freeItemIds.includes(sm_id);
+    // };
+
 
 
     const openModal = (sale) => {
@@ -226,10 +268,14 @@ function pos() {
         setSelectedSale(sale);
         setQuantity(1); // Reset quantity to 1 whenever a new item is selected
         console.log('Clicked Sale:', sale);
-        const freeItemName = getFreeItemNames(sale.sm_id);
-        console.log('Free Item Name:', freeItemName);
-    };
 
+        const freeItemIds = getFreeItemNames(sale.sm_id);
+        if (freeItemIds.length > 0) {
+            console.log('Free Item IDs:', freeItemIds);
+        } else {
+            console.log('No free items available for this sale.');
+        }
+    };
     // ฟังก์ชันเปิด modal
     // const openModal = (sale) => {
     //     if (isPromotionAvailable(sale.sm_id)) {
@@ -240,10 +286,21 @@ function pos() {
     //         alert("This item does not have any promotions.");
     //     }
     // };
+    const [selectedFreeId, setSelectedFreeId] = useState<string | null>(null);
+
+    // Function to handle changes when a radio button is selected
+    const handleFreeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedFreeId(event.target.value); // เข้าถึงค่า string จาก event
+    };
+
+    const freeItemIds = getFreeItemNames(selectedSale?.sm_id || 0);
+    console.log('Free Item IDs11:', freeItemIds);
+
 
 
 
     const today = new Date();
+
     return (
         <div className={kanit.className}>
             <div className="flex flex-col  h-screen">
@@ -470,8 +527,10 @@ function pos() {
                                             className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
                                             name="sell"
                                         >
+                                            {/* อายฟูฟิกtypeมาเลย แต่ยังไม่ทำกรณีเพิ่ม */}
                                             <option>ขายหน้าร้าน</option>
-                                            <option>เดลิเวอรี่</option>
+                                            <option>Grab</option>
+                                            <option>Line Man</option>
                                         </select>
                                     </div>
 
@@ -496,11 +555,14 @@ function pos() {
                                                                     </p>
                                                                     <p className="ml-4">{product.sm_price * product.quantity} บาท</p>
                                                                 </div>
+
                                                                 <p className="mt-1 text-sm text-gray-500">
-                                                                    {filteredSales.find((sale) => sale.sm_id.toString() === product.id)?.sm_name
-                                                                        ? `x ${filteredSales.find((sale) => sale.sm_id.toString() === product.id)?.sm_name}`
+                                                                    {smfreeIdNameMap.get(parseInt(selectedFreeId))
+                                                                        ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
                                                                         : 'x ดิป'}
                                                                 </p>
+                                                                
+
 
                                                             </div>
                                                             <div className="flex flex-1 items-end justify-between text-sm ">
@@ -668,20 +730,25 @@ function pos() {
 
                                                     <div className="ml-6">
                                                         <p className="text-lg text-[#73664B] font-medium">
-                                                            ดิปซอส <span className='text-sm text-[#73664B] font-normal'>เลือกได้ 1 รสชาติ</span>
+                                                            ของแถม <span className='text-sm text-[#73664B] font-normal'>เลือกได้ 1 รายการ</span>
                                                         </p>
-                                                        {/* ต้อง fetch มา เมนูสำหรับขาย ไทป์ดิป 4 */}
-                                                        <RadioGroup value={selectedSaleId} onChange={handleSaleChange}>
-                                                            {filteredSales.map((sale) => (
-                                                                <Radio
-                                                                    isDisabled={isRadioDisabled(sale.sm_id)} // Check each radio's sm_id against the current free items
-                                                                    key={sale.sm_id}
-                                                                    value={sale.sm_id.toString()}
-                                                                >
-                                                                    {sale.sm_name}
-                                                                </Radio>
-                                                            ))}
-                                                        </RadioGroup>
+
+                                                        {freeItemIds.length > 0 ? (
+                                                            <RadioGroup value={selectedFreeId} onChange={handleFreeChange}>
+                                                                {freeItemIds.map(id => (
+                                                                    <Radio
+                                                                        key={id}
+                                                                        value={id.toString()}
+                                                                    >
+                                                                        {smfreeIdNameMap.get(id) || 'No Name Available'}
+                                                                    </Radio>
+                                                                ))}
+                                                            </RadioGroup>
+                                                        ) : (
+                                                            <p>ไม่มีรายการฟรี</p>
+                                                        )}
+
+
 
 
                                                         <div>
