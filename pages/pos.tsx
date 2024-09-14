@@ -43,7 +43,8 @@ function pos() {
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedPromotion, setSelectedPromotion] = useState(null);
     const [selectedPromotionfree, setSelectedPromotionfree] = useState<PromoFree | null>(null);
-    const [hasFreeItems, setHasFreeItems] = useState(true);
+    const [price, setPrice] = useState([]);
+
 
     const closeModal = () => {
         setIsOpen(false);
@@ -80,6 +81,22 @@ function pos() {
         pm_datestart: string;
         pm_dateend: string;
         detail: PromoFreeDetail[];
+    }
+    interface PriceDeli {
+        odt_id2: number; // Adjust if these fields are optional
+        odt_name2: string;
+        odtd_price2: number;
+        odt_id3: number;
+        odt_name3: string;
+        odtd_price3: number;
+    }
+
+    interface SaleType {
+        sm_id: number;
+        sm_name: string;
+        sm_price: number;
+        pricedeli: PriceDeli[];
+
     }
 
 
@@ -137,6 +154,15 @@ function pos() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/setting/price`)
+            .then(response => response.json())
+            .then(price => {
+                setPrice(price);
+                setStatusLoading(true);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/promotion/readfree`)
             .then(response => response.json())
             .then(promofree => {
@@ -151,10 +177,10 @@ function pos() {
                 console.log('smfreeIdNameMap:', idNameMap); // ตรวจสอบค่าของ smfreeIdNameMap
 
             })
-
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
+
 
 
     }, [id, setSale]);
@@ -299,6 +325,58 @@ function pos() {
 
 
 
+    // delivery
+    const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<number | null>(null);
+
+    const handleDeliveryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedValue = parseInt(event.target.value, 10) ?? 1; // Convert value to number
+        let nameURL = ""
+        if (selectedValue == 1)
+            nameURL = `${process?.env?.NEXT_PUBLIC_API_URL}/salesmenu/small`
+
+        else {
+            nameURL = `${process?.env?.NEXT_PUBLIC_API_URL}/pos/small/${selectedValue}`
+        }
+        setSelectedDeliveryOption(selectedValue);
+        console.log("Updated selectedDeliveryOption:", selectedValue); // Log updated value
+
+        fetch(nameURL)
+            .then(response => response.json())
+            .then(data => {
+                setSale(data);
+                setStatusLoading(true);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    };
+
+
+    const getPriceBasedOnDelivery = (sale: SaleType) => {
+        if (selectedDeliveryOption === null) return sale.sm_price; // Default price
+        // Defensive check
+
+        // Initialize `pricedeli` to an empty array if it's undefined
+        const pricedeli = sale.pricedeli || [];
+
+        console.log("Selected Delivery Option:", selectedDeliveryOption);
+        // console.log("pricedeli data:", pricedeli);
+
+        const deliveryOption = pricedeli.find(d =>
+            d.odt_id2 === selectedDeliveryOption || d.odt_id3 === selectedDeliveryOption
+        );
+
+        // console.log("Delivery Option Found:", deliveryOption);
+
+        return deliveryOption ? deliveryOption.odtd_price2 : sale.sm_price;
+    };
+
+
+
+
+
+
+
     const today = new Date();
 
     return (
@@ -397,8 +475,7 @@ function pos() {
                                                                         </CardBody>
                                                                         <CardFooter className="text-small justify-between">
                                                                             <p className='text-[#73664B]'>{sale.sm_name}</p>
-                                                                            <p className=" text-[#F2B461]">{sale.sm_price} บาท</p>
-
+                                                                            <p className="text-[#F2B461]">{getPriceBasedOnDelivery(sale)} บาท</p>
                                                                         </CardFooter>
                                                                     </Card>
 
@@ -526,11 +603,13 @@ function pos() {
                                             id="countries"
                                             className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
                                             name="sell"
+                                            onChange={handleDeliveryChange}
                                         >
-                                            {/* อายฟูฟิกtypeมาเลย แต่ยังไม่ทำกรณีเพิ่ม */}
-                                            <option>ขายหน้าร้าน</option>
-                                            <option>Grab</option>
-                                            <option>Line Man</option>
+                                            {/* อายฟูฟิกtypeมาเลย แต่ยังไม่ทำกรณีเพิ่ม line2 grab3*/}
+                                            <option value="1">ขายหน้าร้าน</option>
+                                            <option value="2">Line Man</option>
+                                            <option value="3">Grab</option>
+
                                         </select>
                                     </div>
 
@@ -557,11 +636,12 @@ function pos() {
                                                                 </div>
 
                                                                 <p className="mt-1 text-sm text-gray-500">
-                                                                    {smfreeIdNameMap.get(parseInt(selectedFreeId))
+                                                                    {selectedFreeId && smfreeIdNameMap.get(parseInt(selectedFreeId))
                                                                         ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
-                                                                        : 'x ดิป'}
+                                                                        : 'x ดิป'
+                                                                    }
                                                                 </p>
-                                                                
+
 
 
                                                             </div>
