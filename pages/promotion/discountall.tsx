@@ -73,6 +73,7 @@ function all() {
                             </div>
                             <p className="text-[#73664B] text-sm">รายละเอียด : {ingredients.dc_detail}</p>
                             <p className="text-[#73664B] text-sm">ราคาล่วนลด : {ingredients.dc_diccountprice} บาท</p>
+                            <p className="text-[#73664B] text-sm">ยอดซื้อขั้นต่ำ : {ingredients.minimum} บาท</p>
                             <p className="text-[#73664B] text-sm">เริ่มโปรโมชั่น : {ingredients.datestart} </p>
                             <p className="text-[#73664B] text-sm">สิ้นสุดโปรโมชั่น : {ingredients.dateend}</p>
 

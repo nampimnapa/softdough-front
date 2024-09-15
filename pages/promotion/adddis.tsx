@@ -46,6 +46,7 @@ function add() {
         dc_diccountprice: 0,
         datestart: '',
         dateend: '',
+        minimum:0
     });
 
     // useEffect(() => {
@@ -179,6 +180,23 @@ function add() {
                                 type="number"
                                 name="dc_diccountprice"
                                 value={formData.dc_diccountprice}
+                                onChange={handleInputChange}
+                                autoComplete="family-name"
+                                className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]    sm:text-sm sm:leading-6 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 items-center ">
+                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                            ยอดซื้อขั้นต่ำ :</label>
+                        <div className="mt-2 col-span-2">
+                            <input
+                                placeholder="จำนวนเงิน"
+                                min="0"
+                                type="number"
+                                name="minimum"
+                                value={formData.minimum}
                                 onChange={handleInputChange}
                                 autoComplete="family-name"
                                 className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]    sm:text-sm sm:leading-6 focus:outline-none"
