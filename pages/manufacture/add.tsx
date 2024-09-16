@@ -275,7 +275,7 @@ function Add() {
                                 onClick={handleAddDetail}
                                 type="submit"
                                 value="เพิ่มวัตถุดิบ"
-                                className="text-lg text-white border  bg-[#F2B461] rounded-full py-2 px-2 ">เพิ่มวัตถุดิบ</Button>
+                                className="text-lg text-white border  bg-[#F2B461] rounded-full py-2 px-2 ">เพิ่มสินค้า</Button>
                         </div>
                     </div>
                 </form>

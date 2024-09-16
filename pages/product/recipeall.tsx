@@ -813,7 +813,7 @@ function Recipeall() {
                                             width="100%"
                                             className="mb-3 bg-fourth text-primary"
                                             color="primary"
-                                            name="qtylifetime"
+                                            name="produced_qty"
                                             onChange={handlerecipeData}
                                         />
 
@@ -825,7 +825,7 @@ function Recipeall() {
                                             width="100%"
                                             className="mb-3 bg-fourth text-primary"
                                             color="primary"
-                                            name="produced_qty"
+                                            name="qtylifetime"
                                             onChange={handlerecipeData}
                                         />
                                     </div>
@@ -1122,9 +1122,9 @@ function Recipeall() {
                                             width="100%"
                                             className="mb-3 bg-fourth text-primary"
                                             color="primary"
-                                            name="qtylifetime"
+                                            name="produced_qty"
                                             onChange={handleProductInputEdit}
-                                            value={editProduct.qtylifetime.toString()}
+                                            value={editProduct.produced_qty.toString()}
                                         />
 
                                         <Input
@@ -1135,9 +1135,9 @@ function Recipeall() {
                                             width="100%"
                                             className="mb-3 bg-fourth text-primary"
                                             color="primary"
-                                            name="produced_qty"
+                                            name="qtylifetime"
                                             onChange={handleProductInputEdit}
-                                            value={editProduct.produced_qty.toString()}
+                                            value={editProduct.qtylifetime.toString()}
                                         />
 
                                         <Switch

@@ -36,8 +36,34 @@ export default function EditSalesFixOne({
   const [isDataChanged, setIsDataChanged] = useState(false);
   const [isLoanding, setIsLoading] = useState(false);
   var dataarrayDataSMD = [];
+  let dataType = [];
   const [statusLoadingApi, setStatusLoadingApi] = useState(false);
+  const [productCategory, setProductCategory] = React.useState([]);
+  const [productType, setProductType] = React.useState([]);
 
+  // console.log(sellSelectMix)
+
+  const handleProductTypeChange = (index, value) => {
+    setProductType(prevState => {
+      const updatedProducts = [...prevState];
+      updatedProducts[index] = { pdc_id: productCategory.find(pdc => pdc.pdc_name == value)?.pdc_id };
+      // console.log(value);
+
+      return updatedProducts;
+    });
+  };
+
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
+  const getCategory = () => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
+      .then(response => response.json())
+      .then(data => setProductCategory(data))
+      .catch(error => console.error('Error:', error));
+  }
 
   const changeStatus = () => {
     setSwitchStatus(!switchStatus);
@@ -69,49 +95,76 @@ export default function EditSalesFixOne({
 
   useEffect(() => {
     if (isOpen && idFix) {
-      setStatusLoadingApi(false)
-      getDataSM();
+      setStatusLoadingApi(false);
+      getDough();
     }
-
   }, [isOpen, idFix]);
-
-  const getDataSM = async () => {
+  
+  const getDough = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`);
+      if (!response.ok) {
+        throw new Error(`Error fetching dough data: ${response.statusText}`);
+      }
+      const data = await response.json();
+      setDoughAllData(data);
+  
+      // Fetch sales menu data only after dough data has been successfully fetched
+      await getDataSM(data);
+  
+    } catch (error) {
+      console.error('Error fetching dough data:', error);
+      setStatusLoadingApi(true); // Ensure loading state is updated even if there's an error
+    }
+  };
+  
+  const getDataSM = async (doughAllData) => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/sm/${idFix}`);
       if (!response.ok) {
-        throw new Error(`Error fetching unit data: ${response.statusText}`);
+        throw new Error(`Error fetching sales menu data: ${response.statusText}`);
       }
       const data = await response.json();
-      const dateSMLoad = { sm_id: data[0].sm_id, sm_name: data[0].sm_name, sm_price: data[0].sm_price, status: data[0].status, smt_id: data[0].smt_id, qty_per_unit: data[0].qty_per_unit, smt_name: data[0].smt_name, picture: data[0].picture, fix: data[0].fix }
-      setDataSm(dateSMLoad)
-      setUploadedImage(data[0].picture)
+  
+      const dateSMLoad = {
+        sm_id: data[0].sm_id,
+        sm_name: data[0].sm_name,
+        sm_price: data[0].sm_price,
+        status: data[0].status,
+        smt_id: data[0].smt_id,
+        qty_per_unit: data[0].qty_per_unit,
+        smt_name: data[0].smt_name,
+        picture: data[0].picture,
+        fix: data[0].fix
+      };
+      setDataSm(dateSMLoad);
+      setUploadedImage(data[0].picture);
       setDataSmOld(dateSMLoad);
-      if (data[0].status == "o") {
+  
+      if (data[0].status === "o") {
         setSwitchStatus(true);
-      } else if (data[0].status == "c") {
+      } else if (data[0].status === "c") {
         setSwitchStatus(false);
       }
-
-      data.forEach(element => {
-        dataarrayDataSMD.push({ pd_id: element.pd_id, qty: element.qty })
+  
+      const dataarrayDataSMD = data.map(element => ({ pd_id: element.pd_id, qty: element.qty }));
+      const dataType = data.map(element => {
+        const dough = doughAllData.find(dough => dough.pd_id === element.pd_id);
+        return dough ? { pdc_id: dough.pdc_id } : { pdc_id: null };
       });
+  
       setDataSmd(dataarrayDataSMD);
       setDataSmdOld(dataarrayDataSMD);
-
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`)
-        .then(response => response.json())
-        .then(data => {
-          setDoughAllData(data);
-        })
-        .catch(error => {
-          console.error('Error fetching unit data:', error);
-        });
-      setStatusLoadingApi(true)
-
+      setProductType(dataType);
+  
+      setStatusLoadingApi(true);
+  
     } catch (error) {
-      console.error('Error fetching unit data:', error);
+      console.error('Error fetching sales menu data:', error);
+      setStatusLoadingApi(true); // Ensure loading state is updated even if there's an error
     }
   };
+  
 
   const handleClick = () => {
     inputRef.current.click();
@@ -204,17 +257,23 @@ export default function EditSalesFixOne({
   }
 
   const handleAddProduct = () => {
+    setProductType(prevState => [
+      ...prevState,
+      { pdc_id: 1 }
+    ]);
+  
     setDataSmd(prevState => [
       ...prevState,
-      { pd_name: '', qty: 1 }
+      { pd_id: '', qty: 1 }
     ]);
   };
+  
 
   const handleProductChange = (index, value) => {
     setDataSmd(prevState => {
       const updatedProducts = [...prevState];
-      updatedProducts[index].pd_name = value;
-      const selectedProduct = doughAllData.find(type => type.pd_name === value.toString());
+      const selectedProduct = doughAllData.find(type => type.pd_name === value.toString())?.pd_id;
+      updatedProducts[index].pd_id = selectedProduct;
       console.log(selectedProduct)
       return updatedProducts;
     });
@@ -225,7 +284,7 @@ export default function EditSalesFixOne({
   useEffect(() => {
     const changesInSm = hasChanges(dataSm, dataSmOld);
     const changesInSmd = hasArrayChanges(dataSmd, dataSmdOld);
-    setIsChanged(changesInSm || changesInSmd);
+    setIsChanged(changesInSm && changesInSmd);
   }, [dataSm, dataSmd]);
 
   function hasChanges(newData, oldData) {
@@ -253,10 +312,25 @@ export default function EditSalesFixOne({
     return false;
   }
 
+  const handleDelete = (index) => {
+    setDataSmd(prevState => {
+      const updatedProducts = [...prevState];
+      updatedProducts.splice(index, 1);
+      return updatedProducts;
+    });
+
+    setProductType(prevState => {
+      const updatedProducts = [...prevState];
+      updatedProducts.splice(index, 1);
+      return updatedProducts;
+    });
+  };
+
 
   // console.log("dataSmOld", dataSmdOld);
   // console.log("dataSm", dataSmd);
   // console.log(dataSm == dataSmOld)
+  console.log(productType)
 
   return (
     <Modal
@@ -396,6 +470,26 @@ export default function EditSalesFixOne({
                   <CardBody className="h-[150px] overflow-auto">
                     {dataSmd.map((product, index) => (
                       <div key={index} className="flex items-center w-full mt-3">
+                        <div className="flex h-min items-center w-2/4">
+                          <Select
+                            isRequired
+                            label="ประเภทเมนู"
+                            className="max-w-xs bg-fourth text-primary label-primary"
+                            size="sm"
+                            color="primary"
+                            name="producttype"
+                            selectedKeys={[productCategory.find(cat => cat.pdc_id == productType[index].pdc_id)?.pdc_name]}
+                            onChange={(e) => handleProductTypeChange(index, e.target.value)}
+                          >
+                            {
+                              productCategory.map((prod) => (
+                                <SelectItem key={prod.pdc_name} value={prod.pdc_id}>
+                                  {prod.pdc_name}
+                                </SelectItem>
+                              ))
+                            }
+                          </Select>
+                        </div>
                         <div className="flex h-min items-center w-3/4">
                           <Select
                             isRequired
@@ -407,15 +501,19 @@ export default function EditSalesFixOne({
                             selectedKeys={[doughAllData.find(dough => dough.pd_id == product.pd_id)?.pd_name]}
                             onChange={(e) => handleProductChange(index, e.target.value)}
                           >
-                            {doughAllData.map(prod =>
-                              <SelectItem key={prod.pd_name} value={prod.pd_id}>
-                                {prod.pd_name}
-                              </SelectItem>
-                            )}
+                            {
+                              doughAllData.map(prod =>
+                                prod.pdc_id === productType[index]?.pdc_id ? (
+                                  <SelectItem key={prod.pd_name} value={prod.pd_id}>
+                                    {prod.pd_name}
+                                  </SelectItem>
+                                ) : null
+                              )
+                            }
                           </Select>
                         </div>
                         <div className="flex w-full">
-                          <p className="text-sm px-2 pl-10 w-2/3 text-[#73664B]">จำนวนชิ้น:</p>
+                          <p className="text-sm px-2 pl-3 w-2/3 text-[#73664B]">จำนวนชิ้น:</p>
                           <div className="flex items-center w-3/5">
                             <button
                               className="btn btn-square bg-[#D9CAA7] btn-sm"
@@ -454,7 +552,7 @@ export default function EditSalesFixOne({
                                 />
                               </svg>
                             </button>
-                            <CiTrash className="text-red-500 text-3xl ml-5" />
+                            <CiTrash className="text-red-500 text-3xl ml-5" onClick={() => handleDelete(index)}/>
                           </div>
                         </div>
                       </div>

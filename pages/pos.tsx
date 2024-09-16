@@ -39,25 +39,28 @@ function pos() {
     const [typesellmenumix, setTypesellmenumix] = useState([]);
     const [statusLoading, setStatusLoading] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
+    const [isOpen2, setIsOpen2] = useState(false);
+    const [isOpen3, setIsOpen3] = useState(false);
+
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
     const [selectedPromotion, setSelectedPromotion] = useState(null);
     const [selectedPromotionfree, setSelectedPromotionfree] = useState<PromoFree | null>(null);
     const [price, setPrice] = useState([]);
+    const [addressData, setAddressData] = useState(null);
 
 
     const closeModal = () => {
         setIsOpen(false);
         setSelectedSale(null);
-
     };
-
     const handleCancel = () => {
         closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
     };
     interface Promotion {
         dc_name: string,
         dc_diccountprice: number,
+        minimum: number
 
     }
     interface Sale {
@@ -180,11 +183,30 @@ function pos() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/setting/address`)
+            .then((response) => {
+                console.log('Full response:', response); // Log the full response
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse JSON if the response is okay
+            })
+            .then((data) => {
+                console.log('Fetched data:', data); // Log the parsed data
+                if (data && Array.isArray(data) && data.length > 0) {
+                    console.log('Address object:', data[0]); // Log the first object in the array
+                    setAddressData(data[0]); // Set the first object from the array
+                    setStatusLoading(true); // Indicate loading is complete
+                }
+            })
+            .catch((error) => {
+                console.error('Error fetching address data:', error);
+                setStatusLoading(false); // Loading failed
+            });
 
 
 
     }, [id, setSale]);
-    const [open, setOpen] = useState(true)
 
     const [quantity, setQuantity] = useState(1); // Initial quantity set to 1
 
@@ -222,6 +244,7 @@ function pos() {
     const calculateTotalPriceBeforeDiscount = (selectedItems) => {
         return selectedItems.reduce((total, item) => total + item.sm_price * item.quantity, 0);
     };
+    Promotion.filter((promotion) => calculateTotalPriceBeforeDiscount(selectedItems) >= promotion.minimum)
 
 
 
@@ -302,6 +325,7 @@ function pos() {
             console.log('No free items available for this sale.');
         }
     };
+
     // ฟังก์ชันเปิด modal
     // const openModal = (sale) => {
     //     if (isPromotionAvailable(sale.sm_id)) {
@@ -371,12 +395,52 @@ function pos() {
         return deliveryOption ? deliveryOption.odtd_price2 : sale.sm_price;
     };
 
+    // confirm
+    const openModal2 = () => {
+        setIsOpen2(true);
+
+    };
+    const closeModal2 = () => {
+        setIsOpen2(false);
+    };
+    // เงินทอน
+    const [paymentMethod, setPaymentMethod] = useState('');
+    const [cashReceived, setCashReceived] = useState(0); // Customer's payment amount
+    // Handle payment method change
+    const handlePaymentChange = (e) => {
+        setPaymentMethod(e.target.value);
+    };
+
+    // Calculate change
+    const calculateChange = () => {
+        const totalPrice = calculateTotalPrice();
+        return cashReceived - totalPrice;
+    };
+    const openModal3 = () => {
+        setIsOpen3(true);
+
+    };
+    const closeModal3 = () => {
+        setIsOpen3(false);
+    };
+    // Function to format address
+    const formatAddress = (data) => {
+        if (!data) return 'ไม่มีข้อมูลที่อยู่';
+        return `${data.sh_address}, เขต ${data.sh_ampher}, อำเภอ ${data.sh_district}, จังหวัด ${data.sh_province}, รหัสไปรษณีย์ ${data.sh_zipcode}`;
+    };
+
+    // Debug: Check what data is being fetched
+    console.log('address data:', addressData);
 
 
 
 
-
-
+    const [todayDateTime, setTodayDateTime] = useState('');
+    useEffect(() => {
+        const now = new Date();
+        const formattedDateTime = now.toLocaleString(); // You can customize this format
+        setTodayDateTime(formattedDateTime);
+      }, []);
     const today = new Date();
 
     return (
@@ -596,7 +660,7 @@ function pos() {
                                         <p className="text-lg font-medium text-[#73664B]">คำสั่งซื้อ</p>
                                     </div>
                                     <div className="flex items-start justify-between mt-2">
-                                        <p className="font-normal text-[#73664B]">วันที่ : {todayDate}</p>
+                                        <p className="font-normal text-[#73664B]">วันที่ : {todayDateTime}</p>
                                     </div>
                                     <div className="flex items-start justify-between mt-2 ">
                                         <select
@@ -617,7 +681,6 @@ function pos() {
                                         <div className="flow-root">
                                             <ul role="list" className="-my-6 divide-y divide-gray-200">
                                                 {selectedItems.map((product, index) => (
-
                                                     <li key={index} className="flex py-6">
                                                         <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                                             <img
@@ -638,12 +701,9 @@ function pos() {
                                                                 <p className="mt-1 text-sm text-gray-500">
                                                                     {selectedFreeId && smfreeIdNameMap.get(parseInt(selectedFreeId))
                                                                         ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
-                                                                        : 'x ดิป'
+                                                                        : ''
                                                                     }
                                                                 </p>
-
-
-
                                                             </div>
                                                             <div className="flex flex-1 items-end justify-between text-sm ">
                                                                 <p className="text-gray-500">จำนวน </p>
@@ -670,9 +730,7 @@ function pos() {
                                                                     <button
                                                                         onClick={() => handleIncreaseQuantity(product.sm_id)}
 
-                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
-
-                                                                    >
+                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs">
                                                                         <svg
                                                                             className="text-[#73664B]"
                                                                             xmlns="http://www.w3.org/2000/svg"
@@ -686,17 +744,12 @@ function pos() {
                                                                             />
                                                                         </svg>
                                                                     </button>
-
-
-
                                                                 </div>
                                                                 <div className="flex">
                                                                     <button
                                                                         type="button"
                                                                         className="font-medium "
-                                                                        onClick={() => handleRemoveItem(index)}
-
-                                                                    >
+                                                                        onClick={() => handleRemoveItem(index)}>
                                                                         <TrashIcon className="h-5 w-5 text-red-500" />
                                                                     </button>
                                                                 </div>
@@ -719,11 +772,12 @@ function pos() {
 
                                         >
                                             <option value="" >ไม่มีโปรโมชัน</option>
-                                            {Promotion.map((promotion, index) => (
-                                                <option key={index} value={promotion.dc_name}>
-                                                    {promotion.dc_name} ,    {promotion.dc_diccountprice}
-                                                </option>
-                                            ))}
+                                            {Promotion.filter((promotion) => calculateTotalPriceBeforeDiscount(selectedItems) >= promotion.minimum)
+                                                .map((promotion, index) => (
+                                                    <option key={index} value={promotion.dc_name}>
+                                                        {promotion.dc_name}, {promotion.dc_diccountprice}
+                                                    </option>
+                                                ))}
                                         </select>
                                     </div>
                                     <div className="flex justify-between text-sm   text-[#73664B]">
@@ -740,6 +794,7 @@ function pos() {
                                     </div>
                                     <div className="mt-6">
                                         <Button
+                                            onClick={openModal2}
                                             href="#"
                                             className="flex items-center justify-center rounded-md border border-transparent bg-[#73664B] px-6 py-3 text-base font-medium text-white shadow-sm w-full"
                                         >
@@ -753,8 +808,290 @@ function pos() {
                 </main>
             </div>
             {/* <div className="flex justify-start"> */}
-            <div className="w-1/2  mt-10  flex justify-start " >
+            <div className="w-1/2  mt-10  flex justify-start ">
+                <>
+                    {isOpen2 && (
+                        <Transition appear show={isOpen2} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-black/25" />
+                                </Transition.Child>
 
+                                <div className="fixed inset-0 overflow-y-auto">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 scale-95"
+                                            enterTo="opacity-100 scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 scale-100"
+                                            leaveTo="opacity-0 scale-95"
+                                        >
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                <Dialog.Title
+                                                    as="h3"
+                                                    className="text-lg font-medium leading-6  text-center text-[#73664B]"
+                                                >
+                                                    รายละเอียดคำสั่งซื้อ
+                                                </Dialog.Title>
+
+                                                <div className="mx-6 ">
+                                                    <p className="text-lg text-[#73664B] font-medium mt-3">
+                                                        รายการ
+                                                    </p>
+
+                                                    <div className="space-y-4">
+                                                        {selectedItems.map((product, index) => (
+                                                            <div className="flex justify-between">
+
+                                                                <div key={index}>
+                                                                    <p>{product.quantity} {product.sm_name}</p>
+                                                                    <p className="text-sm text-gray-500">{selectedFreeId && smfreeIdNameMap.get(parseInt(selectedFreeId))
+                                                                        ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
+                                                                        : ''
+                                                                    }</p>
+                                                                </div>
+                                                                <p className="font-medium">{product.sm_price * product.quantity}</p>
+
+                                                            </div>
+                                                        ))}
+
+                                                    </div>
+
+                                                    <div className="mt-6 space-y-2">
+                                                        <div className="flex justify-between">
+                                                            <p>ยอดรวม</p>
+                                                            <p>{calculateTotalPriceBeforeDiscount(selectedItems).toFixed(2)} บาท</p>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <p>ส่วนลด</p>
+                                                            <p>- {selectedPromotion ? selectedPromotion.dc_diccountprice.toFixed(2) : '0.00'} บาท</p>
+                                                        </div>
+                                                        <div className="flex justify-between font-base font-medium">
+                                                            <p>รวมสุทธิ</p>
+                                                            <p>{calculateTotalPrice().toFixed(2)} บาท</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="mt-6">
+                                                        <p>การชำระเงิน:</p>
+                                                        <select
+                                                            id="countries"
+                                                            className="bg-[#E3D9C0] mt-2 block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
+                                                            name="sell"
+                                                            onChange={handlePaymentChange}
+
+                                                        >
+                                                            <option value="tran">โอนจ่าย</option>
+                                                            <option value="cash">เงินสด</option>
+
+                                                        </select>
+
+                                                    </div>
+                                                    {paymentMethod === 'cash' && (
+                                                        <div className="mt-4">
+                                                            <label htmlFor="cashReceived" className="block text-sm text-gray-600">จำนวนเงินที่ลูกค้าจ่าย:</label>
+                                                            <input
+                                                                type="number"
+                                                                id="cashReceived"
+                                                                className="mt-1 w-full rounded-md border-gray-300 py-1.5 pl-2 text-gray-900 shadow-sm sm:text-sm"
+                                                                placeholder="กรอกจำนวนเงิน"
+                                                                value={cashReceived}
+                                                                onChange={(e) => setCashReceived(parseFloat(e.target.value))}
+                                                            />
+
+                                                            <div className="flex justify-between mt-3 text-sm text-[#73664B]">
+                                                                <p>เงินทอน:</p>
+                                                                <p>{cashReceived > 0 ? calculateChange().toFixed(2) : '0.00'} บาท</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/*  choose */}
+                                                <div className="flex justify-end mt-5">
+                                                    <div className="inline-flex justify-end">
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={closeModal2}
+                                                        >
+                                                            ยกเลิก
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={openModal3}
+
+                                                        ><Link href="#">
+                                                                ยืนยัน
+                                                            </Link></button>
+                                                    </div>
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                    )
+                    }
+                </>
+            </div>
+            <div className="w-1/2  mt-10  flex justify-start ">
+                <>
+                    {isOpen3 && (
+                        <Transition appear show={isOpen2} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-black/25" />
+                                </Transition.Child>
+
+                                <div className="fixed inset-0 overflow-y-auto">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 scale-95"
+                                            enterTo="opacity-100 scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 scale-100"
+                                            leaveTo="opacity-0 scale-95"
+                                        >
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                <Dialog.Title
+                                                    as="h3"
+                                                    className="text-lg font-medium leading-6  text-center text-[#73664B]"
+                                                >
+                                                    รายละเอียดคำสั่งซื้อ
+                                                </Dialog.Title>
+
+                                                <div className="mx-6 ">
+                                                    <div className='mt-3'>
+                                                        <p className="text-gray-700">{formatAddress(addressData)}</p>
+
+                                                    </div>
+                                                    <p className=" ">
+                                                        เลขที่ใบเสร็จ
+                                                    </p>
+                                                    <p className="">
+                                                        วันที่ : {todayDateTime}
+                                                    </p>
+                                                    <p className=" ">
+                                                        คำสั่งซื้อ
+                                                    </p>
+                                                    <p className=" ">
+                                                        พนักงานขาย
+                                                    </p>
+                                                    <p className=" ">
+                                                        การขำระเงิน
+                                                    </p>
+                                                    <p className=" ">
+                                                        รายการ
+                                                    </p>
+
+                                                    <div className="space-y-4">
+                                                        {selectedItems.map((product, index) => (
+                                                            <div className="flex justify-between">
+
+                                                                <div key={index}>
+                                                                    <p>{product.quantity} {product.sm_name}</p>
+                                                                    <p className="text-sm text-gray-500">{selectedFreeId && smfreeIdNameMap.get(parseInt(selectedFreeId))
+                                                                        ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
+                                                                        : ''
+                                                                    }</p>
+                                                                </div>
+                                                                <p className="font-medium">{product.sm_price * product.quantity}</p>
+
+                                                            </div>
+                                                        ))}
+
+                                                    </div>
+
+                                                    <div className="mt-6 space-y-2">
+                                                        <div className="flex justify-between">
+                                                            <p>ยอดรวม</p>
+                                                            <p>{calculateTotalPriceBeforeDiscount(selectedItems).toFixed(2)} บาท</p>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <p>ส่วนลด</p>
+                                                            <p>- {selectedPromotion ? selectedPromotion.dc_diccountprice.toFixed(2) : '0.00'} บาท</p>
+                                                        </div>
+                                                        <div className="flex justify-between font-base font-medium">
+                                                            <p>รวมสุทธิ</p>
+                                                            <p>{calculateTotalPrice().toFixed(2)} บาท</p>
+                                                        </div>
+                                                    </div>
+
+                                                    
+                                                    {paymentMethod === 'cash' && (
+                                                        <div className="mt-4">
+                                                            <label htmlFor="cashReceived" className="block text-sm text-gray-600">จำนวนเงินที่ลูกค้าจ่าย:</label>
+                                                            <input
+                                                                type="number"
+                                                                id="cashReceived"
+                                                                className="mt-1 w-full rounded-md border-gray-300 py-1.5 pl-2 text-gray-900 shadow-sm sm:text-sm"
+                                                                placeholder="กรอกจำนวนเงิน"
+                                                                value={cashReceived}
+                                                                onChange={(e) => setCashReceived(parseFloat(e.target.value))}
+                                                            />
+
+                                                            <div className="flex justify-between mt-3 text-sm text-[#73664B]">
+                                                                <p>เงินทอน:</p>
+                                                                <p>{cashReceived > 0 ? calculateChange().toFixed(2) : '0.00'} บาท</p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/*  choose */}
+                                                <div className="flex justify-end mt-5">
+                                                    <div className="inline-flex justify-end">
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={closeModal3}
+                                                        >
+                                                            ยกเลิก
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+
+                                                        ><Link href="#">
+                                                                ยืนยัน
+                                                            </Link></button>
+                                                    </div>
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                    )
+                    }
+                </>
+            </div>
+
+            <div className="w-1/2  mt-10  flex justify-start ">
                 <>
                     {isOpen && (
                         <Transition appear show={isOpen} as={Fragment} >
@@ -827,10 +1164,6 @@ function pos() {
                                                         ) : (
                                                             <p>ไม่มีรายการฟรี</p>
                                                         )}
-
-
-
-
                                                         <div>
                                                             <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
 
@@ -884,7 +1217,6 @@ function pos() {
                                                         >
                                                             ยกเลิก
                                                         </button>
-
                                                         <button
                                                             type="button"
                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
@@ -903,8 +1235,8 @@ function pos() {
                     )
                     }
                 </>
-            </div >
-        </div>
+            </div>
+        </div >
 
         // </div>
 

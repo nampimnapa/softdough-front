@@ -19,6 +19,8 @@ type Staff = {
   dc_diccountprice: string;
   datestart: string;
   dateend: string;
+  minimum: string;
+
 };
 
 function DetailStaff() {
@@ -31,6 +33,7 @@ function DetailStaff() {
     dc_diccountprice: "",
     datestart: "",
     dateend: "",
+    minimum: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -52,7 +55,7 @@ function DetailStaff() {
 
   const handleEditWork = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/promotion/update/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/promotion/update/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -162,6 +165,23 @@ function DetailStaff() {
                 type="number"
                 name="dc_diccountprice"
                 value={staff.dc_diccountprice}
+                onChange={handleInputChange}
+                autoComplete="family-name"
+                className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm placeholder:text-[#C5B182] sm:text-sm sm:leading-6 focus:outline-none"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 items-center">
+            <label htmlFor="minimum" className="block text-sm font-medium leading-6 text-[#73664B] mt-3 text-right mr-5">
+              ยอดซื้อขั้นต่ำ :
+            </label>
+            <div className="mt-2 col-span-2">
+              <input
+                placeholder="จำนวนเงิน"
+                min="0"
+                type="number"
+                name="minimum"
+                value={staff.minimum}
                 onChange={handleInputChange}
                 autoComplete="family-name"
                 className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm placeholder:text-[#C5B182] sm:text-sm sm:leading-6 focus:outline-none"

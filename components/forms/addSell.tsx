@@ -77,6 +77,33 @@ export default function AddSell({
 
   const [switchStatus, setSwitchStatus] = useState(false);
 
+  const [productCategory, setProductCategory] = React.useState([]);
+  const [productType, setProductType] = React.useState([]);
+
+  // console.log(sellSelectMix)
+
+  const handleProductTypeChange = (index, value) => {
+    setProductType(prevState => {
+      const updatedProducts = [...prevState];
+      updatedProducts[index] = { pdc_id: value };
+      // console.log(value);
+
+      return updatedProducts;
+    });
+  };
+
+
+  useEffect(() => {
+    getCategory();
+  }, []);
+
+  const getCategory = () => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
+      .then(response => response.json())
+      .then(data => setProductCategory(data))
+      .catch(error => console.error('Error:', error));
+  }
+
   const changeStatus = () => {
     setSwitchStatus(!switchStatus);
     if (switchStatus) {
@@ -174,6 +201,12 @@ export default function AddSell({
         product: updatedProducts
       };
     });
+
+    setProductType(prevState => {
+      const updatedProducts = [...prevState];
+      updatedProducts.splice(index, 1);
+      return updatedProducts;
+    });
   };
 
   const handleProductInputChangeFix = (e) => {
@@ -266,6 +299,7 @@ export default function AddSell({
     })
     setImageUpload(null);
     setUploadedImage(null);
+    setSellSelectMix([])
   }
 
   // console.log(sellMenuFix.product);
@@ -274,56 +308,59 @@ export default function AddSell({
   // send data to api eyefu
   const sellSubmit = async (sellType) => {
     if (sellType == 2) {
-      if (sellMenuFix.type == "4") {
-        // addData(2, "selltype");
-      } else if (sellMenuFix.type == "1" || sellMenuFix.type == "2") {
+      if (sellMenuFix.type == "1" || sellMenuFix.type == "2") {
         if (sellSelectMix.length > 0) {
-          const newProducts = sellSelectMix.map(item => ({ id: item }));
-          setSellMenuFix(prevState => ({
-            ...prevState,
-            product: [...prevState.product, ...newProducts]
-          }));
-          // addData(2, "selltype");
+          const newProducts = sellSelectMix.map(item => ({ pd_id: item }));
+          setSellMenuFix(prevState => {
+            const updatedMenuFix = {
+              ...prevState,
+              product: [
+                ...(prevState.product || []),
+                ...newProducts
+              ]
+            };
+            submitData(updatedMenuFix);
+
+            return updatedMenuFix;
+          });
         }
       }
+    } else if (sellType == 1) {
+      submitData(sellMenuFix);
     }
+  };
+
+  const submitData = async (dataToSend) => {
+    // console.error("Submit", dataToSend);
     setIsLoading(true);
     setSubmitRequested(true);
 
     setTimeout(async () => {
-      const dataToSend = {
-        sellMenuFix
-      };
-
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/addsm`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(dataToSend.sellMenuFix)
+          body: JSON.stringify(dataToSend)
         });
 
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-
         const result = await response.json();
-        // router.reload();
         updateSaleData();
-        // console.log('Success:', result);
       } catch (error) {
-        // console.error('Error:', error);
-      }
-      finally {
+        // handle error
+      } finally {
         setIsLoading(false);
         setSubmitRequested(false);
-        sell_all
         onClose();
-        clearData()
+        clearData();
       }
     }, 0);
   };
+
 
 
   const addData = (data, name) => {
@@ -353,7 +390,7 @@ export default function AddSell({
   }, [sellMenuFix, submitRequested]);
 
   // console.log(sellMenuFix);
-  console.log(doughAllData)
+  // console.log(doughAllData)
 
 
   return (
@@ -450,19 +487,19 @@ export default function AddSell({
                         disabledKeys={["not"]}
                       >
                         {
-                        typesellmenumix.some(type => type.qty_per_unit > 1) ? (
-                          typesellmenumix.map((type) => (
-                           
+                          typesellmenumix.some(type => type.qty_per_unit > 1) ? (
+                            typesellmenumix.map((type) => (
+
                               <SelectItem key={type.smt_id} value={type.smt_id}>
                                 {type.smt_name}
                               </SelectItem>
-                            
-                          ))
-                        ) : (
-                          <SelectItem key="not" value="not">
-                            ไม่พบประเภทเมนูสำหรับขาย
-                          </SelectItem>
-                        )}
+
+                            ))
+                          ) : (
+                            <SelectItem key="not" value="not">
+                              ไม่พบประเภทเมนูสำหรับขาย
+                            </SelectItem>
+                          )}
                       </Select>
 
                       <Input
@@ -522,7 +559,26 @@ export default function AddSell({
                     <CardBody className="h-[150px] overflow-auto">
                       {sellMenuFix.product.map((product, index) => (
                         <div key={index} className="flex items-center w-full mt-3">
-                          <div className="flex h-min items-center w-3/4">
+                          <div className="flex h-min items-center w-2/4">
+                            <Select
+                              isRequired
+                              label="ประเภทเมนู"
+                              className="max-w-xs bg-fourth text-primary label-primary"
+                              size="sm"
+                              color="primary"
+                              name="producttype"
+                              onChange={(e) => handleProductTypeChange(index, e.target.value)}
+                            >
+                              {
+                                productCategory.map((prod) => (
+                                  <SelectItem key={prod.pdc_id} value={prod.pdc_id}>
+                                    {prod.pdc_name}
+                                  </SelectItem>
+                                ))
+                              }
+                            </Select>
+                          </div>
+                          <div className="flex h-min items-center pl-2 w-3/4">
                             <Select
                               isRequired
                               label="ประเภทเมนูสำหรับขาย"
@@ -532,39 +588,20 @@ export default function AddSell({
                               name="type"
                               onChange={(e) => handleProductChange(index, e.target.value)}
                             >
-                              {/* {doughAllData.map((prod) => (
-                                prod.pdc_id === 1 ? (
-                                  <SelectItem key={prod.pd_id} value={prod.pd_id}>
-                                    {prod.pd_name}
-                                  </SelectItem>
-                                ) : null
-                              ))} */}
                               {
-                                selectedType.qty_per_unit > 1 ?
-                                (
-                                  
-                                  doughAllData.map((prod) => (
-                                    prod.pdc_id === 1 ? (
-                                      <SelectItem key={prod.pd_id} value={prod.pd_id}>
-                                        {prod.pd_name}
-                                      </SelectItem>
-                                    ) : null
-                                  ))
-                                ) : (
-                                  doughAllData.map((prod) => (
-                                    prod.pdc_id === 2 ? (
-                                      <SelectItem key={prod.pd_id} value={prod.pd_id}>
-                                        {prod.pd_name}
-                                      </SelectItem>
-                                    ) : null
-                                ))
-                                )
-                              }
+                                    doughAllData.map((prod) => (
+                                      prod.pdc_id.toString() === productType[index]?.pdc_id ? (
+                                        <SelectItem key={prod.pd_id} value={prod.pd_id}>
+                                          {prod.pd_name}
+                                        </SelectItem>
+                                      ) : null
+                                    ))
 
+                                  }
                             </Select>
                           </div>
                           <div className="flex w-full">
-                            <p className="text-sm px-2 pl-10 w-2/3 items-end justify-end py-2 text-[#73664B]">จำนวนชิ้น :</p>
+                            <p className="text-sm px-2 pl-3 w-2/3 items-end justify-end py-2 text-[#73664B]">จำนวนชิ้น :</p>
                             <div className="flex items-center w-3/5">
                               <button
                                 className="btn btn-square bg-[#D9CAA7] btn-sm"
@@ -774,10 +811,10 @@ export default function AddSell({
                   </div>
 
 
-                  {/* {sellMenuFix.type !== "" && (
+                  {sellMenuFix.type !== "" && (
                     <Card>
                       <CardBody className="h-[190px] overflow-auto">
-                        <RadioGroup
+                        {/* <RadioGroup
                           name="prodiff"
                           onChange={handSelectedChange}
                           value={sellMenuFix.product.length > 0 ? JSON.stringify(sellMenuFix.product[0]) : JSON.stringify({ id: "0", image: "" })}
@@ -791,12 +828,38 @@ export default function AddSell({
                             </CustomRadio>
                           ))}
 
-                        </RadioGroup>
+                        </RadioGroup> */}
+
+                        <CheckboxGroup
+                          value={sellSelectMix}
+                          onChange={(value) => setSellSelectMix(value)}
+                        >
+                          {doughAllData.map((dough, index) => (
+
+                            <Checkbox
+                              classNames={{
+                                base: cn(
+                                  "inline-flex max-w-full w-full bg-content1 m-0",
+                                  "hover:bg-content2 items-center justify-start",
+                                  "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
+                                  "data-[selected=true]:border-primary"
+                                ),
+                                label: "w-full",
+                              }}
+                              key={dough.pd_id} value={dough.pd_id.toString()}
+                            >
+                              <div className="flex justify-start items-center gap-1">
+                                <Avatar radius="sm" src={dough.picture} />
+                                <p className="justify-center ml-3">{dough.pd_name}</p>
+                              </div>
+                            </Checkbox>
+                          ))}
+                        </CheckboxGroup>
                       </CardBody>
                     </Card>
-                  )} */}
+                  )}
 
-<Card {...(sellMenuFix.type == "" ? { isDisabled: true } : { isDisabled: false })}>
+                  {/* <Card {...(sellMenuFix.type == "" ? { isDisabled: true } : { isDisabled: false })}>
                     <CardHeader className=" flex justify-between">
                       <p className="text-xs items-end justify-end text-[#73664B]">จำนวนสินค้าทั้งหมด : {sellMenuFix.product.length}</p>
                       <p className="text-xs items-end justify-end text-[#73664B]">จำนวนชิ้นคงเหลือ : {remainingQuantity}</p>
@@ -883,7 +946,7 @@ export default function AddSell({
                         </Button>
                       </div>
                     </CardBody>
-                  </Card>
+                  </Card> */}
 
 
 

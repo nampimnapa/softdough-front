@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Switch, Input, Card, CardBody, Radio, Avatar, cn, RadioGroup, Button, CardFooter, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Image } from "@nextui-org/react";
+import { CheckboxGroup, Checkbox, Switch, Input, Card, CardBody, Radio, Avatar, cn, RadioGroup, Button, CardFooter, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Image } from "@nextui-org/react";
 
 export const CustomRadio = (props) => {
   const { children, ...otherProps } = props;
@@ -50,6 +50,7 @@ export default function EditSalesFixTwo({
   const [doughAllData, setDoughAllData] = useState([]);
   const [statusLoadingApi, setStatusLoadingApi] = useState(false);
   const [selected, setSelected] = React.useState("");
+  const [sellSelectMix, setSellSelectMix] = React.useState([]);
 
   const inputRef = useRef(null);
 
@@ -80,6 +81,10 @@ export default function EditSalesFixTwo({
       dataarrayDataSMDs.push({ pd_id: data.pd_id, qty: data.qty })
 
       setSelected(data[0].pd_id)
+      const sellSelectMix = data.map((pro) => pro.pd_id.toString());
+      console.log(sellSelectMix)
+      setSellSelectMix(sellSelectMix);
+      setDataSmdOld(sellSelectMix)
 
       fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`)
         .then(response => response.json())
@@ -172,9 +177,14 @@ export default function EditSalesFixTwo({
   }
 
   function handleSubmit() {
+    const newProducts = sellSelectMix.map(item => ({ pd_id: item }));
+    submitData(newProducts);
+  }
+
+  function submitData(data){
     setIsLoading(true);
 
-    var dataLog = { sm_name: dataSm.sm_name, smt_id: dataSm.smt_id, sm_price: dataSm.sm_price, status: dataSm.status, fix: dataSm.fix, picture: dataSm.picture, salesmenudetail: dataSmd };
+    var dataLog = { sm_name: dataSm.sm_name, smt_id: dataSm.smt_id, sm_price: dataSm.sm_price, status: dataSm.status, fix: dataSm.fix, picture: dataSm.picture, salesmenudetail: data };
     console.log("dataSM : ", dataLog);
 
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/editsm/${dataSm.sm_id}`, {
@@ -207,9 +217,9 @@ export default function EditSalesFixTwo({
 
   useEffect(() => {
     const changesInSm = hasChanges(dataSm, dataSmOld);
-    const changesInSmd = hasArrayChanges(dataSmd, dataSmdOld);
+    const changesInSmd = hasArrayChanges(sellSelectMix, dataSmdOld);
     setIsChanged(changesInSm || changesInSmd);
-  }, [dataSm, dataSmd]);
+  }, [dataSm, sellSelectMix]);
 
   function hasChanges(newData, oldData) {
     for (let key in newData) {
@@ -383,7 +393,7 @@ export default function EditSalesFixTwo({
                 </div>
                 <Card>
                   <CardBody className="h-[190px] overflow-auto">
-                    <RadioGroup
+                    {/* <RadioGroup
                       name="prodiff"
                       onChange={handSelectedChange}
                       value={selected}
@@ -398,7 +408,33 @@ export default function EditSalesFixTwo({
                         </CustomRadio>
                       ))}
 
-                    </RadioGroup>
+                    </RadioGroup> */}
+
+                    <CheckboxGroup
+                      value={sellSelectMix}
+                      onChange={(value) => setSellSelectMix(value)}
+                    >
+                      {doughAllData.map((dough, index) => (
+
+                        <Checkbox
+                          classNames={{
+                            base: cn(
+                              "inline-flex max-w-full w-full bg-content1 m-0",
+                              "hover:bg-content2 items-center justify-start",
+                              "cursor-pointer rounded-lg gap-2 p-4 border-2 border-transparent",
+                              "data-[selected=true]:border-primary"
+                            ),
+                            label: "w-full",
+                          }}
+                          key={dough.pd_id} value={dough.pd_id.toString()}
+                        >
+                          <div className="flex justify-start items-center gap-1">
+                            <Avatar radius="sm" src={dough.picture} />
+                            <p className="justify-center ml-3">{dough.pd_name}</p>
+                          </div>
+                        </Checkbox>
+                      ))}
+                    </CheckboxGroup>
                   </CardBody>
                 </Card>
                 <div className="flex justify-end mt-4">
@@ -412,7 +448,7 @@ export default function EditSalesFixTwo({
               </ModalBody>
             </>
           ) : (
-            <Spinner label="Loading..." color="warning" className='my-20'/>
+            <Spinner label="Loading..." color="warning" className='my-20' />
           )
         )}
       </ModalContent>
