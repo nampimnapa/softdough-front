@@ -21,20 +21,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Icon } from '@iconify/react';
 
-import io from 'socket.io-client';
-const socket = io('http://localhost:8080', {
-  query: { userId: 'USER_ID_HERE' }
-});
 
-socket.on('connect', () => {
-  console.log('Connected to server:', socket.id); // ตรวจสอบว่าเชื่อมต่อสำเร็จ
-});
-
-socket.on('lowStockNotification', (alerts) => {
-  console.log('Received lowStockNotification:', alerts); // ตรวจสอบการรับการแจ้งเตือน
-  setLowStockAlerts(prevAlerts => [...prevAlerts, ...alerts]);
-  setNotificationCount(prevCount => prevCount + alerts.length);
-});
 
 
 
@@ -90,6 +77,24 @@ const settingDropdown = [
   { title: "หน่วย", href: "/setting/unit" }
 ];
 
+import io from 'socket.io-client';
+// const socket = io('http://localhost:8080', {
+//   query: { userId: 'USER_ID_HERE' }
+// });
+
+// socket.on('connect', () => {
+//   console.log('Connected to server:', socket.id); // ตรวจสอบว่าเชื่อมต่อสำเร็จ
+// });
+
+// socket.on('lowStockNotification', (alerts) => {
+//   console.log('Received lowStockNotification:', alerts); // ตรวจสอบการรับการแจ้งเตือน
+//   setLowStockAlerts(prevAlerts => [...prevAlerts, ...alerts]);
+//   setNotificationCount(prevCount => prevCount + alerts.length);
+// });
+const socket = io('http://localhost:8080', {
+  query: { userId: 'USER_ID_HERE' }
+});
+
 const Sidebar = ({ children, className }) => {
   const [isActive, setIsActive] = useState(null);
   const handleActive = (page) => {
@@ -134,31 +139,36 @@ const Sidebar = ({ children, className }) => {
   // };
 
   //ใหม่
+  // ใหม่
   const [notificationCount, setNotificationCount] = useState(0);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [lowStockAlerts, setLowStockAlerts] = useState([]);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   useEffect(() => {
-    // Fetch initial notifications
-    fetchNotifications();
-
-    // Listen for lowStockNotification events from the server
-    socket.on('lowStockNotification', (alerts) => {
-      setLowStockAlerts(prevAlerts => [...prevAlerts, ...alerts]);
-      setNotificationCount(prevCount => prevCount + alerts.length);
+    // ตรวจสอบการเชื่อมต่อของ socket
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket.id);
     });
 
-    // Cleanup on component unmount
+    // ดึงการแจ้งเตือนที่ยังไม่ได้อ่านเมื่อ component ถูก mount
+    fetchNotifications();
+
+    // ฟังการแจ้งเตือนเมื่อมีวัตถุดิบปริมาณต่ำกว่าเกณฑ์
+    socket.on('lowStockNotification', (alerts) => {
+      setLowStockAlerts((prevAlerts) => [...prevAlerts, ...alerts]);
+      setNotificationCount((prevCount) => prevCount + alerts.length);
+    });
+
+    // ล้างฟังชั่นที่ใช้ event socket เมื่อ component ถูก unmount
     return () => {
       socket.off('lowStockNotification');
+      socket.disconnect();
     };
   }, []);
 
   const fetchNotifications = async () => {
     try {
-      const userId = 'YOUR_USER_ID'; // ใช้ userId ที่ถูกต้องของผู้ใช้ปัจจุบัน
-      console.log(userId,'userId');
-      const response = await fetch(`http://localhost:8080/notification/unread`, {
+      const response = await fetch('http://localhost:8080/notification/unread', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -166,39 +176,34 @@ const Sidebar = ({ children, className }) => {
         credentials: 'include',
       });
       const data = await response.json();
-      console.log('Fetched notifications:', data); // ตรวจสอบการดึงข้อมูลการแจ้งเตือน
       setLowStockAlerts(data);
       setNotificationCount(data.length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
   };
-  
-  
 
   const handleMarkAsRead = async (notiId) => {
-    console.log('Marking')
     try {
-        await fetch('http://localhost:8080/notification/markAsRead', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
-                noti_id: notiId,
-                // userId: '' // ตรวจสอบว่า userId ถูกต้อง
-            })
-        });
-        console.log('Marked as read:', notiId); // ตรวจสอบว่า mark as read สำเร็จ
-        setLowStockAlerts(prevAlerts => prevAlerts.filter(alert => alert.noti_id !== notiId));
-        setNotificationCount(prevCount => prevCount - 1);
+      await fetch('http://localhost:8080/notification/markAsRead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ noti_id: notiId }),
+      });
+      // ลบการแจ้งเตือนที่อ่านแล้วออกจากรายการ
+      setLowStockAlerts((prevAlerts) => prevAlerts.filter((alert) => alert.noti_id !== notiId));
+      setNotificationCount((prevCount) => prevCount - 1);
     } catch (error) {
-        console.error('Error marking notification as read:', error);
+      console.error('Error marking notification as read:', error);
     }
   };
-  
 
+  const handleBellClick = () => {
+    setIsNotificationOpen(!isNotificationOpen);
+  };
 
 
   return (
@@ -380,6 +385,7 @@ const Sidebar = ({ children, className }) => {
               </div> */}
 
               {/* ลองการแจ้งเตือน*/}
+              {/* มีสีแดง */}
               {/* <div className="notification-bell" onClick={handleBellClick}>
                 <div className="bell-icon relative">
                   <BellIcon className="h-6 w-6 text-[#73664B]" />
@@ -404,7 +410,8 @@ const Sidebar = ({ children, className }) => {
                   </ul>
                 </div>
               )} */}
-              <div className="notification-bell">
+              {/* ไม่มีสีแดง */}
+              {/* <div className="notification-bell">
                 <div className="bell-icon" onClick={() => setShowNotifications(!showNotifications)}>
                   <BellIcon className="h-6 w-6 text-[#73664B]" />
                   {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
@@ -415,7 +422,7 @@ const Sidebar = ({ children, className }) => {
                     <ul>
                       {lowStockAlerts.map(alert => (
                         <li key={alert.noti_id} className="notification-item">
-                          วัตถุดิบ {alert.ind_name} ปริมาณต่ำกว่าเกณฑ์ขั้นต่ำ 
+                          วัตถุดิบ {alert.ind_name} ปริมาณต่ำกว่าเกณฑ์ขั้นต่ำ
                           <button className="mark-read-btn" onClick={() => handleMarkAsRead(alert.noti_id)}>
                             Mark as Read
                           </button>
@@ -424,8 +431,40 @@ const Sidebar = ({ children, className }) => {
                     </ul>
                   </div>
                 )}
-              </div>
+              </div> */}
+              {/* ลองใหม่ */}
+              <div className="border-r border-r-[#C5B182] mr-2 pr-2">
+                {/* {children} */}
 
+                <div className="notification-bell" onClick={handleBellClick}>
+                  <div className="bell-icon relative">
+                    <BellIcon className="h-6 w-6 text-[#73664B]" />
+                    {notificationCount > 0 && (
+                      <span className="badge absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 text-sm">
+                        {notificationCount}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {isNotificationOpen && lowStockAlerts.length > 0 && (
+                  <div className="alert-list absolute bg-white shadow-lg p-4 rounded-md mt-2">
+                    <ul>
+                      {lowStockAlerts.map((alert) => (
+                        <li key={alert.ind_id} className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
+                          <Link href="/ingredients/all" legacyBehavior>
+                            <button className="mark-read-btn" onClick={() => handleMarkAsRead(alert.noti_id)}>
+                              วัตถุดิบ {alert.ind_name} ปริมาณต่ำกว่าเกณฑ์ขั้นต่ำ</button>
+                          </Link>
+                          {/* <button className="mark-read-btn" onClick={() => handleMarkAsRead(alert.noti_id)}>
+                            Mark as Read
+                          </button> */}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
 
 
               <UserCircleIcon className="h-6 w-6 text-[#73664B] justify-end" />
