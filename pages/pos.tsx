@@ -3,7 +3,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import Link from "next/link";
-import { Button, Input, RadioGroup, Radio } from "@nextui-org/react";
+import { Button, Input, RadioGroup, Radio, Checkbox } from "@nextui-org/react";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, Transition } from '@headlessui/react';
 import { Tabs, Tab, } from "@nextui-org/react";
 import { Spinner, useDisclosure, Image } from "@nextui-org/react";
@@ -48,6 +48,7 @@ function pos() {
     const [selectedPromotionfree, setSelectedPromotionfree] = useState<PromoFree | null>(null);
     const [price, setPrice] = useState([]);
     const [addressData, setAddressData] = useState(null);
+    const [Mix, setMix] = useState([]);
 
 
     const closeModal = () => {
@@ -68,6 +69,10 @@ function pos() {
         sm_name: String,
         sm_price: number,
         smt_id: number,
+        fix: string,
+        qty_per_unit: number,
+        pd_id: number
+
     }
     interface PromoFreeDetail {
         smbuy_id: number;
@@ -102,19 +107,33 @@ function pos() {
 
     }
 
+    const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
+    let selectedDiff = "";
+
+    const [selectedSaleNames, setSelectedSaleNames] = useState<string | null>(null); // เก็บชื่อของสินค้าที่ถูกเลือกทั้งหมดในรูปแบบอาร์เรย์
+
+    const handleSaleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedSaleId(event.target.value);
+        // เก็บข้อมูลสินค้าใหม่ที่ถูกเลือก
+        // const newSelectedItem = { id: event.target.value };
+        // setSelectedItems((prevItems) => [...prevItems, newSelectedItem]);
+    };
 
     const handleAddToCart = () => {
         if (selectedSale) {
             const newItem = {
                 ...selectedSale,
                 quantity: quantity,
-                id: selectedSaleId
+                id: selectedFreeId
             };
             setSelectedItems((prevItems) => [...prevItems, newItem]);
+            // console.log("selectedSaleId",selectedFreeId);
+            setSelectedFreeId(null)
             closeModal();
+            closeModalmix();
+
         }
     };
-
 
     const handleRemoveItem = (index) => {
         setSelectedItems((prevItems) => prevItems.filter((_, i) => i !== index));
@@ -127,7 +146,17 @@ function pos() {
         setTodayDate(today);
     }, []);
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/small`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm/${id}`)
+            .then(response => response.json())
+            .then(data => {
+                setMix(data);
+                setStatusLoading(true);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm`)
             .then(response => response.json())
             .then(data => {
                 setSale(data);
@@ -241,12 +270,23 @@ function pos() {
         const discount = selectedPromotion ? selectedPromotion.dc_diccountprice : 0;
         return totalPrice - discount;
     };
+    const [netTotal, setNetTotal] = useState(0); // State for net total
+    useEffect(() => {
+        const newNetTotal = calculateTotalPrice();
+        setNetTotal(newNetTotal); // Update state with the new net total
+    }, [selectedItems, selectedPromotion]);
+
+    const [totalPrice, setTotalPrice] = useState(0); // State to store total price
+
     const calculateTotalPriceBeforeDiscount = (selectedItems) => {
         return selectedItems.reduce((total, item) => total + item.sm_price * item.quantity, 0);
     };
     Promotion.filter((promotion) => calculateTotalPriceBeforeDiscount(selectedItems) >= promotion.minimum)
 
-
+    useEffect(() => {
+        const price = calculateTotalPriceBeforeDiscount(selectedItems); // Calculate total price
+        setTotalPrice(price); // Update state with the new total price
+    }, [selectedItems]); // Depend on selectedItems
 
     // const filteredSales = Sale.filter((sale) => sale.smt_id === 4);
 
@@ -257,17 +297,7 @@ function pos() {
         setSelectedPromotion(selectedPromo || null);
     };
 
-    const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
 
-    const [selectedSaleNames, setSelectedSaleNames] = useState<string | null>(null); // เก็บชื่อของสินค้าที่ถูกเลือกทั้งหมดในรูปแบบอาร์เรย์
-
-    const handleSaleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedSaleId(event.target.value);
-
-        // เก็บข้อมูลสินค้าใหม่ที่ถูกเลือก
-        // const newSelectedItem = { id: event.target.value };
-        // setSelectedItems((prevItems) => [...prevItems, newSelectedItem]);
-    };
 
     // const selectedSaleName = filteredSales.find(sale => sale.sm_id.toString() === selectedSaleId)?.sm_name;
 
@@ -293,7 +323,7 @@ function pos() {
         const freeItems = selectedPromotionfree.flatMap(promotion =>
             promotion.detail
         ).filter(detail => detail.smbuy_id === saleId);
-        console.log('Free Items:', freeItems); // ตรวจสอบค่าของ freeItems
+        // console.log('Free Items:', freeItems); // ตรวจสอบค่าของ freeItems
 
         // ส่งกลับเป็น smfree_id
         return freeItems.map(item => item.smfree_id);
@@ -310,19 +340,45 @@ function pos() {
     //     return !freeItemIds.includes(sm_id);
     // };
 
-
-
+    const [isOpenmix, setIsOpenmix] = useState(false);
+    const closeModalmix = () => {
+        setIsOpenmix(false);
+    };
     const openModal = (sale) => {
-        setIsOpen(true);
-        setSelectedSale(sale);
-        setQuantity(1); // Reset quantity to 1 whenever a new item is selected
-        console.log('Clicked Sale:', sale);
+        const fixValue = String(sale.fix);
+        if (fixValue === "2") {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm/${sale.sm_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    setMix(data); // Store the fetched data in the state
+                    setStatusLoading(true);
+                })
+                .catch(error => {
+                    console.error('Error fetching unit data:', error);
+                });
+            setIsOpen(false); // Close the regular modal
 
-        const freeItemIds = getFreeItemNames(sale.sm_id);
-        if (freeItemIds.length > 0) {
-            console.log('Free Item IDs:', freeItemIds);
+            // Open a different modal for `fix: "2"`
+            setIsOpenmix(true); // Assuming you have another state for a different modal
+            setSelectedSale(sale);
+            setQuantity(1); // Reset quantity to 1 whenever a new item is selected
+
+            console.log('Opening special modal for fix 2:', sale);
         } else {
-            console.log('No free items available for this sale.');
+            setIsOpenmix(false); // Close the special modal
+
+            // Standard modal for other cases
+            setIsOpen(true);
+            setSelectedSale(sale);
+            setQuantity(1); // Reset quantity to 1 whenever a new item is selected
+            console.log('Clicked Sale:', sale);
+
+            const freeItemIds = getFreeItemNames(sale.sm_id);
+            if (freeItemIds.length > 0) {
+                console.log('Free Item IDs:', freeItemIds);
+            } else {
+                console.log('No free items available for this sale.');
+            }
         }
     };
 
@@ -344,19 +400,18 @@ function pos() {
     };
 
     const freeItemIds = getFreeItemNames(selectedSale?.sm_id || 0);
-    console.log('Free Item IDs11:', freeItemIds);
 
 
 
 
     // delivery
-    const [selectedDeliveryOption, setSelectedDeliveryOption] = useState<number | null>(null);
+    const [selectedDeliveryOption, setSelectedDeliveryOption] = useState(1);
 
     const handleDeliveryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedValue = parseInt(event.target.value, 10) ?? 1; // Convert value to number
         let nameURL = ""
         if (selectedValue == 1)
-            nameURL = `${process?.env?.NEXT_PUBLIC_API_URL}/salesmenu/small`
+            nameURL = `${process?.env?.NEXT_PUBLIC_API_URL}/pos/sm`
 
         else {
             nameURL = `${process?.env?.NEXT_PUBLIC_API_URL}/pos/small/${selectedValue}`
@@ -383,7 +438,7 @@ function pos() {
         // Initialize `pricedeli` to an empty array if it's undefined
         const pricedeli = sale.pricedeli || [];
 
-        console.log("Selected Delivery Option:", selectedDeliveryOption);
+        // console.log("Selected Delivery Option:", selectedDeliveryOption);
         // console.log("pricedeli data:", pricedeli);
 
         const deliveryOption = pricedeli.find(d =>
@@ -404,11 +459,13 @@ function pos() {
         setIsOpen2(false);
     };
     // เงินทอน
-    const [paymentMethod, setPaymentMethod] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState(''); //วิธีจ่ายเงิน
     const [cashReceived, setCashReceived] = useState(0); // Customer's payment amount
     // Handle payment method change
     const handlePaymentChange = (e) => {
-        setPaymentMethod(e.target.value);
+        const selectedValue = e.target.value;
+        setPaymentMethod(selectedValue);
+        console.log("เลือกวิธีจ่าย:", paymentMethod);
     };
 
     // Calculate change
@@ -416,10 +473,13 @@ function pos() {
         const totalPrice = calculateTotalPrice();
         return cashReceived - totalPrice;
     };
+
+
     const openModal3 = () => {
         setIsOpen3(true);
 
     };
+
     const closeModal3 = () => {
         setIsOpen3(false);
     };
@@ -430,18 +490,102 @@ function pos() {
     };
 
     // Debug: Check what data is being fetched
-    console.log('address data:', addressData);
+    // console.log('address data:', addressData);
+    const [selectedPdIds, setSelectedPdIds] = useState([]);
+    // const [quantities, setQuantities] = useState({});
+    const [error, setError] = useState("");
+    const [quantities, setQuantities] = useState<{ [key: number]: number }>({});
 
 
+    // Functions to increment and decrement quantity
+    const incrementQuantitymix = (pd_id: number) => {
+        const currentTotal = Object.values(quantities).reduce((acc, qty) => acc + qty, 0);
+        if (currentTotal < selectedSale.qty_per_unit) {
+            setQuantities({
+                ...quantities,
+                [pd_id]: (quantities[pd_id] || 1) + 1,
+            });
+        }
+    };
 
+    const decrementQuantitymix = (pd_id: number) => {
+        if (quantities[pd_id] > 1) {
+            setQuantities({
+                ...quantities,
+                [pd_id]: quantities[pd_id] - 1,
+            });
+        } else {
+            // If quantity is 1 and decremented, remove from selected IDs
+            handleCheckboxChange(pd_id);
+        }
+    };
+    // Function to handle checkbox change
+    const handleCheckboxChange = (pd_id: number) => {
+        if (selectedPdIds.includes(pd_id)) {
+            // If already selected, remove it from the list
+            const newSelectedIds = selectedPdIds.filter(id => id !== pd_id);
+            setSelectedPdIds(newSelectedIds);
+
+            // Remove the quantity entry for this pd_id
+            const { [pd_id]: _, ...rest } = quantities; // Remove the entry from quantities
+            setQuantities(rest);
+        } else {
+            // Check if adding this item would exceed the limit
+            const currentTotal = Object.values(quantities).reduce((acc, qty) => acc + qty, 0);
+            if (currentTotal < selectedSale.qty_per_unit) {
+                setSelectedPdIds([...selectedPdIds, pd_id]);
+                setQuantities({ ...quantities, [pd_id]: 1 }); // Initialize with quantity 1
+            }
+        }
+    };
 
     const [todayDateTime, setTodayDateTime] = useState('');
+
     useEffect(() => {
-        const now = new Date();
-        const formattedDateTime = now.toLocaleString(); // You can customize this format
-        setTodayDateTime(formattedDateTime);
-      }, []);
+        const updateDateTime = () => {
+            const now = new Date();
+            const formattedDateTime = now.toLocaleString(); // Customize the format if needed
+            setTodayDateTime(formattedDateTime);
+        };
+
+        updateDateTime();
+
+        const intervalId = setInterval(updateDateTime, 1000);
+
+        // Clear the interval on component unmount
+        return () => clearInterval(intervalId);
+    }, []);
     const today = new Date();
+    // Update odChange whenever cashReceived changes
+    const [odChange, setOdChange] = useState(0);
+    useEffect(() => {
+        if (paymentMethod === 'c' && cashReceived > 0) {
+            setOdChange(calculateChange()); // Store calculated change
+        } else {
+            setOdChange(0); // Reset change if payment method is not cash
+        }
+    }, [cashReceived, paymentMethod]);
+    const handleSubmit = () => {
+        const discountTotal = selectedPromotion ? selectedPromotion.dc_diccountprice : 0; // Get discount amount
+        const dataOrder = {
+            od_date: todayDateTime,
+            od_qtytotal: selectedItems.reduce((total, product) => total + product.quantity, 0),
+            od_sumdetail: totalPrice, // State to store total price
+            od_change: odChange, //เงินทอน
+            od_pay: cashReceived, //จำนวนเงินสดที่ลูกค้าจ่าย
+            od_paytype: paymentMethod,
+            od_status: 1, //1ปกติ 0ยกเลิก
+            od_net: netTotal,
+            od_discounttotal: discountTotal, //ส่วนลด
+            note: "",
+
+            sh_id: addressData.sh_id, //ที่อยู่
+            odt_id: selectedDeliveryOption, //ประเภทรายการขาย
+            dc_id: selectedPromotion.dc_id,
+            // user_id: "",
+        };
+        console.log("dataOrder : ", dataOrder)
+    }
 
     return (
         <div className={kanit.className}>
@@ -699,10 +843,15 @@ function pos() {
                                                                 </div>
 
                                                                 <p className="mt-1 text-sm text-gray-500">
-                                                                    {selectedFreeId && smfreeIdNameMap.get(parseInt(selectedFreeId))
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
+                                                                    {product.id !== null
+                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
                                                                         : ''
                                                                     }
+                                                                    {selectedPdIds.includes(product.pd_id) && (
+                                                                        <p className="mt-1 text-sm text-gray-500">
+                                                                            Selected: {quantities[product.pd_id] || 1} pieces
+                                                                        </p>
+                                                                    )}
                                                                 </p>
                                                             </div>
                                                             <div className="flex flex-1 items-end justify-between text-sm ">
@@ -855,8 +1004,8 @@ function pos() {
 
                                                                 <div key={index}>
                                                                     <p>{product.quantity} {product.sm_name}</p>
-                                                                    <p className="text-sm text-gray-500">{selectedFreeId && smfreeIdNameMap.get(parseInt(selectedFreeId))
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
+                                                                    <p className="text-sm text-gray-500">{product.id !== null
+                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
                                                                         : ''
                                                                     }</p>
                                                                 </div>
@@ -891,13 +1040,13 @@ function pos() {
                                                             onChange={handlePaymentChange}
 
                                                         >
-                                                            <option value="tran">โอนจ่าย</option>
-                                                            <option value="cash">เงินสด</option>
+                                                            <option value="t" >โอนจ่าย</option>
+                                                            <option value="c" >เงินสด</option>
 
                                                         </select>
 
                                                     </div>
-                                                    {paymentMethod === 'cash' && (
+                                                    {paymentMethod === 'c' && (
                                                         <div className="mt-4">
                                                             <label htmlFor="cashReceived" className="block text-sm text-gray-600">จำนวนเงินที่ลูกค้าจ่าย:</label>
                                                             <input
@@ -909,8 +1058,8 @@ function pos() {
                                                                 onChange={(e) => setCashReceived(parseFloat(e.target.value))}
                                                             />
 
-                                                            <div className="flex justify-between mt-3 text-sm text-[#73664B]">
-                                                                <p>เงินทอน:</p>
+                                                            <div className="flex justify-between mt-3  text-[#73664B]">
+                                                                <p className='font-base font-medium'>เงินทอน:</p>
                                                                 <p>{cashReceived > 0 ? calculateChange().toFixed(2) : '0.00'} บาท</p>
                                                             </div>
                                                         </div>
@@ -988,22 +1137,23 @@ function pos() {
                                                         <p className="text-gray-700">{formatAddress(addressData)}</p>
 
                                                     </div>
-                                                    <p className=" ">
-                                                        เลขที่ใบเสร็จ
-                                                    </p>
+                                                    {/* ต้องเข้า dn หลังจากนี้ เลขที่ใบเสร็จจะสร้างตอนหลังจากนี้ จะออกตอน export pdf */}
+                                                    {/* <p className=" ">
+                                                        เลขที่ใบเสร็จ :
+                                                    </p> */}
                                                     <p className="">
                                                         วันที่ : {todayDateTime}
                                                     </p>
                                                     <p className=" ">
-                                                        คำสั่งซื้อ
+                                                        คำสั่งซื้อ: {selectedDeliveryOption === 1 ? 'ขายหน้าร้าน' : selectedDeliveryOption === 2 ? 'Line Man' : selectedDeliveryOption === 3 ? 'Grab' : ''}
                                                     </p>
                                                     <p className=" ">
-                                                        พนักงานขาย
+                                                        พนักงานขาย :
                                                     </p>
                                                     <p className=" ">
-                                                        การขำระเงิน
+                                                        การขำระเงิน : {paymentMethod === 't' ? 'โอนจ่าย' : paymentMethod === 'c' ? 'เงินสด' : ''}
                                                     </p>
-                                                    <p className=" ">
+                                                    <p className="mt-3">
                                                         รายการ
                                                     </p>
 
@@ -1013,10 +1163,11 @@ function pos() {
 
                                                                 <div key={index}>
                                                                     <p>{product.quantity} {product.sm_name}</p>
-                                                                    <p className="text-sm text-gray-500">{selectedFreeId && smfreeIdNameMap.get(parseInt(selectedFreeId))
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(selectedFreeId))}`
+                                                                    <p className="text-sm text-gray-500">{product.id !== null
+                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
                                                                         : ''
                                                                     }</p>
+
                                                                 </div>
                                                                 <p className="font-medium">{product.sm_price * product.quantity}</p>
 
@@ -1038,27 +1189,37 @@ function pos() {
                                                             <p>รวมสุทธิ</p>
                                                             <p>{calculateTotalPrice().toFixed(2)} บาท</p>
                                                         </div>
+                                                        {paymentMethod === 'c' && (
+                                                            <div className='space-y-2'>
+                                                                <div className="flex justify-between">
+                                                                    <p>เงินสด</p>
+                                                                    <p>{cashReceived.toFixed(2)} บาท</p>
+                                                                </div>
+                                                                <div className="flex justify-between ">
+                                                                    <p>เงินทอน</p>
+                                                                    <p>{cashReceived > 0 ? calculateChange().toFixed(2) : '0.00'} บาท</p>
+                                                                </div>
+                                                            </div>
+                                                        )}
+
                                                     </div>
 
-                                                    
-                                                    {paymentMethod === 'cash' && (
+
+
+                                                    {/* {paymentMethod === 'cash' && (
                                                         <div className="mt-4">
-                                                            <label htmlFor="cashReceived" className="block text-sm text-gray-600">จำนวนเงินที่ลูกค้าจ่าย:</label>
-                                                            <input
-                                                                type="number"
-                                                                id="cashReceived"
-                                                                className="mt-1 w-full rounded-md border-gray-300 py-1.5 pl-2 text-gray-900 shadow-sm sm:text-sm"
-                                                                placeholder="กรอกจำนวนเงิน"
-                                                                value={cashReceived}
-                                                                onChange={(e) => setCashReceived(parseFloat(e.target.value))}
-                                                            />
+
+                                                            <div className="flex justify-between mt-3 text-sm text-[#73664B]">
+                                                                <p>เงินสด:</p>
+                                                                <p>{cashReceived} บาท</p>
+                                                            </div>
 
                                                             <div className="flex justify-between mt-3 text-sm text-[#73664B]">
                                                                 <p>เงินทอน:</p>
                                                                 <p>{cashReceived > 0 ? calculateChange().toFixed(2) : '0.00'} บาท</p>
                                                             </div>
                                                         </div>
-                                                    )}
+                                                    )} */}
                                                 </div>
 
                                                 {/*  choose */}
@@ -1074,10 +1235,10 @@ function pos() {
                                                         <button
                                                             type="button"
                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-
-                                                        ><Link href="#">
-                                                                ยืนยัน
-                                                            </Link></button>
+                                                            onClick={handleSubmit}
+                                                        >
+                                                            ยืนยัน
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </Dialog.Panel>
@@ -1214,6 +1375,214 @@ function pos() {
                                                             type="button"
                                                             className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                             onClick={closeModal}
+                                                        >
+                                                            ยกเลิก
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={handleAddToCart}
+                                                        ><Link href="#">
+                                                                ยืนยัน
+                                                            </Link></button>
+                                                    </div>
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                    )
+                    }
+                </>
+            </div>
+
+            <div className="w-1/2  mt-10  flex justify-start ">
+                <>
+                    {isOpenmix && (
+                        <Transition appear show={isOpenmix} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-black/25" />
+                                </Transition.Child>
+
+                                <div className="fixed inset-0 overflow-y-auto">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 scale-95"
+                                            enterTo="opacity-100 scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 scale-100"
+                                            leaveTo="opacity-0 scale-95"
+                                        >
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                {/* <Dialog.Title
+                                                    as="h3"
+                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                >
+                                                    {selectedSale.sm_name}
+                                                </Dialog.Title> */}
+                                                <div className='flex'>
+                                                    {selectedSale && (
+                                                        <Card shadow="sm">
+                                                            <CardBody className="overflow-visible p-0">
+                                                                <Image
+                                                                    shadow="sm"
+                                                                    radius="lg"
+                                                                    width={200}
+                                                                    src={selectedSale.picture || '/default-image.png'}  // Fallback if picture is missing
+                                                                    className="object-cover h-[140px]"
+                                                                />
+                                                            </CardBody>
+                                                            <CardFooter className="text-small justify-between">
+                                                                <p className='text-[#73664B]'>{selectedSale.sm_name || 'No Name Available'}</p> {/* Fallback for name */}
+                                                                <p className="text-[#F2B461]">{selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}</p> {/* Fallback for price */}
+                                                            </CardFooter>
+                                                        </Card>
+                                                    )}
+
+                                                    <div className="ml-6">
+                                                        {selectedSale && (
+                                                            <p className="text-lg text-[#73664B] font-medium">
+                                                                คละ <span className='text-sm text-[#73664B] font-normal'>เลือกได้ {selectedSale.qty_per_unit} รายการ</span>
+                                                            </p>
+                                                        )}
+
+                                                        <div>
+                                                            {Mix.length > 0 ? (
+                                                                Mix.map(id => (
+                                                                    <div key={id} className="flex items-center space-x-2">
+                                                                        <Checkbox
+                                                                            disabled={
+                                                                                selectedSale && // Ensure selectedSale exists before using its properties
+                                                                                quantities[id.pd_id] === undefined &&
+                                                                                Object.values(quantities).reduce((acc, qty) => acc + qty, 0) >= selectedSale.qty_per_unit
+                                                                            }
+                                                                            size="md"
+                                                                            color="warning"
+                                                                            checked={selectedPdIds.includes(id.pd_id)}
+                                                                            onChange={() => handleCheckboxChange(id.pd_id)}
+                                                                        >
+                                                                            {id.pd_name || 'No Name Available'}
+                                                                        </Checkbox>
+
+                                                                        {/* Quantity controls */}
+                                                                        {selectedPdIds.includes(id.pd_id) && (
+                                                                            <>
+                                                                                <div className="flex items-center mt-2">
+                                                                                    <button
+                                                                                        onClick={() => decrementQuantitymix(id.pd_id)}
+                                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                        disabled={quantities[id.pd_id] <= 1}
+                                                                                    >
+                                                                                        <svg
+                                                                                            className="text-[#73664B]"
+                                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                                            width="1em"
+                                                                                            height="1em"
+                                                                                            viewBox="0 0 256 256"
+                                                                                        >
+                                                                                            <path
+                                                                                                fill="currentColor"
+                                                                                                d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                                            />
+                                                                                        </svg>
+                                                                                    </button>
+                                                                                    <span className="w-4 text-center mx-2">{quantities[id.pd_id] || 1}</span>
+                                                                                    <button
+                                                                                        onClick={() => incrementQuantitymix(id.pd_id)}
+                                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                        disabled={
+                                                                                            selectedSale && // Ensure selectedSale exists before using qty_per_unit
+                                                                                            (quantities[id.pd_id] || 1) >= selectedSale.qty_per_unit
+                                                                                        }
+                                                                                    >
+                                                                                        <svg
+                                                                                            className="text-[#73664B]"
+                                                                                            xmlns="http://www.w3.org/2000/svg"
+                                                                                            width="1em"
+                                                                                            height="1em"
+                                                                                            viewBox="0 0 256 256"
+                                                                                        >
+                                                                                            <path
+                                                                                                fill="currentColor"
+                                                                                                d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                                            />
+                                                                                        </svg>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </>
+                                                                        )}
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                <p>ไม่มีรายการฟรี</p>
+                                                            )}
+
+                                                            <div>
+                                                                <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
+
+                                                                <button
+                                                                    onClick={decrementQuantity}
+
+                                                                    className="mt-2 btn btn-square bg-[#D9CAA7] btn-xs "
+                                                                >
+                                                                    <svg
+                                                                        className="text-[#73664B]"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="1em"
+                                                                        height="1em"
+                                                                        viewBox="0 0 256 256"
+                                                                    >
+                                                                        <path
+                                                                            fill="currentColor"
+                                                                            d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </button>
+                                                                <span className="w-4 text-center mx-2">{quantity}</span>
+                                                                <button
+                                                                    onClick={incrementQuantity}
+
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-xs"
+
+                                                                >
+                                                                    <svg
+                                                                        className="text-[#73664B]"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="1em"
+                                                                        height="1em"
+                                                                        viewBox="0 0 256 256"
+                                                                    >
+                                                                        <path
+                                                                            fill="currentColor"
+                                                                            d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/*  choose */}
+                                                <div className="flex justify-end mt-5">
+                                                    <div className="inline-flex justify-end">
+                                                        <button
+                                                            type="button"
+                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                            onClick={closeModalmix}
                                                         >
                                                             ยกเลิก
                                                         </button>
