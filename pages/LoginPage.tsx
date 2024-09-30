@@ -14,7 +14,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  
+
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +33,7 @@ const LoginPage = () => {
         username: username,
         password: password
       };
-      
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login/login`, {
         method: 'POST',
         headers: {
@@ -50,7 +50,15 @@ const LoginPage = () => {
 
       // ทำสิ่งที่ต้องการหลังจากเข้าสู่ระบบสำเร็จ
       const data = await response.json();
-      console.log(data.message);
+      console.log(data,"data"); // เพิ่มบรรทัดนี้เพื่อตรวจสอบ
+
+      // บันทึก userId ใน localStorage หลังจากเข้าสู่ระบบสำเร็จ
+      localStorage.setItem('userId', data.st_id); // Adjust according to the response structure
+
+      // ตรวจสอบว่า userId ถูกบันทึกใน localStorage
+      // localStorage.setItem('userId', data.st_id);
+      console.log('User ID saved in localStorage:', data.st_id); // เพิ่มบรรทัดนี้เพื่อตรวจสอบ
+
       if (data.message.includes('admin')) {
         router.push('/expenses/add');
       } else if (data.message.includes('production')) {
@@ -74,10 +82,10 @@ const LoginPage = () => {
               <div className="form-control">
                 <p className='text-center font-bold'>เข้าสู่ระบบ</p>
                 <div className='mt-4'>
-                  <Input 
-                    type="text" 
-                    label="ชื่อผู้ใช้งาน" 
-                    placeholder="" 
+                  <Input
+                    type="text"
+                    label="ชื่อผู้ใช้งาน"
+                    placeholder=""
                     name="username"
                     value={username}
                     onChange={handleInputChange}

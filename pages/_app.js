@@ -46,7 +46,7 @@ const kanit = Kanit({
   subsets: ["thai", "latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
-const adminPaths = ['/ingredients', '/dashboard', '/setting', '/manufacture', '/product', '/staff', '/expenses', '/promotion', '/sale'];
+const adminPaths = ['/ingredients', '/dashboard', '/setting', '/manufacture', '/product', '/staff', '/expenses', '/promotion', '/sale','/notification'];
 const staffPaths = ['/staffpro'];
 const staffPaths1 = ['/staffsell'];
 export default function App({ Component, pageProps }) {

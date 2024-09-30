@@ -497,7 +497,7 @@ function Type() {
                             ))}
                             {!loading && !error && typeProducts.length === 0 && (
                                 <tr>
-                                    <td colSpan={2} className="text-center py-3 text-[#73664B]">ไม่มีรายการจ่าย</td>
+                                    <td colSpan={2} className="text-center py-3 text-[#73664B]">ไม่มีรายการเงินทอนตั้งต้น</td>
                                 </tr>
                             )}
                         </tbody>
