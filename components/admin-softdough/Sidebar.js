@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { forwardRef, useState, useEffect } from "react";
+import React, { forwardRef, useState, useEffect, useRef } from "react";
 import Logo from "../../public/images/logo.svg";
 import Link from "next/link";
 import { Disclosure } from "@headlessui/react";
@@ -78,22 +78,7 @@ const settingDropdown = [
 ];
 
 import io from 'socket.io-client';
-// const socket = io('http://localhost:8080', {
-//   query: { userId: 'USER_ID_HERE' }
-// });
 
-// socket.on('connect', () => {
-//   console.log('Connected to server:', socket.id); // ตรวจสอบว่าเชื่อมต่อสำเร็จ
-// });
-
-// socket.on('lowStockNotification', (alerts) => {
-//   console.log('Received lowStockNotification:', alerts); // ตรวจสอบการรับการแจ้งเตือน
-//   setLowStockAlerts(prevAlerts => [...prevAlerts, ...alerts]);
-//   setNotificationCount(prevCount => prevCount + alerts.length);
-// });
-const socket = io('http://localhost:8080', {
-  query: { userId: 'USER_ID_HERE' }
-});
 
 const Sidebar = ({ children, className }) => {
   const [isActive, setIsActive] = useState(null);
@@ -102,70 +87,113 @@ const Sidebar = ({ children, className }) => {
     console.log(isActive);
   };
 
-  //ลองการแจ้งเตือน
-  // const [lowStockAlerts, setLowStockAlerts] = useState([]);
-  // const [isNotificationOpen, setIsNotificationOpen] = useState(false); // State to control notification dropdown
-  // const [isActive1, setIsActive1] = useState(null);
 
-  // // Handle socket connection and receiving low stock alerts
-  // useEffect(() => {
-  //   const socket = io('http://localhost:8080');
-  //   socket.on('connect', () => {
-  //     console.log('Socket.io connected');
-  //   });
-
-  //   // Receive low stock alerts from the server
-  //   socket.on('lowStockNotification', (alerts) => {
-  //     setLowStockAlerts(alerts);
-  //   });
-
-  //   socket.on('disconnect', () => {
-  //     console.log('Socket.io disconnected');
-  //   });
-
-  //   return () => {
-  //     socket.disconnect();
-  //   };
-  // }, []);
-
-  // Toggle notification visibility and clear alert badge when clicked
-  // const handleBellClick = () => {
-  //   setIsNotificationOpen(!isNotificationOpen);
-
-  //   // Clear the alert badge when clicked
-  //   if (lowStockAlerts.length > 0) {
-  //     setLowStockAlerts([]);
-  //   }
-  // };
 
   //ใหม่
-  // ใหม่
-  const [notificationCount, setNotificationCount] = useState(0);
-  const [lowStockAlerts, setLowStockAlerts] = useState([]);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [hasNotifications, setHasNotifications] = useState(false);
 
   useEffect(() => {
-    // ตรวจสอบการเชื่อมต่อของ socket
+    const socket = io('http://localhost:8080', {
+      query: { userId: localStorage.getItem('userId') }, // ส่ง userId
+    });
+
     socket.on('connect', () => {
       console.log('Socket connected:', socket.id);
+      socket.emit('registerUser', localStorage.getItem('userId')); // ลงทะเบียนผู้ใช้
     });
 
-    // ดึงการแจ้งเตือนที่ยังไม่ได้อ่านเมื่อ component ถูก mount
-    fetchNotifications();
-
-    // ฟังการแจ้งเตือนเมื่อมีวัตถุดิบปริมาณต่ำกว่าเกณฑ์
-    socket.on('lowStockNotification', (alerts) => {
-      setLowStockAlerts((prevAlerts) => [...prevAlerts, ...alerts]);
-      setNotificationCount((prevCount) => prevCount + alerts.length);
+    socket.on('newNotification', (notification) => {
+      console.log('Received notification:', notification);
+      setNotifications((prevNotifications) => [...prevNotifications, notification]);
+      setHasNotifications(true);
     });
 
-    // ล้างฟังชั่นที่ใช้ event socket เมื่อ component ถูก unmount
+    fetchUnreadNotifications();
+
+
     return () => {
-      socket.off('lowStockNotification');
       socket.disconnect();
     };
   }, []);
 
+
+
+  const [allNotifications, setAllNotifications] = useState([]);
+
+  const [isNotificationVisible, setIsNotificationVisible] = useState(false);
+
+  // เรียกใช้งานฟังก์ชันเพื่อดึงการแจ้งเตือนทั้งหมดเมื่อมีการกดที่กระดิ่ง
+  const handleBellClick = async () => {
+    setHasNotifications(false); // Reset notification flag
+
+    await markNotificationsAsRead();
+    setIsNotificationVisible(prev => !prev); // สลับการแสดงผลของกล่องการแจ้งเตือน
+
+    await fetchAllNotifications(); // ดึงการแจ้งเตือนทั้งหมด
+  };
+
+  const fetchUnreadNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/notification/unread', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': `Bearer ${token}` // ถ้ามีการยืนยันตัวตน
+        },
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (data.length > 0) {
+        setHasNotifications(true); // แสดงจุดสีแดง
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+  // ฟังก์ชันในการอัปเดตการแจ้งเตือน
+  const markNotificationsAsRead = async () => {
+    try {
+      const userId = localStorage.getItem('userId');
+      const response = await fetch('http://localhost:8080/notification/markAsRead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ userId }), // ส่ง userId เพื่ออัปเดต
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to mark notifications as read');
+      }
+
+      console.log('Notifications marked as read');
+    } catch (error) {
+      console.error('Error marking notifications as read:', error);
+    }
+  };
+  const fetchAllNotifications = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/notification/all', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch notifications');
+      }
+
+      const data = await response.json();
+      console.log('Fetched notifications:', data);
+      setAllNotifications(data); // สมมติว่าคุณมี state เพื่อเก็บ notifications
+    } catch (error) {
+      console.error('Error fetching all notifications:', error);
+    }
+  };
+  // ฟังก์ชันดึงการแจ้งเตือนที่ยังไม่ได้อ่านจาก API
   const fetchNotifications = async () => {
     try {
       const response = await fetch('http://localhost:8080/notification/unread', {
@@ -175,7 +203,13 @@ const Sidebar = ({ children, className }) => {
         },
         credentials: 'include',
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch notifications');
+      }
+
       const data = await response.json();
+      console.log('Fetched notifications:', data);
       setLowStockAlerts(data);
       setNotificationCount(data.length);
     } catch (error) {
@@ -183,9 +217,10 @@ const Sidebar = ({ children, className }) => {
     }
   };
 
+  // ฟังก์ชันจัดการการกดเครื่องหมายว่าอ่านแล้ว
   const handleMarkAsRead = async (notiId) => {
     try {
-      await fetch('http://localhost:8080/notification/markAsRead', {
+      const response = await fetch('http://localhost:8080/notification/markAsRead', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -193,7 +228,12 @@ const Sidebar = ({ children, className }) => {
         credentials: 'include',
         body: JSON.stringify({ noti_id: notiId }),
       });
-      // ลบการแจ้งเตือนที่อ่านแล้วออกจากรายการ
+
+      if (!response.ok) {
+        throw new Error('Failed to mark notification as read');
+      }
+
+      // ลบการแจ้งเตือนที่อ่านแล้วออกจาก state
       setLowStockAlerts((prevAlerts) => prevAlerts.filter((alert) => alert.noti_id !== notiId));
       setNotificationCount((prevCount) => prevCount - 1);
     } catch (error) {
@@ -201,10 +241,13 @@ const Sidebar = ({ children, className }) => {
     }
   };
 
-  const handleBellClick = () => {
-    setIsNotificationOpen(!isNotificationOpen);
-  };
-
+  // ฟังก์ชันจัดการการคลิกที่ไอคอนกระดิ่ง
+  // const handleBellClick = () => {
+  //   setIsNotificationOpen(!isNotificationOpen); // เปิด/ปิดหน้าต่างการแจ้งเตือน
+  //   if (!isNotificationOpen) {
+  //     socket.emit('getNotificationCount'); // ดึงจำนวนการแจ้งเตือนเมื่อเปิดหน้าต่างการแจ้งเตือน
+  //   }
+  // };
 
   return (
     // nav ส่วนบน
@@ -432,39 +475,85 @@ const Sidebar = ({ children, className }) => {
                   </div>
                 )}
               </div> */}
-              {/* ลองใหม่ */}
-              <div className="border-r border-r-[#C5B182] mr-2 pr-2">
-                {/* {children} */}
 
-                <div className="notification-bell" onClick={handleBellClick}>
-                  <div className="bell-icon relative">
-                    <BellIcon className="h-6 w-6 text-[#73664B]" />
-                    {notificationCount > 0 && (
-                      <span className="badge absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 text-sm">
-                        {notificationCount}
-                      </span>
+              {/* ��ู้ใช้ */}
+              <div onClick={handleBellClick} className="border-r border-r-[#C5B182] mr-2 pr-2" style={{ position: 'relative' }}>
+                <BellIcon className="h-6 w-6 text-[#73664B]" />
+                {hasNotifications && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '0',
+                    right: '0',
+                    width: '10px',
+                    height: '10px',
+                    borderRadius: '50%',
+                    backgroundColor: 'red',
+                  }} />
+                )}
+
+                {/* แสดงกล่องการแจ้งเตือน */}
+                {isNotificationVisible && (
+                  // <div className="notification-box" style={{
+                  //   position: 'absolute',
+                  //   top: '30px', // ปรับตำแหน่งตามต้องการ
+                  //   right: '0',
+                  //   backgroundColor: 'white',
+                  //   border: '1px solid #ccc',
+                  //   borderRadius: '8px',
+                  //   boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                  //   zIndex: 1000,
+                  //   padding: '10px',
+                  //   width: '250px', // ปรับความกว้างตามต้องการ
+                  // }}>
+                  <div className="absolute right-0 z-10 mt-2 w-96 origin-top-right rounded-md bg-white shadow-md ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in">
+                    {/* <button onClick={() => setIsNotificationVisible(false)} style={{
+                      background: 'none',
+                      border: 'none',
+                      float: 'right',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                    }}>✖️</button> ปุ่มปิดกล่อง */}
+                    {allNotifications.length > 0 ? (
+                      <>
+                        <div className="flex justify-center items-centerpx-5 py-3 mx-1 mt-2 text-[#73664B] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]">การแจ้งเตือน</div>
+                        {allNotifications.slice(0, 7).map(notification => (
+                          <div
+                          key={notification.id}
+                          className="flex flex-row items-center px-5 py-3 mx-1 text-[#73664B] hover:bg-[#FFFFDD] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]"
+                        >
+                          <div className="flex-grow">
+                            {notification.ind_name} ใกล้หมดสต็อก
+                          </div>
+                          <span className="ml-auto text-xs text-gray-500">{notification.timeAgo}</span> {/* จัดให้อยู่ขวาสุดและเล็กลง */}
+                        </div>
+                        
+                        ))}
+                        {allNotifications.length > 7 && (
+                          <div
+                            className="flex justify-center items-center px-4 py-2 mb-2 text-[#73664B] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]"
+                            style={{
+                              cursor: 'pointer',
+                              color: '#73664B',
+                              textDecoration: 'underline',
+                              width: '100%', // ทำให้ div กว้างเต็ม
+                            }}
+                            onClick={() => window.location.href = '/notification/noti'}>
+                            ดูทั้งหมด
+                          </div>
+
+
+                        )}
+                      </>
+                    ) : (
+                      <div>No new notifications</div> // แสดงข้อความเมื่อไม่มีการแจ้งเตือน
                     )}
                   </div>
-                </div>
-
-                {isNotificationOpen && lowStockAlerts.length > 0 && (
-                  <div className="alert-list absolute bg-white shadow-lg p-4 rounded-md mt-2">
-                    <ul>
-                      {lowStockAlerts.map((alert) => (
-                        <li key={alert.ind_id} className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                          <Link href="/ingredients/all" legacyBehavior>
-                            <button className="mark-read-btn" onClick={() => handleMarkAsRead(alert.noti_id)}>
-                              วัตถุดิบ {alert.ind_name} ปริมาณต่ำกว่าเกณฑ์ขั้นต่ำ</button>
-                          </Link>
-                          {/* <button className="mark-read-btn" onClick={() => handleMarkAsRead(alert.noti_id)}>
-                            Mark as Read
-                          </button> */}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 )}
+
+
               </div>
+
+
 
 
               <UserCircleIcon className="h-6 w-6 text-[#73664B] justify-end" />

@@ -58,7 +58,7 @@ const kanit = Kanit({
   subsets: ["thai", "latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
-const adminPaths = ['/ingredients', '/dashboard', '/setting', '/manufacture', '/product', '/staff', '/expenses','/promotion'];
+const adminPaths = ['/ingredients', '/dashboard', '/setting', '/manufacture', '/product', '/staff', '/expenses','/promotion','/notification'];
 const staffPaths = ['/staffsell'];
 export default function App({ Component, pageProps }) {
   const { pathname } = useRouter();
