@@ -49,7 +49,7 @@ const manufactureDropdown = [
 // รายการขาย
 const sellDropdown = [
   { title: "ทำรายการขาย", href: "/ingredients/instore" },
-  { title: "รายการขายทั้งหมด", href: "/ingredients/all" },
+  { title: "รายการขายทั้งหมด", href: "/sale/all" },
   { title: "สต๊อกสินค้า", href: "/ingredients/using" },
   { title: "สรุปยอดรายการขายรายวัน", href: "/ingredients/instore" },
   { title: "รออนุมัติ", href: "/ingredients/using" },

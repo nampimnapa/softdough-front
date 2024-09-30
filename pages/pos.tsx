@@ -8,6 +8,7 @@ import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, Transition } from '@h
 import { Tabs, Tab, } from "@nextui-org/react";
 import { Spinner, useDisclosure, Image } from "@nextui-org/react";
 import { Card, CardBody, CardFooter } from "@nextui-org/react";
+import generatePDF from "../components/puppeteer/generatepdf";
 
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
@@ -29,9 +30,11 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
+
 function pos() {
     const router = useRouter();
     const { id } = router.query;
+
     const [Sale, setSale] = useState([]);
     const [Promotion, setPromotion] = useState([]);
 
@@ -459,7 +462,7 @@ function pos() {
         setIsOpen2(false);
     };
     // เงินทอน
-    const [paymentMethod, setPaymentMethod] = useState(''); //วิธีจ่ายเงิน
+    const [paymentMethod, setPaymentMethod] = useState('t'); //วิธีจ่ายเงิน
     const [cashReceived, setCashReceived] = useState(0); // Customer's payment amount
     // Handle payment method change
     const handlePaymentChange = (e) => {
@@ -565,8 +568,12 @@ function pos() {
             setOdChange(0); // Reset change if payment method is not cash
         }
     }, [cashReceived, paymentMethod]);
-    const handleSubmit = () => {
+
+    const handleSubmit = async () => {
         const discountTotal = selectedPromotion ? selectedPromotion.dc_diccountprice : 0; // Get discount amount
+        // Format the current date to MySQL's DATETIME format
+        const todayDate = new Date(); // Get the current date and time
+        const todayDateTime = todayDate.toISOString().slice(0, 19).replace('T', ' '); // Convert to "YYYY-MM-DD HH:MM:SS"
         const dataOrder = {
             od_date: todayDateTime,
             od_qtytotal: selectedItems.reduce((total, product) => total + product.quantity, 0),
@@ -581,11 +588,81 @@ function pos() {
 
             sh_id: addressData.sh_id, //ที่อยู่
             odt_id: selectedDeliveryOption, //ประเภทรายการขาย
-            dc_id: selectedPromotion.dc_id,
+            dc_id: selectedPromotion?.dc_id || null,
             // user_id: "",
         };
         console.log("dataOrder : ", dataOrder)
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/order`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(dataOrder),
+            });
+
+            // const result = await response.json();
+            if (response.ok) {
+                console.log("Order created successfully");
+                alert("Order created successfully");
+
+                // Fetch ข้อมูลออร์เดอร์ที่เพิ่งบันทึกจาก DB
+                // const od_id = result.od_id; // สมมติว่าผลลัพธ์คืน od_id กลับมา
+
+                const fetchOrderResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/order/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
+
+                const orderData = await fetchOrderResponse.json();
+
+
+                // Call the API route to generate the PDF
+                const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/generate-pdf`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData),
+                });
+
+                if (pdfResponse.ok) {
+                    console.log("PDF generation completed successfully.");
+                    alert("PDF generated successfully!");
+                    const pdfBlob = await pdfResponse.blob(); // รับข้อมูล PDF เป็น Blob
+                    const pdfUrl = URL.createObjectURL(pdfBlob); // สร้าง URL สำหรับ Blob
+                    window.open(pdfUrl, '_blank'); // เปิด PDF ในแท็บใหม่
+                    
+                } else {
+                    console.error("Error generating PDF:", await pdfResponse.json());
+                }
+               
+                closeModal3
+                closeModal2
+            } else {
+                console.error("Failed to create order",);
+            }
+        } catch (error) {
+            console.error("Error submitting order:", error);
+        }
     }
+    // const handleOpenWindow = () => {
+    //     const pdfWindow = window.open('');
+    //     if (pdfWindow) {
+    //         pdfWindow.document.write('This is a test window');
+    //         pdfWindow.document.close();
+    //     } else {
+    //         console.error("Failed to open test window");
+    //     }
+    // };
+
+
+
 
     return (
         <div className={kanit.className}>
@@ -847,11 +924,11 @@ function pos() {
                                                                         ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
                                                                         : ''
                                                                     }
-                                                                    {selectedPdIds.includes(product.pd_id) && (
+                                                                    {/* {selectedPdIds.includes(product.pd_id) && (
                                                                         <p className="mt-1 text-sm text-gray-500">
                                                                             Selected: {quantities[product.pd_id] || 1} pieces
                                                                         </p>
-                                                                    )}
+                                                                    )} */}
                                                                 </p>
                                                             </div>
                                                             <div className="flex flex-1 items-end justify-between text-sm ">
