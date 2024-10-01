@@ -558,6 +558,7 @@ function pos() {
         // Clear the interval on component unmount
         return () => clearInterval(intervalId);
     }, []);
+
     const today = new Date();
     // Update odChange whenever cashReceived changes
     const [odChange, setOdChange] = useState(0);
@@ -568,12 +569,22 @@ function pos() {
             setOdChange(0); // Reset change if payment method is not cash
         }
     }, [cashReceived, paymentMethod]);
-
     const handleSubmit = async () => {
         const discountTotal = selectedPromotion ? selectedPromotion.dc_diccountprice : 0; // Get discount amount
-        // Format the current date to MySQL's DATETIME format
-        const todayDate = new Date(); // Get the current date and time
-        const todayDateTime = todayDate.toISOString().slice(0, 19).replace('T', ' '); // Convert to "YYYY-MM-DD HH:MM:SS"
+
+        // Format the current date to MySQL's DATETIME format (using Bangkok timezone)
+        const today = new Date();
+        const todayDateTime = today.toLocaleString('sv-SE', {
+            timeZone: 'Asia/Bangkok',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false // ใช้รูปแบบ 24 ชั่วโมง
+        }).replace('T', ' '); // แปลงเป็นฟอร์แมต "YYYY-MM-DD HH:MM:SS"
+
         const dataOrder = {
             od_date: todayDateTime,
             od_qtytotal: selectedItems.reduce((total, product) => total + product.quantity, 0),
@@ -590,6 +601,7 @@ function pos() {
             odt_id: selectedDeliveryOption, //ประเภทรายการขาย
             dc_id: selectedPromotion?.dc_id || null,
             // user_id: "",
+            selectedItems
         };
         console.log("dataOrder : ", dataOrder)
 
@@ -637,11 +649,11 @@ function pos() {
                     const pdfBlob = await pdfResponse.blob(); // รับข้อมูล PDF เป็น Blob
                     const pdfUrl = URL.createObjectURL(pdfBlob); // สร้าง URL สำหรับ Blob
                     window.open(pdfUrl, '_blank'); // เปิด PDF ในแท็บใหม่
-                    
+
                 } else {
                     console.error("Error generating PDF:", await pdfResponse.json());
                 }
-               
+
                 closeModal3
                 closeModal2
             } else {
