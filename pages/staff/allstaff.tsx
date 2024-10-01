@@ -377,7 +377,7 @@
 //     const [loading, setLoading] = useState(true);
 
 //     useEffect(() => {
-//         fetch('http://localhost:8080/staff/read')
+//         fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/read`)
 //             .then(response => response.json())
 //             .then(data => {
 //                 console.log(data);
@@ -611,7 +611,7 @@ function StaffIndex() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:8080/staff/read', {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/read`, {
             credentials: 'include' // Ensure cookies are sent with the request
         })
             .then(response => response.json())
@@ -860,7 +860,7 @@ export default StaffIndex;
 //     const [searchTerm, setSearchTerm] = useState("");
 
 //     useEffect(() => {
-//         fetch('http://localhost:8080/staff/read', {
+//         fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/read`, {
 //             credentials: 'include'
 //         })
 //             .then(response => {

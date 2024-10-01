@@ -766,8 +766,7 @@ const AddPromotion: React.FC = () => {
                             {/* <div className="flex-none w-1/3"> */}
 
                             <Select
-                                                            size="xs"
-
+                                size="sm"
                                 selectionMode="multiple"
                                 placeholder="เลือกสินค้า"
                                 selectedKeys={selectedKeys}
@@ -839,7 +838,7 @@ const AddPromotion: React.FC = () => {
                         <div className="flex flex-col" style={{ width: '80%' }}>
 
                             <Select
-                                size="xs"
+                                size="sm"
                                 selectionMode="multiple"
                                 placeholder="เลือกสินค้า"
                                 selectedKeys={selectedKeys1}

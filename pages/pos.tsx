@@ -31,7 +31,24 @@ const kanit = Kanit({
 });
 
 
-function pos() {
+interface Sale {
+    sm_id: number;
+    sm_name: string;
+    sm_price: number;
+    smt_id: number;
+    fix: string;
+    qty_per_unit: number;
+    pd_id: number;
+    picture: string;
+}
+
+interface Promotion {
+    dc_name: string;
+    dc_diccountprice: number;
+    minimum: number;
+}
+
+function Pos() {
     const router = useRouter();
     const { id } = router.query;
 
@@ -87,6 +104,7 @@ function pos() {
     }
 
     interface PromoFree {
+        flatMap: any;
         pm_id: number;
         pm_name: string;
         pm_datestart: string;
@@ -276,8 +294,8 @@ function pos() {
     const [netTotal, setNetTotal] = useState(0); // State for net total
     useEffect(() => {
         const newNetTotal = calculateTotalPrice();
-        setNetTotal(newNetTotal); // Update state with the new net total
-    }, [selectedItems, selectedPromotion]);
+        setNetTotal(newNetTotal);
+    }, [selectedItems, selectedPromotion, calculateTotalPrice]);
 
     const [totalPrice, setTotalPrice] = useState(0); // State to store total price
 
@@ -568,7 +586,8 @@ function pos() {
         } else {
             setOdChange(0); // Reset change if payment method is not cash
         }
-    }, [cashReceived, paymentMethod]);
+    }, [cashReceived, paymentMethod, calculateChange]);
+
     const handleSubmit = async () => {
         const discountTotal = selectedPromotion ? selectedPromotion.dc_diccountprice : 0; // Get discount amount
 
@@ -811,11 +830,14 @@ function pos() {
                                                                 return null;
                                                             }
                                                             // Extract unique smbuytype and smfreetype values
-                                                            const smbuyTypes = [...new Set(ingredients.detail.map(detail => detail.smbuytype))].join(', ');
-                                                            const smfreeTypes = [...new Set(ingredients.detail.map(detail => detail.smfreetype))].join(', ');
+                                                            // const smbuyTypes = [...new Set(ingredients.detail.map(detail => detail.smbuytype))].join(', ');
+                                                            // const smfreeTypes = [...new Set(ingredients.detail.map(detail => detail.smfreetype))].join(', ');
+
+                                                            const smbuyTypes = Array.from(new Set(ingredients.detail.map(detail => detail.smbuytype))).join(', ');
+                                                            const smfreeTypes = Array.from(new Set(ingredients.detail.map(detail => detail.smfreetype))).join(', ');
 
                                                             return (
-                                                                <Link href={`/promotion/${ingredients.pm_id}`} >
+                                                                <Link href={`/promotion/${ingredients.pm_id}`} key={ingredients.pm_id+"link"}>
                                                                     <div key={ingredients.pm_id} className="card bg-base-100 shadow-[0px_0px_7px_0px_#EEE8DA]">
                                                                         <div className="card-body p-4">
                                                                             <div className="flex flex-row items-center justify-between">
@@ -916,7 +938,7 @@ function pos() {
                                                 {selectedItems.map((product, index) => (
                                                     <li key={index} className="flex py-6">
                                                         <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                                            <img
+                                                            <Image
                                                                 alt={product.picture}
                                                                 src={product.picture}
                                                                 className="h-full w-full object-cover object-center"
@@ -1089,7 +1111,7 @@ function pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between">
+                                                            <div className="flex justify-between" key={index+"select"}>
 
                                                                 <div key={index}>
                                                                     <p>{product.quantity} {product.sm_name}</p>
@@ -1248,7 +1270,7 @@ function pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between">
+                                                            <div className="flex justify-between" key={index+"selectItem"}>
 
                                                                 <div key={index}>
                                                                     <p>{product.quantity} {product.sm_name}</p>
@@ -1380,6 +1402,7 @@ function pos() {
                                                     <Card shadow="sm" >
                                                         <CardBody className="overflow-visible p-0">
                                                             <Image
+                                                            alt={selectedSale.picture}
                                                                 shadow="sm"
                                                                 radius="lg"
                                                                 width={200}
@@ -1527,6 +1550,7 @@ function pos() {
                                                         <Card shadow="sm">
                                                             <CardBody className="overflow-visible p-0">
                                                                 <Image
+                                                                alt={'/default-image.png'}
                                                                     shadow="sm"
                                                                     radius="lg"
                                                                     width={200}
@@ -1702,4 +1726,4 @@ function pos() {
     )
 }
 
-export default pos
+export default Pos

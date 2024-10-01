@@ -95,7 +95,7 @@ function Add() {
     };
 
     // const saveData = async () => {
-    //     const response = await fetch(`http://localhost:8080/expenses/add`, {
+    //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/add`, {
     //         method: 'POST',
     //         headers: {
     //             'Content-Type': 'application/json',
@@ -286,7 +286,7 @@ function Add() {
                     <>
                         {isOpen && (
                             <Transition appear show={isOpen} as={Fragment}>
-                                <Dialog as="div" className="relative z-10" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                     <Transition.Child
                                         as={Fragment}
                                         enter="ease-out duration-300"

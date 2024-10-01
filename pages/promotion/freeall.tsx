@@ -8,7 +8,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-function all() {
+function All() {
 
     const [ind, setIngredientall] = useState<any[]>([]);
     const [indlot, setIngredientLot] = useState<any[]>([]);
@@ -63,11 +63,14 @@ function all() {
             <div className="m-4 grid grid-cols-3 gap-3">
                 {Array.isArray(ind) && ind.map((ingredients, idx) => {
                     // Extract unique smbuytype and smfreetype values
-                    const smbuyTypes = [...new Set(ingredients.detail.map(detail => detail.smbuytype))].join(', ');
-                    const smfreeTypes = [...new Set(ingredients.detail.map(detail => detail.smfreetype))].join(', ');
+                    // const smbuyTypes = [...new Set(ingredients.detail.map(detail => detail.smbuytype))].join(', ');
+                    // const smfreeTypes = [...new Set(ingredients.detail.map(detail => detail.smfreetype))].join(', ');
+
+                    const smbuyTypes = Array.from(new Set(ingredients.detail.map(detail => detail.smbuytype))).join(', ');
+                    const smfreeTypes = Array.from(new Set(ingredients.detail.map(detail => detail.smfreetype))).join(', ');
 
                     return (
-                        <Link href={`/promotion/${ingredients.pm_id}`} >
+                        <Link href={`/promotion/${ingredients.pm_id}`} key={ingredients.pm_id + "linkitem"}>
                             <div key={ingredients.pm_id} className="card bg-base-100 shadow-[0px_0px_7px_0px_#EEE8DA]">
                                 <div className="card-body p-4">
                                     <div className="flex flex-row items-center justify-between">
@@ -95,4 +98,4 @@ function all() {
     );
 }
 
-export default all
+export default All

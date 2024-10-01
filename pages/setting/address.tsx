@@ -659,6 +659,8 @@ function Address() {
                                 label="ตำบล"
                                 id="sh_ampher"
                                 list={tambons}
+                                child={null}  // หรือใส่ค่าที่เหมาะสมตามลอจิกของแอพ
+                                childsId={[]}  // ถ้าจำเป็น
                             />
                             <input
                                 type="text"

@@ -6,7 +6,7 @@ import { CheckboxGroup, Checkbox } from "@nextui-org/react";
 import { Accordion, AccordionItem, Button } from "@nextui-org/react";
 
 
-export default function unit() {
+export default function Unit() {
     // https://std.moc.go.th/std/codelist_detail/69?page=13
     const Unit =
         [{ id: 1, name: "ถุง" },

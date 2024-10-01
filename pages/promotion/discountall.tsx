@@ -8,7 +8,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-function all() {
+function All() {
 
     const [ind, setIngredientall] = useState<any[]>([]);
     const [indlot, setIngredientLot] = useState<any[]>([]);
@@ -89,4 +89,4 @@ function all() {
     );
 }
 
-export default all
+export default All

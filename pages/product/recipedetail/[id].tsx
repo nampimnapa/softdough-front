@@ -85,7 +85,7 @@ function Recipe_detail() {
     // useEffect(() => {
     //     const fetchData = async () => {
     //         try {
-    //             const response = await fetch(`http://localhost:8080/product/products/${id}`);
+    //             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/products/${id}`);
     //             const data = await response.json();
     //             console.log("data:", data);
     //             setRecipe(data);
@@ -97,7 +97,7 @@ function Recipe_detail() {
     //         }
     //     };
     //     if (id) { // ตรวจสอบว่า id มีค่าหรือไม่
-    //         fetch(`http://localhost:8080/product/pdset/${id}`)
+    //         fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/pdset/${id}`)
     //             .then(response => response.json())
     //             .then(data => {
     //                 setRecipeDetail(data.data);

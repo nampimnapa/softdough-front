@@ -22,7 +22,7 @@ const DetailStaff: React.FC<detailStaffProps> = ({ids}) => {
     const fetchData = async (idstaff) => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8080/staff/read/${idstaff}`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/read/${idstaff}`);
             const data = await response.json();
             setStaff(data);
         } catch (error) {

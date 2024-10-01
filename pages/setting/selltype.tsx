@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 
-function type() {
+function Type() {
   const router = useRouter();
   const { id } = router.query;
   const [typeProducts, setTypeProducts] = useState([]);
@@ -169,7 +169,7 @@ function type() {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-center text-sm text-[#73664B] py-3">
+                    <td colSpan={3} className="text-center text-sm text-[#73664B] py-3">
                       ไม่มีข้อมูลประเภทรายการจ่าย
                     </td>
                   </tr>
@@ -214,4 +214,4 @@ function type() {
   );
 }
 
-export default type;
+export default Type;
