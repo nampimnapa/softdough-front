@@ -8,7 +8,7 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
 }
 
-function all() {
+function All() {
 
     const [ind, setIngredientall] = useState<any[]>([]);
     const [indlot, setIngredientLot] = useState<any[]>([]);
@@ -51,7 +51,7 @@ function all() {
     return (
         <div className="h-screen  bg-white">
             <p className='text-[#F2B461] font-medium m-4'>โปรโมชัน</p>
-           
+
             <div>
                 <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">โปรโมชันส่วนลด</p>
             </div>
@@ -77,7 +77,7 @@ function all() {
                         </div>
                     </div>
                 ))}
-                
+
             </div>
 
             <div>
@@ -86,8 +86,10 @@ function all() {
             <div className="m-4 grid grid-cols-3 gap-3">
                 {Array.isArray(ind1) && ind1.map((ingredients, idx) => {
                     // Extract unique smbuytype and smfreetype values
-                    const smbuyTypes = [...new Set(ingredients.detail.map(detail => detail.smbuytype))].join(', ');
-                    const smfreeTypes = [...new Set(ingredients.detail.map(detail => detail.smfreetype))].join(', ');
+                    // const smbuyTypes = [...new Set(ingredients.detail.map(detail => detail.smbuytype))].join(', ');
+                    // const smfreeTypes = [...new Set(ingredients.detail.map(detail => detail.smfreetype))].join(', ');
+                    const smbuyTypes = Array.from(new Set(ingredients.detail.map(detail => detail.smbuytype))).join(', ');
+                    const smfreeTypes = Array.from(new Set(ingredients.detail.map(detail => detail.smfreetype))).join(', ');
 
                     return (
                         // <Link href={`/promotion/${ingredients.pm_id}`} >
@@ -101,7 +103,7 @@ function all() {
                                     {/* <Link href={`/promotion/${ingredients.pm_id}`} className="flex justify-end">
                                         <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
                                     </Link> */}
-                                    
+
                                 </div>
                                 <p className="text-[#73664B] text-sm">ประเภทสินค้าที่ซื้อ : {smbuyTypes}</p>
                                 <p className="text-[#73664B] text-sm">ประเภทสินค้าที่แถม : {smfreeTypes}</p>
@@ -117,6 +119,6 @@ function all() {
     );
 }
 
-export default all
+export default All
 
 

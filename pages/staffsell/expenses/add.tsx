@@ -93,7 +93,7 @@ function Add() {
     };
 
     // const saveData = async () => {
-    //     const response = await fetch(`http://localhost:8080/expenses/add`, {
+    //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/add`, {
     //         method: 'POST',
     //         headers: {
     //             'Content-Type': 'application/json',

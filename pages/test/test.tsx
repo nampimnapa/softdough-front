@@ -30,7 +30,7 @@ const SalesmenuForm: React.FC = () => {
   
       if (picture) formData.append('picture', picture);
   
-      const response = await fetch('http://localhost:8080/salesmenu/addsm', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/addsm`, {
         method: 'POST',
         body: formData,
       });

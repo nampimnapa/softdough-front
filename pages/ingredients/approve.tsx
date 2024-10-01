@@ -7,21 +7,34 @@ import { HiOutlineTrash } from "react-icons/hi";
 import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Button } from "@nextui-org/react";
 import { Dialog, Transition } from '@headlessui/react';
+import Head from 'next/head';
+
 const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
-import Head from 'next/head'
 
+interface IngredientData {
+    id: string;
+    checkk: string;
+    created_at: string;
+    note?: string;
+    name?: string;
+    status: string;
+    indU_id: string;
+}
 
-function approve() {
-    const [ind, setIngredientall] = useState<any[]>([]);
+function Approve() {
+    const [ind, setIngredientAll] = useState<IngredientData[]>([]);
     const [indlot, setIngredientLot] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
     const [isOpen2, setIsOpen2] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [message, setMessage] = useState('Loading');
 
+    const router = useRouter();
+    const { id } = router.query;
 
     const closeModal = () => {
         setIsOpen(false);
@@ -31,12 +44,15 @@ function approve() {
         setSelectedId(id);
         setIsOpen(true);
     };
+
     const openModal2 = () => {
         setIsOpen2(true);
     };
+
     const closeModal2 = () => {
         setIsOpen2(false);
     };
+
     const handleCancel = () => {
         closeModal();
     };
@@ -45,9 +61,9 @@ function approve() {
         // Fetch staff data on component mount
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/usedIngredients`)
             .then((response) => response.json())
-            .then((data) => {
+            .then((data: IngredientData[]) => {
                 console.log(data);
-                setIngredientall(data); // Assuming the response is an array of staff objects
+                setIngredientAll(data);
                 setLoading(false);
             })
             .catch((error) => {
@@ -57,14 +73,11 @@ function approve() {
     }, []);
 
     const filteredProduction = ind.filter((data) => data.status === "1");
-    const [message, setMessage] = useState('Loading');
-    const router = useRouter();
-    const { id } = router.query;
 
     const handleStatusChange = async () => {
-        // Check if pdo_status is '1', then only proceed with updating
-        const id = selectedId;
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/updateStatus/${id}`, {
+        if (!selectedId) return;
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/updateStatus/${selectedId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -77,17 +90,15 @@ function approve() {
 
         if (responseData.status === 200) {
             setMessage('Data update successfully');
-            // router.push('/product/all');
-            setIngredientall((prevInd) =>
-                prevInd.map((item) => (item.indU_id === id ? { ...item, status: "2" } : item))
+            setIngredientAll((prevInd) =>
+                prevInd.map((item) => (item.indU_id === selectedId ? { ...item, status: "2" } : item))
             );
         } else {
             setMessage(responseData.message || 'Error occurred');
         }
         closeModal();
-
-
     };
+
     return (
         <div>
             <Head>
@@ -103,7 +114,7 @@ function approve() {
                         <input type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา" required ></input>
+                            placeholder="ค้นหา" required />
                     </div>
                     <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
                         ค้นหา
@@ -112,11 +123,9 @@ function approve() {
             </div>
             <div className="w-full">
                 <div className="flex w-full flex-col">
-
                     <div className="relative overflow-x-auto mx-4">
-
                         <table className="w-full text-sm text-center table-fixed">
-                            <thead >
+                            <thead>
                                 <tr className="text-white  font-normal  bg-[#908362]  ">
                                     <td scope="col" className="px-3 py-3 w-64">
                                         ล็อตสินค้า
@@ -143,40 +152,26 @@ function approve() {
                                         </td>
                                         <td className=" py-1 text-left w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
                                             {data.created_at}
-
                                         </td>
-
                                         <td className="ms-7 py-1  text-center text-[#73664B] whitespace-nowrap overflow-hidden">
                                             {data.checkk === "other" ? data.note : data.name}
-
                                         </td>
                                         <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
                                             <button type="submit" className="w-full flex justify-center items-center" >
-                                                {/* <Link  className="w-full flex justify-center items-center"> */}
                                                 <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
-                                                {/* </Link> */}
                                             </button>
                                         </td>
                                         <td className="px-12 py-1 whitespace-nowrap overflow-hidden flex justify-center ">
                                             <Button className="mr-2 bg-red-500 text-white" size="sm">ยกเลิก</Button>
                                             <Button size="sm" className="bg-green-500 text-white"
                                                 onClick={() => openModal(data.id)}
-                                            // onClick={() => handleStatusChange(data.id)}
                                             >ยืนยัน</Button>
                                         </td>
-
                                     </tr>
                                 ))}
-
-
-
                             </tbody>
                         </table>
                     </div>
-
-
-
-
                 </div>
             </div>
             <div className="flex justify-start">
@@ -251,7 +246,7 @@ function approve() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default approve
+export default Approve;

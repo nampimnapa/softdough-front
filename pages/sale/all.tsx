@@ -95,7 +95,8 @@ function Listorder() {
                                         {Array.isArray(Production) && Production
 
                                             // เรียงวันที่จากล่าสุดไปเก่าสุด
-                                            .sort((a, b) => new Date(b.od_date) - new Date(a.od_date))
+                                            // .sort((a, b) => new Date(b.od_date) - new Date(a.od_date))
+                                            .sort((a, b) => new Date(b.od_date).getTime() - new Date(a.od_date).getTime())
                                             .filter((order) => {
                                                 // เพิ่มเงื่อนไขกรองข้อมูลที่ต้องการที่นี่
                                                 const isOrderNameValid = order.odt_name !== null && order.odt_name !== undefined;

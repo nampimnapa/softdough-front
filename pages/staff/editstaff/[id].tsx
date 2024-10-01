@@ -57,7 +57,7 @@ function Detailstaff() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch(`http://localhost:8080/staff/read/${id}`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/read/${id}`)
             .then((response) => response.json())
             .then((data) => {
                 setStaff(data);
@@ -70,7 +70,7 @@ function Detailstaff() {
     }, [id]);
 
     const getData = async (ids) => {
-        const responseData = await fetch(`http://localhost:8080/staff/read/${ids}`, {
+        const responseData = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/read/${ids}`, {
             method: 'GET'
         })
         const dataStaff = await responseData.json();
@@ -79,7 +79,7 @@ function Detailstaff() {
     
     const handleEditWork = async () => {
         try {
-            const response = await fetch(`http://localhost:8080/staff/update/${id}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/update/${id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

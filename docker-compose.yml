@@ -1,0 +1,7 @@
+services:
+  softdough-front:
+    image: softdough-front:1.0
+    build:
+      context: .
+    ports:
+      - "3000:3000"

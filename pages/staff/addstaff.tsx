@@ -146,7 +146,7 @@
 // //   };
 
 // //   const saveData = async () => {
-// //     const response = await fetch(`http://localhost:8080/staff/add`, {
+// //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/add`, {
 // //       method: 'POST',
 // //       headers: {
 // //         'Content-Type': 'application/json',
@@ -751,7 +751,7 @@
 //   };
 
 //   const saveData = async () => {
-//     const response = await fetch(`http://localhost:8080/staff/add`, {
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/add`, {
 //       method: 'POST',
 //       headers: {
 //         'Content-Type': 'application/json',
@@ -1112,7 +1112,7 @@
 //   };
 
 //   const saveData = async () => {
-//     const response = await fetch(`http://localhost:8080/staff/add`, {
+//     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/add`, {
 //       method: 'POST',
 //       headers: {
 //         'Content-Type': 'application/json',
@@ -1638,7 +1638,7 @@ const kanit = Kanit({
   weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function addstaff() {
+function Addstaff() {
   const [message, setMessage] = useState('Loading');
 
   const [startValue, setStartValue] = useState({
@@ -1716,7 +1716,7 @@ function addstaff() {
   };
 
   const saveData = async () => {
-    const response = await fetch(`http://localhost:8080/staff/add`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/staff/add`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1850,8 +1850,8 @@ function addstaff() {
             ยกเลิก</button>
           <>
             {isOpen && (
-              <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                <Dialog as="div" className="relative z-10" onClose={closeModal} >
+              <Transition appear show={isOpen} as={Fragment}>
+                <Dialog as="div" className={`relative z-10 ${kanit.className}`} onClose={closeModal} >
                   <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -1927,4 +1927,4 @@ function addstaff() {
 }
 
 
-export default addstaff
+export default Addstaff

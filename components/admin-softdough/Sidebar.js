@@ -22,7 +22,7 @@ import {
 import { Icon } from '@iconify/react';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:8080', {
+const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
   query: { userId: 'USER_ID_HERE' }
 });
 
@@ -93,7 +93,7 @@ const Sidebar = ({ children, className }) => {
   // const [Notifications, setNotifications] = useState(false);
 
   useEffect(() => {
-    const socket = io('http://localhost:8080', {
+    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
       query: { userId: localStorage.getItem('userId') }, // ส่ง userId
     });
 
@@ -134,7 +134,7 @@ const Sidebar = ({ children, className }) => {
 
   const fetchUnreadNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:8080/notification/unread', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notification/unread`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const Sidebar = ({ children, className }) => {
   const markNotificationsAsRead = async () => {
     try {
       const userId = localStorage.getItem('userId');
-      const response = await fetch('http://localhost:8080/notification/markAsRead', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notification/markAsRead`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -174,7 +174,7 @@ const Sidebar = ({ children, className }) => {
   };
   const fetchAllNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:8080/notification/all', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notification/all`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ const Sidebar = ({ children, className }) => {
   // ฟังก์ชันดึงการแจ้งเตือนที่ยังไม่ได้อ่านจาก API
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:8080/notification/unread', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notification/unread`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ const Sidebar = ({ children, className }) => {
   // ฟังก์ชันจัดการการกดเครื่องหมายว่าอ่านแล้ว
   const handleMarkAsRead = async (notiId) => {
     try {
-      const response = await fetch('http://localhost:8080/notification/markAsRead', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/notification/markAsRead`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
