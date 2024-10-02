@@ -2,7 +2,7 @@ import React from 'react'
 // หน้าภาพรวม
 const dashboard = () => {
   return (
-    <div></div>
+    <div>Test Jenkins</div>
   )
 }
 
