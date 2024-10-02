@@ -1,6 +1,6 @@
 services:
-  softdough-front:
-    image: softdough-front:1.0
+  softdoughfront:
+    image: softdoughfront
     build:
       context: .
     ports:
