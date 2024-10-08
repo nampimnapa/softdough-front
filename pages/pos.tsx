@@ -651,8 +651,6 @@ function Pos() {
                 });
 
                 const orderData = await fetchOrderResponse.json();
-
-
                 // Call the API route to generate the PDF
                 const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/generate-pdf`, {
                     method: 'POST',
