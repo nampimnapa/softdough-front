@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . .
 
+COPY /root/env/.env.local ./.env.local
+
 RUN npm ci
 
 RUN npm run build
