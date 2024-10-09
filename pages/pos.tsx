@@ -638,10 +638,8 @@ function Pos() {
             if (response.ok) {
                 console.log("Order created successfully");
                 alert("Order created successfully");
-
                 // Fetch ข้อมูลออร์เดอร์ที่เพิ่งบันทึกจาก DB
                 // const od_id = result.od_id; // สมมติว่าผลลัพธ์คืน od_id กลับมา
-
                 const fetchOrderResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/latest`, {
                     method: 'GET',
                     headers: {
