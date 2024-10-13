@@ -426,7 +426,7 @@ function Type() {
     });
     return (
         <div className="h-screen">
-            <p className='text-[#F2B461] font-medium m-4'>ประเภทรายการจ่าย</p>
+            <p className='text-[#F2B461] font-medium m-4'>รอบการขาย</p>
             {/* <div className="flex "> */}
             <div className="mt-5">
                 <div className="flex flex-row items-center w-full">
