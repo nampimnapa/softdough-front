@@ -603,7 +603,16 @@ function Pos() {
             second: '2-digit',
             hour12: false // ใช้รูปแบบ 24 ชั่วโมง
         }).replace('T', ' '); // แปลงเป็นฟอร์แมต "YYYY-MM-DD HH:MM:SS"
-
+        const allItems = selectedItems.map(product => {
+            const isFreeItem = product.id !== null && smfreeIdNameMap.has(parseInt(product.id));
+            return {
+                sm_id: product.sm_id,
+                quantity: product.quantity,
+                price: isFreeItem ? 0 : product.sm_price,
+                isFreeItem: isFreeItem,
+                smfree_id: isFreeItem ? parseInt(smfreeIdNameMap.get(parseInt(product.id))) : null
+            };
+        });
         const dataOrder = {
             od_date: todayDateTime,
             od_qtytotal: selectedItems.reduce((total, product) => total + product.quantity, 0),
@@ -620,7 +629,8 @@ function Pos() {
             odt_id: selectedDeliveryOption, //ประเภทรายการขาย
             dc_id: selectedPromotion?.dc_id || null,
             // user_id: "",
-            selectedItems
+            selectedItems,
+            allItems
         };
         console.log("dataOrder : ", dataOrder)
 
@@ -833,7 +843,7 @@ function Pos() {
                                                             const smfreeTypes = Array.from(new Set(ingredients.detail.map(detail => detail.smfreetype))).join(', ');
 
                                                             return (
-                                                                <Link href={`/promotion/${ingredients.pm_id}`} key={ingredients.pm_id+"link"}>
+                                                                <Link href={`/promotion/${ingredients.pm_id}`} key={ingredients.pm_id + "link"}>
                                                                     <div key={ingredients.pm_id} className="card bg-base-100 shadow-[0px_0px_7px_0px_#EEE8DA]">
                                                                         <div className="card-body p-4">
                                                                             <div className="flex flex-row items-center justify-between">
@@ -1107,7 +1117,7 @@ function Pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between" key={index+"select"}>
+                                                            <div className="flex justify-between" key={index + "select"}>
 
                                                                 <div key={index}>
                                                                     <p>{product.quantity} {product.sm_name}</p>
@@ -1266,7 +1276,7 @@ function Pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between" key={index+"selectItem"}>
+                                                            <div className="flex justify-between" key={index + "selectItem"}>
 
                                                                 <div key={index}>
                                                                     <p>{product.quantity} {product.sm_name}</p>
@@ -1398,7 +1408,7 @@ function Pos() {
                                                     <Card shadow="sm" >
                                                         <CardBody className="overflow-visible p-0">
                                                             <Image
-                                                            alt={selectedSale.picture}
+                                                                alt={selectedSale.picture}
                                                                 shadow="sm"
                                                                 radius="lg"
                                                                 width={200}
@@ -1546,7 +1556,7 @@ function Pos() {
                                                         <Card shadow="sm">
                                                             <CardBody className="overflow-visible p-0">
                                                                 <Image
-                                                                alt={'/default-image.png'}
+                                                                    alt={'/default-image.png'}
                                                                     shadow="sm"
                                                                     radius="lg"
                                                                     width={200}

@@ -92,8 +92,8 @@ function Detailproduction() {
 
         setIsChecked2(newIsChecked); // ตั้งค่า isChecked2 ใหม่
         setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
-        console.log("newIsChecked",newIsChecked)
-        console.log("newCheckedItems",newCheckedItems)
+        console.log("newIsChecked", newIsChecked)
+        console.log("newCheckedItems", newCheckedItems)
 
     };
 
@@ -116,19 +116,19 @@ function Detailproduction() {
     // };
     const handleCheckboxChange3 = () => {
         const newIsChecked = !isChecked3; // Toggle isChecked3
-    
+
         // Create a new array to store the status of each checkbox in the table
         const newCheckedItems = {};
         detail.pdodetail.forEach(pdodetail => {
             newCheckedItems[pdodetail.pdod_id] = true; // Set all checkboxes to true
         });
-    
+
         setIsChecked3(newIsChecked); // Update isChecked3
         setCheckedItems3(newCheckedItems); // Update the status of each checkbox in the table
         console.log("newIsChecked", newIsChecked);
         console.log("newCheckedItems", newCheckedItems);
     };
-    
+
 
     const handleCheckboxChangeDetail = (pdod_id) => {
         // เปลี่ยนสถานะของ Checkbox แต่ละอันในตาราง
@@ -184,7 +184,7 @@ function Detailproduction() {
                 pdo_status: pdoStatus
 
             };
-            
+
             console.log("console.log(requestBody);", requestBody);
             router.push('/manufacture/listorder');
             if (checkedIds.length === 0) {
@@ -279,11 +279,11 @@ function Detailproduction() {
                     <div>
                         <p className={`text-base px-6 py-2 font-bold
                                     ${detail.pdo_status === '3' ? 'text-green-500' :
-                                        detail.pdo_status === '4' ? 'text-green-500' :
-                                detail.pdo_status === '2' ? 'text-yellow-500' :
-                                    detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
+                                detail.pdo_status === '4' ? 'text-green-500' :
+                                    detail.pdo_status === '2' ? 'text-yellow-500' :
+                                        detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
                             }`}>
-                            {detail.pdo_status === '5' ? 'รออนุมัติ' :detail.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
+                            {detail.pdo_status === '5' ? 'รออนุมัติ' : detail.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
                         </p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">ใบสั่งผลิต : {detail.pdo_id_name}</p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">วันที่สั่งผลิต : {detail.updated_at}</p>
@@ -417,7 +417,7 @@ function Detailproduction() {
                                         <>
                                             {isOpen && (
                                                 <Transition appear show={isOpen} as={Fragment} >
-                                                    <Dialog as="div"  onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                                    <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                                         <Transition.Child
                                                             as={Fragment}
                                                             enter="ease-out duration-300"
@@ -489,7 +489,7 @@ function Detailproduction() {
                                 <>
                                     {isOpen && (
                                         <Transition appear show={isOpen} as={Fragment} >
-                                            <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -561,7 +561,7 @@ function Detailproduction() {
                                 <>
                                     {isOpen && (
                                         <Transition appear show={isOpen} as={Fragment} >
-                                            <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -620,8 +620,8 @@ function Detailproduction() {
                                                                             type="button"
                                                                             className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                                                             onClick={handleConfirmModal}
-                                                                            // onClick={() => handleConfirmModal(detail.pdo_id)}
-                                                                            // onClick={() => handleConfirmModal(detail.pdo_id_name)}
+                                                                        // onClick={() => handleConfirmModal(detail.pdo_id)}
+                                                                        // onClick={() => handleConfirmModal(detail.pdo_id_name)}
 
                                                                         >
                                                                             ยืนยัน
@@ -646,7 +646,7 @@ function Detailproduction() {
                                 <>
                                     {isOpen && (
                                         <Transition appear show={isOpen} as={Fragment} >
-                                            <Dialog as="div"  onClose={closeModal} className={`relative z-10 ${kanit.className}`} >
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`} >
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -716,7 +716,7 @@ function Detailproduction() {
                                 <>
                                     {isOpen2 && (
                                         <Transition appear show={isOpen2} as={Fragment} >
-                                            <Dialog as="div"  onClose={closeModal}  className={`relative z-10 ${kanit.className}`}>
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
