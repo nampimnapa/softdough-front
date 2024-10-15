@@ -18,8 +18,10 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 
-function detailproduction() {
+function Detailproduction() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isOpen2, setIsOpen2] = useState(false);
+
 
     const closeModal = () => {
         setIsOpen(false);
@@ -29,7 +31,10 @@ function detailproduction() {
         setIsOpen(true);
     };
     const openModal2 = () => {
-        setIsOpen(true);
+        setIsOpen2(true);
+    };
+    const closeModal2 = () => {
+        setIsOpen2(false);
     };
     const handleCancel = () => {
         closeModal();
@@ -70,10 +75,11 @@ function detailproduction() {
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
         console.log(isChecked)
-
+        setIsOpen(true);
     };
 
     const [isChecked2, setIsChecked2] = useState(false); // State to track checkbox status
+    const [checkedItems2, setCheckedItems2] = useState({}); // State for checked items managed by handleCheckboxChange2
 
     const handleCheckboxChange2 = () => {
         const newIsChecked = !isChecked2; // สลับสถานะ isChecked2
@@ -86,33 +92,59 @@ function detailproduction() {
 
         setIsChecked2(newIsChecked); // ตั้งค่า isChecked2 ใหม่
         setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
-        console.log(newIsChecked)
-        console.log(newCheckedItems)
-
-        // ตรวจสอบและส่งค่า pdo_status เป็น 3 หาก isChecked2 เป็น true
-        if (isChecked2) {
-            // ส่งค่า pdo_status เป็น 3 ทั้งหมด
-            // อย่าลืมเปลี่ยน detail.pdodetail ให้เป็นข้อมูลจริงที่ได้มาจาก API และอ้างถึง pdodetail.pdod_status แทน
-            detail.pdodetail.forEach(pdodetail => {
-                // ส่งค่า pdo_status เป็น 3 ให้กับรายการที่มี pdod_id นี้
-                sendPdoStatus(pdodetail.pdod_id, 3); // ส่งค่า pdo_status ไปยัง API
-            });
-        }
+        console.log("newIsChecked", newIsChecked)
+        console.log("newCheckedItems", newCheckedItems)
 
     };
+
+    const [isChecked3, setIsChecked3] = useState(false); // State to track checkbox status
+    const [checkedItems3, setCheckedItems3] = useState({}); // State for checked items managed by handleCheckboxChange3
+
+    // const handleCheckboxChange3 = () => {
+    //     const newIsChecked = !isChecked3; // สลับสถานะ isChecked2
+
+    //     // สร้างอาร์เรย์ใหม่เพื่อเก็บสถานะของ Checkbox แต่ละอันในตาราง
+    //     const newCheckedItems = {};
+    //     detail.pdodetail.forEach(pdodetail => {
+    //         newCheckedItems[pdodetail.pdod_id] = newIsChecked;
+    //     });
+
+    //     setIsChecked3(newIsChecked); // ตั้งค่า isChecked2 ใหม่
+    //     setCheckedItems(newCheckedItems); // อัปเดตสถานะของ Checkbox แต่ละตัวในตาราง
+    //     console.log(newIsChecked)
+    //     console.log(newCheckedItems)
+    // };
+    const handleCheckboxChange3 = () => {
+        const newIsChecked = !isChecked3; // Toggle isChecked3
+
+        // Create a new array to store the status of each checkbox in the table
+        const newCheckedItems = {};
+        detail.pdodetail.forEach(pdodetail => {
+            newCheckedItems[pdodetail.pdod_id] = true; // Set all checkboxes to true
+        });
+
+        setIsChecked3(newIsChecked); // Update isChecked3
+        setCheckedItems3(newCheckedItems); // Update the status of each checkbox in the table
+        console.log("newIsChecked", newIsChecked);
+        console.log("newCheckedItems", newCheckedItems);
+    };
+
 
     const handleCheckboxChangeDetail = (pdod_id) => {
         // เปลี่ยนสถานะของ Checkbox แต่ละอันในตาราง
-        const newCheckedItems = { ...checkedItems, [pdod_id]: checkedItems[pdod_id] };
+        const newCheckedItems = { ...checkedItems, [pdod_id]: !checkedItems[pdod_id] };
         setCheckedItems(newCheckedItems);
+        console.log(newCheckedItems);
+
     };
-    const isCheckedForDetail = (id) => {
-        return detail.pdo_status === '2' && checkedItems[id];
-    };
+    // const isCheckedForDetail = (id) => {
+    //     return detail.pdo_status === '2' && checkedItems[id];
+    // };
 
 
     const handleStatusChange = async (id) => {
         // Check if pdo_status is '1', then only proceed with updating
+
         if (!isChecked && detail && detail.pdo_status === '1') {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus/${id}`, {
                 method: 'PATCH',
@@ -127,16 +159,168 @@ function detailproduction() {
 
             if (responseData.status === 200) {
                 setMessage('Data update successfully');
-                // router.push('/product/all');
+                router.push('/product/all');
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
         }
 
+    };
+
+    console.log("id", `${id}`)
+    const handleConfirmModal = async () => {
+        // if (
+        //     // !isChecked && detail && 
+        //     detail.pdo_status === '2') {
+        //     const idpdo = `${id}`;
+        //     // const allChecked = Object.values(checkedItems3).every(value => value === true);
+        //     const pdoStatus = isChecked3 ? 3 : 5;
+
+        //     const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+        //     const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
+        //     const requestBody = {
+        //         pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
+        //         pdo_id: idpdo, // Add the pdo_id
+        //         pdo_status: pdoStatus
+
+        //     };
+
+        //     console.log("console.log(requestBody);", requestBody);
+        //     router.push('/manufacture/listorder');
+        //     if (checkedIds.length === 0) {
+        //         setMessage('No items selected');
+        //         return;
+        //     }
+
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+        //         method: 'PATCH',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(requestBody),
+        //     });
+
+        //     const responseData = await response.json();
+        //     console.log(requestBody)
+
+
+
+        //     if (responseData.status === 200) {
+        //         setMessage('Data update successfully');
+        //         // router.push('/product/all');
+        //     } else {
+        //         setMessage(responseData.message || 'Error occurred');
+        //     }
+        // }
+
+        if (detail.pdo_status === '2') {
+            const idpdo = `${id}`;
+            const pdoStatus = isChecked3 ? 3 : 5;
+
+            const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+
+            // Create array of pdod_ids with broken and over values from inputValues
+            const pdodDetailList = checkedIds.map(id => ({
+                pdod_id: Number(id),
+                broken: inputValues[id]?.broken || 0, // Default value for broken
+                over: inputValues[id]?.over || 0    // Default value for over
+            }));
+
+            const requestBody = {
+                pdod_ids: pdodDetailList, // Array of objects with pdod_id, broken, and over
+                pdo_id: idpdo, // Add the pdo_id
+                pdo_status: pdoStatus
+            };
+
+            console.log("console.log(requestBody);", requestBody);
+            router.push('/manufacture/listorder');
+
+            if (checkedIds.length === 0) {
+                setMessage('No items selected');
+                return;
+            }
+
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            const responseData = await response.json();
+            console.log(requestBody);
+
+            if (responseData.status === 200) {
+                setMessage('Data update successfully');
+            } else {
+                setMessage(responseData.message || 'Error occurred');
+            }
+        }
 
     };
-    const sendPdoStatus = (pdodId, status) => {
 
+
+
+    const sendPdoStatus = async () => {
+        // Check the value of pdo_status
+        // ตรวจสอบสถานะ pdo_status
+        if (isChecked && detail.pdo_status === '1') {
+            // หาก pdo_status เป็น '1' ให้ย้ายไปที่หน้า listorder
+            router.push('/manufacture/listorder');
+        } else if (!isChecked && detail.pdo_status === '1') {
+            openModal();
+        } else if (isChecked && detail.pdo_status === '2') {
+            openModal();
+
+            // const idpdo = `${id}`;
+            // // If pdo_status is '2', update the status using API
+            // const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+            // const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
+            // const requestBody = {
+            //     pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
+            //     pdo_id: idpdo // Add the pdo_id
+            // };
+            // console.log("console.log(requestBody);", requestBody);
+            // router.push('/manufacture/listorder');
+            // if (checkedIds.length === 0) {
+            //     setMessage('No items selected');
+            //     return;
+            // }
+
+            // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+            //     method: 'PATCH',
+            //     headers: {
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify(requestBody),
+            // });
+
+            // const responseData = await response.json();
+
+
+
+            // if (responseData.status === 200) {
+            //     setMessage('Data update successfully');
+            //     // router.push('/product/all');
+            // } else {
+            //     setMessage(responseData.message || 'Error occurred');
+            // }
+
+        }
+
+
+    };
+    const [inputValues, setInputValues] = useState({});
+
+    const handleInputChange = (pdod_id, field, value) => {
+        setInputValues((prevValues) => ({
+            ...prevValues,
+            [pdod_id]: {
+                ...prevValues[pdod_id],
+                [field]: Number(value),  // เก็บค่า broken หรือ over ในรูปแบบตัวเลข
+            },
+        }));
     };
 
 
@@ -153,68 +337,105 @@ function detailproduction() {
                 {detail !== null ? (
                     <div>
                         <p className={`text-base px-6 py-2 font-bold
-                                    ${detail.pdo_status === '2' ? 'text-yellow-500' :
-                                detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
+                                    ${detail.pdo_status === '3' ? 'text-green-500' :
+                                detail.pdo_status === '4' ? 'text-green-500' :
+                                    detail.pdo_status === '2' ? 'text-yellow-500' :
+                                        detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
                             }`}>
-                            {detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
+                            {detail.pdo_status === '5' ? 'รออนุมัติ' : detail.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '3' ? 'เสร็จสิ้นแล้ว' : detail.pdo_status === '2' ? 'กำลังดำเนินการ' : detail.pdo_status === '1' ? 'สั่งผลิตแล้ว' : detail.pdo_status}
                         </p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">ใบสั่งผลิต : {detail.pdo_id_name}</p>
                         <p className="text-sm px-6 py-2 text-[#73664B]">วันที่สั่งผลิต : {detail.updated_at}</p>
 
                         <div className="relative overflow-x-auto mx-6 mt-2">
 
-                            <table className="w-full text-sm text-center text-gray-500 ">
-                                <thead >
-                                    <tr className="text-white  font-normal  bg-[#908362] ">
-                                        <td scope="col" className="px-6 py-3">
-                                            ประเภทสินค้า
-                                        </td>
-                                        <td scope="col" className="px-6 py-3">
-                                            สินค้า
-                                        </td>
-                                        <td scope="col" className="px-6 py-3">
-                                            จำนวน
-                                        </td>
-                                        <td scope="col" className="px-6 py-3">
-                                            การผลิต
-                                        </td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {detail.pdodetail.map((pdodetail, idx) => (
-                                        <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                            <td
-                                                scope="row"
-                                                className="px-6 py-1 whitespace-nowrap dark:text-white"
-                                            >
-                                                {pdodetail.pdc_name}
-                                            </td>
-                                            <td className="px-6 py-1">{pdodetail.pd_name}</td>
+                        <table className="w-full text-sm text-center text-gray-500 ">
+  <thead>
+    <tr className="text-white font-normal bg-[#908362]">
+      <td scope="col" className="px-6 py-3">ประเภทสินค้า</td>
+      <td scope="col" className="px-6 py-3">สินค้า</td>
+      <td scope="col" className="px-6 py-3">จำนวน</td>
+      {/* Only display "จำนวนผลิตเสีย" and "จำนวนผลิตเกิน" columns if status is not 1 */}
+      {detail.pdodetail[0]?.status !== '1' && (
+        <>
+          <td scope="col" className="px-6 py-3">จำนวนผลิตเสีย</td>
+          <td scope="col" className="px-6 py-3">จำนวนผลิตเกิน</td>
+        </>
+      )}
+      <td scope="col" className="px-6 py-3">การผลิต</td>
+    </tr>
+  </thead>
 
-                                            <td className="px-6 py-1 h-10 ">
-                                                {pdodetail.qty}
-                                            </td>
+  <tbody>
+    {detail.pdodetail.map((pdodetail, idx) => (
+      <tr key={idx} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+        <td scope="row" className="px-6 py-1 whitespace-nowrap dark:text-white">
+          {pdodetail.pdc_name}
+        </td>
+        <td className="px-6 py-1">{pdodetail.pd_name}</td>
+        <td className="px-6 py-1 h-10">{pdodetail.qty}</td>
 
-                                            <td className={`text-sm px-6 py-2 
-    ${detail.pdo_status === '3' ? 'text-green-500' :
-                                                    detail.pdo_status === '1' ? 'text-[#C5B182]' : ''
-                                                }`}>
-                                                {pdodetail.status === '3' ? 'เสร็จสิ้นแล้ว' : pdodetail.status === '1' ? 'รอยืนยันดำเนินการ' : ''}
-                                                {pdodetail.status === '2' && (
-                                                    <Checkbox
-                                                        color="success"
-                                                        onChange={() => handleCheckboxChangeDetail(pdodetail.pdod_id)}
-                                                        isSelected={checkedItems[pdodetail.pdod_id]} // ใช้ค่าจาก checkedItems เพื่อกำหนดสถานะ checked หรือ unchecked
-                                                    >
-                                                    </Checkbox>
-                                                )}
-                                            </td>
+        {/* Display Broken input or value based on status */}
+        {pdodetail.status !== '1' && (
+          <td className="px-6 py-1 h-10">
+            {pdodetail.status === '3' ? (
+              <span>{pdodetail.pdod_broken}</span> // Display value when status is 3
+            ) : (
+              <input
+                type="number"
+                placeholder="Broken"
+                min="0"
+                defaultValue={0}
+                onChange={(e) =>
+                  handleInputChange(pdodetail.pdod_id, 'broken', e.target.value)
+                }
+                className="ml-2 px-2 py-1 border rounded-md"
+              />
+            )}
+          </td>
+        )}
 
-                                        </tr>
+        {/* Display Over input or value based on status */}
+        {pdodetail.status !== '1' && (
+          <td className="px-6 py-1 h-10">
+            {pdodetail.status === '3' ? (
+              <span>{pdodetail.pdod_over}</span> // Display value when status is 3
+            ) : (
+              <input
+                type="number"
+                placeholder="Over"
+                min="0"
+                defaultValue={0}
+                onChange={(e) =>
+                  handleInputChange(pdodetail.pdod_id, 'over', e.target.value)
+                }
+                className="ml-2 px-2 py-1 border rounded-md"
+              />
+            )}
+          </td>
+        )}
 
-                                    ))}
-                                </tbody>
-                            </table>
+        {/* Status display */}
+        <td className={`text-sm px-6 py-2 ${pdodetail.status === '3' ? 'text-green-500' : pdodetail.status === '1' ? 'text-[#C5B182]' : ''}`}>
+          {pdodetail.status === '3'
+            ? 'เสร็จสิ้นแล้ว'
+            : pdodetail.status === '1'
+              ? 'รอยืนยันดำเนินการ'
+              : ''}
+
+          {pdodetail.status === '2' && (
+            <Checkbox
+              color="success"
+              onChange={() => handleCheckboxChangeDetail(pdodetail.pdod_id)}
+              isSelected={checkedItems[pdodetail.pdod_id]} // Use checkedItems to set checked status
+            />
+          )}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
                         </div>
                     </div>
                 ) : (
@@ -232,13 +453,7 @@ function detailproduction() {
                                 </Checkbox>
                             </div>
                         )}
-                        {/* {detail.pdo_status === '2' && (
-                            <div className="ml-6 mt-5">
-                                <Checkbox radius="sm" color="warning" onChange={handleCheckboxChange} checked={isChecked}>
-                                    ยืนยันการผลิตสำเร็จ
-                                </Checkbox>
-                            </div>
-                        )} */}
+
                         {detail.pdo_status === '2' && (
                             <div className="ml-6 mt-5">
                                 <Checkbox
@@ -247,12 +462,11 @@ function detailproduction() {
                                     onClick={handleCheckboxChange2}
                                     isSelected={isChecked2} // ใช้ค่าของ isChecked2 โดยตรงเพื่อกำหนดสถานะ checked หรือ unchecked
                                 >
-                                    ยืนยันการผลิตสำเร็จ
+                                    เลือกรายการการผลิตทั้งหมด
                                 </Checkbox>
                             </div>
                         )}
 
-                        {/* Rest of your component */}
                     </div>
                 ) : (
                     <p>Loading...</p>
@@ -262,42 +476,42 @@ function detailproduction() {
             {
                 detail !== null ? (
                     <div className="flex justify-start">
-                        <div className="w-1/2  mt-10  flex justify-start " >
+                        <div className="w-full mt-10 flex justify-start">
                             <Button
-                                // href="/manufacture/listorder"
-                                onClick={() => {
-                                    if (isChecked) {
-                                        // If isChecked is true, navigate without showing modal
-                                        router.push('/manufacture/listorder');
-                                    } else {
-                                        // If isChecked is false, open modal and call the function
-                                        openModal();
-                                        
-                                    }
-                                }}
-                                
+                                onClick={sendPdoStatus} // Proceed with status update
                                 type="button"
-                                className=" text-white bg-[#73664B]  focus:outline-none  font-medium rounded-full text-sm px-5 py-2.5  mb-2 ml-5">
-                                เสร็จสิ้น</Button>
-
+                                className="text-white bg-[#73664B] focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 mb-2 ml-5">
+                                เสร็จสิ้น
+                            </Button>
 
                             {detail !== null && detail.pdo_status === '1' && (
                                 <div className="w-full flex justify-start">
-                                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">
+                                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
                                         แก้ไขใบสั่งผลิต
+                                    </Button>
+
+                                </div>
+                            )}
+                            {/* ต้องแก้ให้ pdo.status =3 อันนี้เอาไว้ดู ui เฉยๆ มีเรื่อง modal*/}
+                            {detail !== null && detail.pdo_status === '3' && (
+                                <div className="w-full flex justify-between">
+                                    <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
+                                        สั่งผลิตอีกครั้ง
+                                    </Button>
+                                    <Button onClick={openModal2} type="button" className="mr-6 ml-2 text-white bg-[#C5B182] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
+                                        เพิ่มวัตถุดิบที่ใช้
                                     </Button>
                                 </div>
                             )}
 
-
-                            {!isChecked && detail && detail.pdo_status === '1' && (
+                            {!isChecked && detail.pdo_status === '1' && (
                                 // Modal แสดงเมื่อ isChecked เป็น true และ detail.pdo_status เท่ากับ '2'
                                 <div className="flex justify-start">
                                     <div className="w-1/2 mt-10 flex justify-start">
                                         <>
                                             {isOpen && (
-                                                <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                                    <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                                                <Transition appear show={isOpen} as={Fragment} >
+                                                    <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                                         <Transition.Child
                                                             as={Fragment}
                                                             enter="ease-out duration-300"
@@ -364,12 +578,12 @@ function detailproduction() {
                                     </div>
                                 </div>
                             )}
-                            {isChecked && detail && detail.pdo_status === '1' && (
+                            {isChecked && detail.pdo_status === '1' && (
                                 // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
                                 <>
                                     {isOpen && (
-                                        <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                            <Dialog as="div" className="relative z-10" onClose={closeModal}  >
+                                        <Transition appear show={isOpen} as={Fragment} >
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                                 <Transition.Child
                                                     as={Fragment}
                                                     enter="ease-out duration-300"
@@ -435,6 +649,233 @@ function detailproduction() {
                                     }
                                 </>
                             )}
+
+                            {isChecked && detail.pdo_status === '2' && (
+                                // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
+                                <>
+                                    {isOpen && (
+                                        <Transition appear show={isOpen} as={Fragment} >
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0 bg-black/25" />
+                                                </Transition.Child>
+
+                                                <div className="fixed inset-0 overflow-y-auto">
+                                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                <Dialog.Title
+                                                                    as="h3"
+                                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                                >
+                                                                    ยืนยันการผลิตสำเร็จ
+                                                                </Dialog.Title>
+                                                                <div className="mt-2">
+                                                                    <p className="text-sm text-[#73664B]">
+                                                                        คุณต้องการยืนยันการผลิตสำเร็จหรือไม่
+                                                                    </p>
+                                                                </div>
+                                                                <div className="mt-2">
+                                                                    <Checkbox radius="sm" color="warning"
+                                                                        onChange={handleCheckboxChange3}
+                                                                        checked={isChecked} size="sm" className="text-primary" >
+                                                                        ยืนยันการผลิตสำเร็จ
+                                                                    </Checkbox>
+                                                                </div>
+                                                                {/*  choose */}
+                                                                <div className="flex justify-end">
+                                                                    <div className="inline-flex justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                            onClick={closeModal}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                            onClick={handleConfirmModal}
+                                                                        // onClick={() => handleConfirmModal(detail.pdo_id)}
+                                                                        // onClick={() => handleConfirmModal(detail.pdo_id_name)}
+
+                                                                        >
+                                                                            ยืนยัน
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
+                                    )
+                                    }
+                                </>
+                            )}
+
+
+                            {isChecked && detail && detail.pdo_status === '3' && (
+                                // {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (
+                                // {/* // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2' */}
+                                <>
+                                    {isOpen && (
+                                        <Transition appear show={isOpen} as={Fragment} >
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`} >
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0 bg-black/25" />
+                                                </Transition.Child>
+
+                                                <div className="fixed inset-0 overflow-y-auto">
+                                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                <Dialog.Title
+                                                                    as="h3"
+                                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                                >
+                                                                    ไปที่หน้าเพิ่มใบสั่งผลิตอีกครั้ง
+                                                                </Dialog.Title>
+                                                                <div className="mt-2">
+                                                                    <p className="text-sm text-[#73664B]">
+                                                                        คุณต้องการสั่งผลิตอีกครั้งหรือไม่
+                                                                    </p>
+                                                                </div>
+                                                                {/*  choose */}
+                                                                <div className="flex justify-end">
+                                                                    <div className="inline-flex justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none "
+                                                                            onClick={closeModal}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none "
+                                                                        // onClick={handleConfirm}
+                                                                        ><Link href={`../again/${id}`}>
+                                                                                ยืนยัน
+                                                                            </Link></button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
+                                    )
+                                    }
+                                </>
+                            )}
+                            {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (                                // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2'
+                                <>
+                                    {isOpen2 && (
+                                        <Transition appear show={isOpen2} as={Fragment} >
+                                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                                <Transition.Child
+                                                    as={Fragment}
+                                                    enter="ease-out duration-300"
+                                                    enterFrom="opacity-0"
+                                                    enterTo="opacity-100"
+                                                    leave="ease-in duration-200"
+                                                    leaveFrom="opacity-100"
+                                                    leaveTo="opacity-0"
+                                                >
+                                                    <div className="fixed inset-0 bg-black/25" />
+                                                </Transition.Child>
+
+                                                <div className="fixed inset-0 overflow-y-auto">
+                                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                                        <Transition.Child
+                                                            as={Fragment}
+                                                            enter="ease-out duration-300"
+                                                            enterFrom="opacity-0 scale-95"
+                                                            enterTo="opacity-100 scale-100"
+                                                            leave="ease-in duration-200"
+                                                            leaveFrom="opacity-100 scale-100"
+                                                            leaveTo="opacity-0 scale-95"
+                                                        >
+                                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                                <Dialog.Title
+                                                                    as="h3"
+                                                                    className="text-lg font-medium leading-6 text-[73664B]"
+                                                                >
+                                                                    ไปที่หน้าเพิ่มวัตถุดิบที่ใช้
+                                                                </Dialog.Title>
+                                                                <div className="mt-2">
+                                                                    <p className="text-sm text-[#73664B]">
+                                                                        คุณต้องการเพิ่มวัตถุดิบที่ใช้หรือไม่
+                                                                    </p>
+                                                                </div>
+                                                                {/*  choose */}
+                                                                <div className="flex justify-end">
+                                                                    <div className="inline-flex justify-end">
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none "
+                                                                            onClick={closeModal2}
+                                                                        >
+                                                                            ยกเลิก
+                                                                        </button>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none "
+                                                                        // onClick={handleConfirm}
+                                                                        ><Link href={`/ingredients/using/add`}>
+                                                                                ยืนยัน
+                                                                            </Link></button>
+                                                                    </div>
+                                                                </div>
+                                                            </Dialog.Panel>
+                                                        </Transition.Child>
+                                                    </div>
+                                                </div>
+                                            </Dialog>
+                                        </Transition>
+                                    )
+                                    }
+                                </>
+                            )}
                         </div >
                     </div>
                 ) : (
@@ -446,4 +887,4 @@ function detailproduction() {
 }
 
 
-export default detailproduction
+export default Detailproduction
