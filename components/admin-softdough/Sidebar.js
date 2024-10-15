@@ -91,6 +91,7 @@ const Sidebar = ({ children, className }) => {
 
   //ใหม่
   const [hasNotifications, setHasNotifications] = useState(false);
+  const [Notifications, setNotifications] = useState(false);
 
   useEffect(() => {
     const socket = io('http://localhost:8080', {
@@ -102,9 +103,10 @@ const Sidebar = ({ children, className }) => {
       socket.emit('registerUser', localStorage.getItem('userId')); // ลงทะเบียนผู้ใช้
     });
 
+    setHasNotifications(false);
     socket.on('newNotification', (notification) => {
       console.log('Received notification:', notification);
-      setNotifications((prevNotifications) => [...prevNotifications, notification]);
+      // setNotifications((prevNotifications) => [...prevNotifications, notification]);
       setHasNotifications(true);
     });
 
@@ -126,10 +128,11 @@ const Sidebar = ({ children, className }) => {
   const handleBellClick = async () => {
     setHasNotifications(false); // Reset notification flag
 
+    await fetchAllNotifications(); // ดึงการแจ้งเตือนทั้งหมด
+
     await markNotificationsAsRead();
     setIsNotificationVisible(prev => !prev); // สลับการแสดงผลของกล่องการแจ้งเตือน
 
-    await fetchAllNotifications(); // ดึงการแจ้งเตือนทั้งหมด
   };
 
   const fetchUnreadNotifications = async () => {
@@ -143,9 +146,13 @@ const Sidebar = ({ children, className }) => {
         credentials: 'include',
       });
       const data = await response.json();
-      if (data.length > 0) {
-        setHasNotifications(true); // แสดงจุดสีแดง
-      }
+      // ตรวจสอบว่ามีการแจ้งเตือนที่ยังไม่ได้อ่านหรือไม่
+      const hasUnread = data.some(notification => notification.read_status === 'N');
+      console.log(hasUnread, "hasUnread")
+      setHasNotifications(hasUnread); // ถ้ามี read_status = 'N' แสดงจุดสีแดง
+
+      // เก็บข้อมูลการแจ้งเตือนทั้งหมด
+      // setAllNotifications(data);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }
@@ -172,9 +179,10 @@ const Sidebar = ({ children, className }) => {
       console.error('Error marking notifications as read:', error);
     }
   };
+
   const fetchAllNotifications = async () => {
     try {
-      const response = await fetch('http://localhost:8080/notification/all', {
+      const response = await fetch('http://localhost:8080/notification/unread', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -513,20 +521,29 @@ const Sidebar = ({ children, className }) => {
                       cursor: 'pointer',
                       fontSize: '16px',
                     }}>✖️</button> ปุ่มปิดกล่อง */}
-                    {allNotifications.length > 0 ? (
+
+                    {/* ปัญหาตอนนี้คลิ๊กปั๊บเปลี่ยนเป็นอ่านทันที อาจจะหาวิธีเพิ่มลงในดาต้าเบสแบบใช้เวลา */}
+                    {/* {allNotifications.length > 0 ? (
                       <>
-                        <div className="flex justify-center items-centerpx-5 py-3 mx-1 mt-2 text-[#73664B] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]">การแจ้งเตือน</div>
-                        {allNotifications.slice(0, 7).map(notification => (
-                          <div
-                          key={notification.id}
-                          className="flex flex-row items-center px-5 py-3 mx-1 text-[#73664B] hover:bg-[#FFFFDD] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]"
-                        >
-                          <div className="flex-grow">
-                            {notification.ind_name} ใกล้หมดสต็อก
-                          </div>
-                          <span className="ml-auto text-xs text-gray-500">{notification.timeAgo}</span> {/* จัดให้อยู่ขวาสุดและเล็กลง */}
+                        <div className="flex justify-center items-center px-5 py-3 mx-1 mt-2 text-[#73664B] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]">
+                          การแจ้งเตือน
                         </div>
-                        
+                        {allNotifications.slice(0, 7).map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={`flex flex-row items-center px-5 py-3 mx-1 text-[#73664B] hover:bg-[#FFFFDD] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B] ${notification.read_status === 'N' ? 'bg-[#FFFAE5] font-bold' : ''
+                              }`}
+                            style={{
+                              borderLeft: notification.read_status === 'N' ? '4px solid #FFB800' : 'none', // เพิ่มเส้นสีเพื่อเน้นการแจ้งเตือนใหม่
+                            }}
+                          >
+                            <div className="flex-grow">
+                              {notification.ind_name} ใกล้หมดสต็อก
+                            </div>
+                            <span className="ml-auto text-xs text-gray-500">
+                              {notification.timeAgo}
+                            </span>
+                          </div>
                         ))}
                         {allNotifications.length > 7 && (
                           <div
@@ -535,18 +552,71 @@ const Sidebar = ({ children, className }) => {
                               cursor: 'pointer',
                               color: '#73664B',
                               textDecoration: 'underline',
-                              width: '100%', // ทำให้ div กว้างเต็ม
+                              width: '100%',
                             }}
-                            onClick={() => window.location.href = '/notification/noti'}>
+                            onClick={() => window.location.href = '/notification/noti'}
+                          >
                             ดูทั้งหมด
                           </div>
-
-
                         )}
                       </>
                     ) : (
-                      <div>No new notifications</div> // แสดงข้อความเมื่อไม่มีการแจ้งเตือน
+                      <div>ไม่มีการแจ้งเตือนใหม่</div> // แสดงข้อความเมื่อไม่มีการแจ้งเตือน
+                    )} */}
+                    {allNotifications.length > 0 ? (
+                      <>
+                        <div className="flex justify-center items-center px-5 py-3 mx-1 mt-2 text-[#73664B]">
+                          การแจ้งเตือน
+                        </div>
+                        {allNotifications.slice(0, 7).map((notification) => (
+                          <div
+                            key={notification.id}
+                            className={`flex flex-col items-start px-5 py-3 mx-1 text-[#73664B] hover:bg-[#FFFFDD] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]`}
+
+                          >
+                            <div className="flex items-center w-full justify-between">
+                              {/* Display notification message based on stock conditions */}
+                              <span>
+                                {notification.qty < notification.qtyminimum ? (
+                                  `ถึงจุดต่ำกว่าขั้นต่ำ ${notification.ind_name} ปริมาณ ${notification.qty}/${notification.qtyminimum}`
+                                ) : (
+                                  `ถึงปริมาณขั้นต่ำ ${notification.ind_name} ปริมาณ ${notification.qty}/${notification.qtyminimum}`
+                                )}
+                              </span>
+
+                              {/* Status indicator */}
+                              {notification.read_status === 'N' && (
+                                <div className="inline-block w-2 h-2 bg-[#FFB800] rounded-full"></div>
+                              )}
+                            </div>
+
+                            {/* Separate line for timeAgo */}
+                            <span className={`mt-1 text-xs ${notification.read_status === 'N' ? 'text-[#FFB800] font-semibold' : 'text-gray-500'}`}>
+                              {notification.timeAgo}
+                            </span>
+                          </div>
+                        ))}
+                        {allNotifications.length > 1 && (
+                          <div
+                            className="flex justify-center items-center px-4 py-2 mb-2 text-[#73664B]"
+                            style={{
+                              cursor: 'pointer',
+                              color: '#73664B',
+                              textDecoration: 'underline',
+                              width: '100%',
+                            }}
+                            onClick={() => window.location.href = '/notification/noti'}
+                          >
+                            ดูทั้งหมด
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div>ไม่มีการแจ้งเตือนใหม่</div>
                     )}
+
+
+
                   </div>
                 )}
 
