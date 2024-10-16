@@ -399,7 +399,7 @@ function Detailproduction() {
                                 </div>
                             )}
                             {/* ต้องแก้ให้ pdo.status =3 อันนี้เอาไว้ดู ui เฉยๆ มีเรื่อง modal*/}
-                            {detail !== null && detail.pdodetail.some(item => item.status === '3') && (
+                            {detail !== null && detail.pdo_status === '3' && (
                                 <div className="w-full flex justify-between">
                                     <Button onClick={openModal} type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
                                         สั่งผลิตอีกครั้ง
@@ -640,8 +640,8 @@ function Detailproduction() {
                             )}
 
 
-                            {/* {isChecked && detail && detail.pdo_status === '3' && ( */}
-                            {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (
+                            {isChecked && detail && detail.pdo_status === '3' && (
+                            // {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (
                                 // {/* // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2' */}
                                 <>
                                     {isOpen && (

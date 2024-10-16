@@ -186,7 +186,7 @@ function Detailproduction() {
             };
             
             console.log("console.log(requestBody);", requestBody);
-            router.push('/manufacture/listorder');
+            router.push('/staffpro/orderlist/list');
             if (checkedIds.length === 0) {
                 setMessage('No items selected');
                 return;
@@ -268,9 +268,9 @@ function Detailproduction() {
     return (
         <div>
             <button className='my-3 mx-5 '>
-                <Link href="/manufacture/listorder" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
+                <Link href="/staffpro/orderlist/list" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
-                    รายการสั่งผลิต
+                    ใบสั่งผลิตทั้งหมด
                 </Link>
             </button>
             <div>

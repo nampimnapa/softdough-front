@@ -603,20 +603,20 @@ const AddPromotion: React.FC = () => {
         // Convert selectedKeys and selectedKeys1 to arrays of numbers
         const smbuyIds = Array.from(selectedKeys).map(id => parseInt(id, 10));
         const smfreeIds = Array.from(selectedKeys1).map(id => parseInt(id, 10));
-
+    
         // Create promotiondetail with smbuy_id and smfree_id as arrays
         const details = {
             smbuy_id: smbuyIds,
             smfree_id: smfreeIds
         };
-
+    
         const newFormData = {
             ...formData,
             promotiondetail: [details] // Wrap details in an array to match the required format
         };
-
+    
         console.error('newFormData', newFormData);
-
+    
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/promotion/addfree`, {
                 method: 'POST',
@@ -625,16 +625,16 @@ const AddPromotion: React.FC = () => {
                 },
                 body: JSON.stringify(newFormData),
             });
-
+    
             const responseData = await response.json();
-
+    
             if (responseData.message === 'success') {
                 setMessage('Data added successfully');
                 router.push('/promotion/freeall');
                 console.log('Selected Keys:', Array.from(selectedKeys));
                 console.log('Selected Keys1:', Array.from(selectedKeys1));
                 console.log('Details:', details);
-
+    
             } else {
                 setMessage(responseData.message || 'Error occurred');
                 openModal();
@@ -645,7 +645,7 @@ const AddPromotion: React.FC = () => {
             openModal();
         }
     };
-
+    
 
 
 
@@ -689,10 +689,10 @@ const AddPromotion: React.FC = () => {
             <button className='my-3 mx-5'>
                 <Link href="/promotion/discountall" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
-                    โปรโมชันส่วนลด
+                    โปรโมชันของแถม
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>เพิ่มโปรโมชั่นส่วนลด</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>เพิ่มโปรโมชันของแถม</p>
             <div className="mt-5">
                 <div className="w-1/2">
                     <div className="grid grid-cols-3 items-center">
@@ -737,7 +737,10 @@ const AddPromotion: React.FC = () => {
                     </div>
                 </div>
 
-                <p className="mx-6 my-4 text-[#73664B] border-b-1 border-b-[#C5B182]">เงื่อนไข</p>
+                <p className="mx-6 my-4 text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียด</p>
+                <p className="mx-6 my-4 text-sm font-medium text-[#73664B] text-sm ">
+                เลือกสินค้าที่ต้องซื้อ
+                </p>
                 <div className="flex flex-row ml-6 mt-3 mr-6">
                     <div className="flex basis-1/4">
                         <label className="text-sm font-medium leading-6 text-[#73664B] ">
@@ -766,7 +769,6 @@ const AddPromotion: React.FC = () => {
                             {/* <div className="flex-none w-1/3"> */}
 
                             <Select
-                                size="sm"
                                 selectionMode="multiple"
                                 placeholder="เลือกสินค้า"
                                 selectedKeys={selectedKeys}
@@ -809,7 +811,7 @@ const AddPromotion: React.FC = () => {
 
                 {/* ของแถม       */}
                 <p className="mx-6 my-4 text-sm font-medium text-[#73664B] text-sm ">
-                    ของแถม
+                เลือกของแถม
                 </p>
                 <div className="flex flex-row ml-6 mt-3 mr-6">
                     <div className="flex basis-1/4">
@@ -838,7 +840,6 @@ const AddPromotion: React.FC = () => {
                         <div className="flex flex-col" style={{ width: '80%' }}>
 
                             <Select
-                                size="sm"
                                 selectionMode="multiple"
                                 placeholder="เลือกสินค้า"
                                 selectedKeys={selectedKeys1}
@@ -877,69 +878,63 @@ const AddPromotion: React.FC = () => {
                 </div>
 
 
-                <div className="flex justify-center my-8 gap-x-6">
+                {/* <div className="flex justify-center my-8 gap-x-6">
                     <button
                         onClick={handleSubmit}
                         className="rounded-md bg-[#F2B461] py-2 px-10 text-sm font-semibold text-white shadow-sm hover:bg-[#D9CAA7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#73664B]"
                     >
                         บันทึก
                     </button>
-                </div>
+                </div> */}
             </div>
 
-            <Transition appear show={isOpen} as={Fragment}>
-                <Dialog as="div" className="relative z-10" onClose={closeModal}>
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-300"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-200"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <div className="fixed inset-0 bg-black bg-opacity-25" />
-                    </Transition.Child>
-
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center p-4 text-center">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-300"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-200"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                    <Dialog.Title
-                                        as="h3"
-                                        className="text-lg font-medium leading-6 text-gray-900"
-                                    >
-                                        Notification
-                                    </Dialog.Title>
-                                    <div className="mt-2">
-                                        <p className="text-sm text-gray-500">
-                                            {message}
-                                        </p>
+            <div className="flex justify-start">
+                <div className="w-1/2 mt-10 flex justify-start">
+                    <button>
+                        <Link href={`/promotion/freeall`} type="button" className="text-white bg-[#C5B182] focus:outline-none font-medium rounded-full text-sm px-5 py-2.5 mb-2 ml-6">
+                            ยกเลิก
+                        </Link>
+                    </button>
+                    <>
+                        {isOpen && (
+                            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
+                                <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                                    <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
+                                        <div className="fixed inset-0 bg-black/25" />
+                                    </Transition.Child>
+                                    <div className="fixed inset-0 overflow-y-auto">
+                                        <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                            <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0 scale-95" enterTo="opacity-100 scale-100" leave="ease-in duration-200" leaveFrom="opacity-100 scale-100" leaveTo="opacity-0 scale-95">
+                                                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                                                    <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-[#73664B]">
+                                                        ยืนยันการเพิ่มโปรโมชันของแถม
+                                                    </Dialog.Title>
+                                                    <div className="mt-2">
+                                                        <p className="text-sm text-[#73664B]">คุณต้องการเพิ่มโปรโมชันของแถม</p>
+                                                    </div>
+                                                    <div className="flex justify-end mt-2">
+                                                        <div className="inline-flex justify-end">
+                                                            <Button type="button" className="text-[#73664B] bg-white inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" onClick={closeModal}>
+                                                                ยกเลิก
+                                                            </Button>
+                                                            <Button type="button" className="bg-white text-[#C5B182] inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] hover:text-[#73664B] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2" onClick={handleSubmit}>
+                                                                ยืนยัน
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+                                                </Dialog.Panel>
+                                            </Transition.Child>
+                                        </div>
                                     </div>
-
-                                    <div className="mt-4">
-                                        <Button
-                                            type="button"
-                                            onClick={closeModal}
-                                            className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                        >
-                                            OK
-                                        </Button>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
-                        </div>
-                    </div>
-                </Dialog>
-            </Transition>
+                                </Dialog>
+                            </Transition>
+                        )}
+                    </>
+                    <button onClick={openModal} type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
+                        บันทึก
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };

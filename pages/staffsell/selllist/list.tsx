@@ -49,7 +49,7 @@ function Listorder() {
 
     return (
         <div>
-            <p className='text-[#F2B461] font-medium m-4'>รายการสั่งผลิต</p>
+            <p className='text-[#F2B461] font-medium m-4'>รายการขายสินค้า</p>
             <div className="flex justify-between">
                 <form className="flex items-center w-full transform scale-75  ">
                     <div className="relative w-1/2 ">

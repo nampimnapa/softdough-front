@@ -704,7 +704,7 @@ function Pos() {
     return (
         <div className={kanit.className}>
             <div className="flex flex-col  h-screen">
-                {/* nav ส่วนบน */}
+                {/* nav ส่วนบน
                 <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1">
                     <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
@@ -728,7 +728,7 @@ function Pos() {
                             </ul>
                         </div>
                     </div>
-                </nav>
+                </nav> */}
 
                 <main className="flex flex-grow bg-white w-full overflow-hidden">
                     {/* Left Content */}

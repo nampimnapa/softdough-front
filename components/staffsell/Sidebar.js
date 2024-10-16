@@ -42,7 +42,7 @@ const Sidebar = ({ children, className }) => {
                 <div className="flex flex-col">
                     <MenuLink
                         isActive={isActive === "สินค้า"}
-                        href="#"
+                        href="/staffsell/pos"
                         title="สินค้า"
                         startIcon={<Icon icon="solar:donut-outline" className="h-5 w-5 inherit"
                         />}
@@ -55,7 +55,7 @@ const Sidebar = ({ children, className }) => {
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "รายการขายสินค้า"}
-                        href="#"
+                        href="/staffsell/selllist/list"
                         title="รายการขายสินค้า"
                         startIcon={<QueueListIcon className="h-5 w-5 inherit" />}
                         handleActive={handleActive} />
@@ -67,13 +67,13 @@ const Sidebar = ({ children, className }) => {
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "เพิ่มเงินเข้าธนาคาร"}
-                        href="#"
+                        href="/staffsell/bank/add"
                         title="เพิ่มเงินเข้าธนาคาร"
                         startIcon={<WalletIcon class="h-5 w-5 inherit" />}
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "เงินเข้าธนาคาร"}
-                        href="#"
+                        href="/staffsell/bank/all"
                         title="เงินเข้าธนาคาร"
                         startIcon={<BuildingLibraryIcon class="h-5 w-5 inherit" />}
                         handleActive={handleActive} />
@@ -87,7 +87,7 @@ const Sidebar = ({ children, className }) => {
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "รายการจ่าย"}
-                        href="/staffsell/orderlist/waiting"
+                        href="/staffsell/expenses/list"
                         title="รายการจ่าย"
                         startIcon={<CurrencyDollarIcon className="h-5 w-5 inherit" />}
                         handleActive={handleActive} />
