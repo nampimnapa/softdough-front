@@ -1,13 +1,7 @@
 import React, { Fragment, useEffect, useState, ChangeEvent } from "react";
 import Link from "next/link";
 import { Tabs, Tab, Chip, Select, SelectItem, Spinner, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/react";
-import {
-    ChevronLeftIcon,
-    MagnifyingGlassIcon,
-    PlusIcon,
-    PencilSquareIcon,
-    TrashIcon
-} from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import Datepicker from "react-tailwindcss-datepicker";

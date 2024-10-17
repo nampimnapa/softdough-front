@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from 'next/router'
 import {
     ChevronLeftIcon,
     MagnifyingGlassIcon,
@@ -10,22 +11,36 @@ import {
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import Datepicker from "react-tailwindcss-datepicker";
-import { useRouter } from "next/router";
 import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
 import Head from 'next/head'
 const kanit = Kanit({
     subsets: ["thai", "latin"],
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import styles from './styles.module.css';
 
 function Add() {
-
+    const router = useRouter()
     const [isOpen, setIsOpen] = useState(false);
     const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
     };
+    const MySwal = withReactContent(Swal);
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            router.push('/ingredients/income/all');
+        }
+    });
 
     const closeModal = () => {
         setIsOpen(false);
@@ -108,14 +123,22 @@ function Add() {
             body: JSON.stringify(requestData),
         });
         const responseData = await response.json();
-        if (responseData.message === 'success') {
-            setMessage('Data added successfully');
+        console.log(responseData)
+        if (responseData.message === 'Ingredient lot added successfully') {
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มข้อมูลวัตถุดิบเข้าร้านสำเร็จ</p>
+            });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มข้อมูลวัตถุดิบเข้าร้านไม่สำเร็จ</p>
+            });
         }
 
-    };
 
+    };
 
 
     return (
@@ -198,7 +221,7 @@ function Add() {
                         <table className="w-full">
                             <tbody className="w-full">
                                 {addedIngredients.map((addedIngredient, index) => (
-                                    <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                    <tr key={index} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white flex items-center">
                                         <td scope="col" className="flex-1 text-center">{addedIngredient.name}</td>
                                         <td scope="col" className="flex-1 text-center">{addedIngredient.quantity}</td>
                                         <td scope="col" className="flex-1 text-center">{addedIngredient.exp}</td>
@@ -301,7 +324,15 @@ function Add() {
                     )
                     }
                 </>
-                <button onClick={openModal} type="button" className="ml-2 mx-auto mr-5 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">บันทึก</button>
+                <button
+                    onClick={openModal}
+                    disabled={addedIngredients.length == 0}
+                    type="button"
+                    className= {`ml-2 mx-auto mr-5 text-white bg-[#73664B] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ${addedIngredients.length !== 0 ? 'bg-[#73664B]' : 'bg-gray-400 cursor-not-allowed'}`}
+                >
+                    บันทึก
+                </button>
+
             </div >
 
         </div>

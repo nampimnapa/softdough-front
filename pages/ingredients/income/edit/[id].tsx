@@ -17,10 +17,27 @@ const kanit = Kanit({
     weight: ["100", "200", "300", "400", "500", "600", "700"],
 });
 import Head from 'next/head'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
 
 function Index() {
     const router = useRouter();
     const { id } = router.query;
+    const MySwal = withReactContent(Swal);
+
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          router.push('/ingredients/income/all');
+        }
+      });
 
     const [Ind, setInd] = useState({
         ind_name: '',
@@ -65,52 +82,6 @@ function Index() {
         setValue(newValue);
     }
 
-    // const handleSubmit = (e, lotIndex) => {
-    //     e.preventDefault();
-    //     const priceValue = e.target.price ? parseInt(e.target.price.value) : null;
-    //     const countInt = parseInt(e.target.count.value, 10);
-    //     const newIngredientData = {
-    //         ind_id: e.target.ingredients.value,
-    //         qtypurchased: countInt,
-    //         date_exp: value.startDate,
-    //         price: priceValue,
-    //     };
-
-    //     const updatedIngrelot = [...ingrelot];
-    //     if (lotIndex >= 0 && lotIndex < updatedIngrelot.length) {
-    //         const existingLot = updatedIngrelot[lotIndex];
-    //         if (existingLot) {
-    //             existingLot.ingre.push(newIngredientData);
-    //         }
-    //     }
-
-    //     setIngrelot(updatedIngrelot);
-    //     e.target.reset();
-    //     setIsModified(true);
-    //     setValue({
-    //         startDate: null,
-    //         endDate: null
-    //     })
-    //     console.log("Data submit: ", updatedIngrelot);
-    // };
-
-
-    // const handleDeleteIngredient = (lotIndex, ingreIndex) => {
-    //     const updatedIngrelot = [...ingrelot];
-    //     if (
-    //         lotIndex >= 0 && lotIndex < updatedIngrelot.length &&
-    //         ingreIndex >= 0 && ingreIndex < updatedIngrelot[lotIndex].ingre.length
-    //     ) {
-    //         const isAddingOrModifying = isModified || updatedIngrelot[lotIndex].ingre.length > 0;
-    //         updatedIngrelot[lotIndex].ingre.splice(ingreIndex, 1);
-    //         setIngrelot(updatedIngrelot);
-
-
-    //         if (isAddingOrModifying) {
-    //             setIsModified(true);
-    //         }
-    //     }
-    // };
     const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
     // const handleCheckboxChange = () => {
     //     setIsChecked(!isChecked); // Toggle checkbox status
@@ -208,11 +179,17 @@ function Index() {
             body: JSON.stringify({ "dataaToEdit": additionalIngredients, "status": (isChecked ? 2 : 1) }), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
         });
         const responseData = await response.json();
-        if (responseData.message === 'test เงื่อนไข') {
-            setMessage('Data updated successfully');
-            router.replace('/ingredients/income/all'); // นำทางไปยังหน้าอื่น
+        if (responseData.message === 'Data updated successfully') {
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>แก้ไขข้อมูลวัตถุดิบเข้าร้านสำเร็จ</p>
+              });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาดในการแก้ไขข้อมูล"
+              });
         }
         setIsModified(true);
     };
@@ -253,9 +230,9 @@ function Index() {
     }
     // console.log("handleInputChange", indde);
     // console.log("additionalIngredients", additionalIngredients);
-    console.log(areArraysEqual(indde, additionalIngredients))
+    // console.log(areArraysEqual(indde, additionalIngredients))
     // console.log("ind",ind);
-    console.log("isChecked", isChecked);
+    // console.log("isChecked", isChecked);
 
 
     return (
@@ -341,7 +318,7 @@ function Index() {
                                 <table className="w-full">
                                     <tbody className="w-full">
                                         {additionalIngredients.filter(ingredient => !ingredient.deleted_at).map((ingredient, Idx) => (
-                                            <tr key={Idx} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white border-b h-10 text-sm flex items-center">
+                                            <tr key={Idx} className="even:bg-[#F5F1E8] border-b h-10 text-sm odd:bg-white flex items-center">
                                                 <td scope="col" className="flex-1 text-center">{Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
                                                     ind.ind_id === ingredient.ind_id ? (ind.ind_name) : ""
                                                 ))}</td>

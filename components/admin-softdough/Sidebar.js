@@ -86,8 +86,6 @@ const Sidebar = ({ children, className }) => {
     console.log(isActive);
   };
 
-
-
   //ใหม่
   const [hasNotifications, setHasNotifications] = useState(false);
   // const [Notifications, setNotifications] = useState(false);
@@ -107,16 +105,11 @@ const Sidebar = ({ children, className }) => {
       // setNotifications((prevNotifications) => [...prevNotifications, notification]);
       setHasNotifications(true);
     });
-
     fetchUnreadNotifications();
-
-
     return () => {
       socket.disconnect();
     };
   }, []);
-
-
 
   const [allNotifications, setAllNotifications] = useState([]);
 
@@ -252,26 +245,23 @@ const Sidebar = ({ children, className }) => {
   return (
     // nav ส่วนบน
 
-    <div className={`flex flex-row items-start overflow-x-hidden ${className} `}>
+    <div className={`flex flex-row items-start overflow-x-hidden ${className}`}>
       {/* เริ่มต้น Sidebar */}
-      <nav nav="true" className="flex flex-col gap-4 py-4 bg-white h-screen max-w-md min-w-[240px]  border border-r-[#C5B182] border-r-1  " >
+      <nav nav="true" className="overflow-y-auto flex flex-col gap-4 py-4 bg-white h-screen max-w-md min-w-[240px] border border-r-[#C5B182] border-r-1">
         <SoftDoughLogo />
-        {/* MenuLink คือ Component ที่สร้างขึ้นมาเองโค้ดอยู่ด้านล่าง */}
         <div className="flex flex-col">
-
-          {/* ภาพรวม */}
           <MenuLink
             isActive={isActive === "ภาพรวม"}
             href="/dashboard/dashboard"
             title="ภาพรวม"
-            startIcon={<ChartPieIcon className="h-5 w-5 inherit " />}
-            handleActive={handleActive} />
-
-          {/* วัตถุดิบ */}
+            startIcon={<ChartPieIcon className="h-5 w-5 inherit" />}
+            handleActive={handleActive}
+          />
           <MenuDropdown
             title="วัตถุดิบ"
-            startIcon={<CubeIcon className="h-5 w-5 inherit " />}
-            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}>
+            startIcon={<CubeIcon className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
+          >
             {ingredientDropdown.map((item, index) => (
               <React.Fragment key={index}>
                 <MenuLink
@@ -283,14 +273,10 @@ const Sidebar = ({ children, className }) => {
               </React.Fragment>
             ))}
           </MenuDropdown>
-
-          {/* สินค้า */}
           <MenuDropdown
             title="สินค้า"
-            startIcon={<Icon icon="solar:donut-outline" className="h-5 w-5 inherit"
-            />}
-            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />
-            }
+            startIcon={<Icon icon="solar:donut-outline" className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {productDropdown.map((item, index) => (
               <React.Fragment key={index}>
@@ -303,12 +289,9 @@ const Sidebar = ({ children, className }) => {
               </React.Fragment>
             ))}
           </MenuDropdown>
-
-          {/* การผลิต */}
           <MenuDropdown
             title="การผลิต"
-            startIcon={<Icon icon="tabler:tools-kitchen-2"
-              className="h-5 w-5 inherit" />}
+            startIcon={<Icon icon="tabler:tools-kitchen-2" className="h-5 w-5 inherit" />}
             endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {manufactureDropdown.map((item, index) => (
@@ -322,8 +305,6 @@ const Sidebar = ({ children, className }) => {
               </React.Fragment>
             ))}
           </MenuDropdown>
-
-          {/* รายการขาย */}
           <MenuDropdown
             title="รายการขาย"
             startIcon={<QueueListIcon className="h-5 w-5 inherit" />}
@@ -340,11 +321,11 @@ const Sidebar = ({ children, className }) => {
               </React.Fragment>
             ))}
           </MenuDropdown>
-          {/* โปรโมชัน */}
           <MenuDropdown
             title="โปรโมชัน"
             startIcon={<MegaphoneIcon className="h-5 w-5 inherit" />}
-            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}>
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
+          >
             {promotionDropdown.map((item, index) => (
               <React.Fragment key={index}>
                 <MenuLink
@@ -356,7 +337,6 @@ const Sidebar = ({ children, className }) => {
               </React.Fragment>
             ))}
           </MenuDropdown>
-          {/* รายการจ่าย */}
           <MenuDropdown
             title="รายการจ่าย"
             startIcon={<CurrencyDollarIcon className="h-5 w-5 inherit" />}
@@ -373,26 +353,25 @@ const Sidebar = ({ children, className }) => {
               </React.Fragment>
             ))}
           </MenuDropdown>
-          {/* พนักงาน */}
           <MenuDropdown
             title="พนักงาน"
-            startIcon={<UserGroupIcon className="h- w-5 inherit" />}
-            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}>
+            startIcon={<UserGroupIcon className="h-5 w-5 inherit" />}
+            endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
+          >
             {staffDropdown.map((item, index) => (
               <React.Fragment key={index}>
                 <MenuLink
                   isActive={isActive === item.title}
                   href={item.href}
                   title={item.title}
-                  handleActive={handleActive} />
+                  handleActive={handleActive}
+                />
               </React.Fragment>
             ))}
           </MenuDropdown>
-          {/* ตั้งค่า */}
           <MenuDropdown
             title="ตั้งค่า"
-            startIcon={<Cog6ToothIcon className="h-5 w-5 inherit" />
-            }
+            startIcon={<Cog6ToothIcon className="h-5 w-5 inherit" />}
             endIcon={<ChevronDownIcon className="h-5 w-5 inherit" />}
           >
             {settingDropdown.map((item, index) => (
@@ -406,7 +385,6 @@ const Sidebar = ({ children, className }) => {
               </React.Fragment>
             ))}
           </MenuDropdown>
-          {/* ออกจากระบบ */}
           <MenuLink
             isActive={isActive === "ออกจากระบบ"}
             href="/logout"
@@ -421,62 +399,7 @@ const Sidebar = ({ children, className }) => {
         {/* nav ส่วนบน */}
         <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-            <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse ">
-
-              {/* <div className="border-r border-r-[#C5B182] mr-2 pr-2">
-                <BellIcon className="h-6 w-6 text-[#73664B]" />
-              </div> */}
-
-              {/* ลองการแจ้งเตือน*/}
-              {/* มีสีแดง */}
-              {/* <div className="notification-bell" onClick={handleBellClick}>
-                <div className="bell-icon relative">
-                  <BellIcon className="h-6 w-6 text-[#73664B]" />
-                  {lowStockAlerts.length > 0 && (
-                    <span className="badge absolute top-0 right-0 bg-red-500 text-white rounded-full px-2 text-sm">
-                      {lowStockAlerts.length}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {isNotificationOpen && lowStockAlerts.length > 0 && (
-                <div className="alert-list absolute bg-white shadow-lg p-4 rounded-md mt-2">
-                  <ul>
-                    {lowStockAlerts.map((alert) => (
-                      <li key={alert.ind_id} className="py-2 px-4 hover:bg-gray-100 cursor-pointer">
-                        <Link href="/ingredient/all">
-                          <a>วัตถุดิบ {alert.ind_name} ปริมาณต่ำกว่าเกณฑ์ขั้นต่ำ</a>
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )} */}
-              {/* ไม่มีสีแดง */}
-              {/* <div className="notification-bell">
-                <div className="bell-icon" onClick={() => setShowNotifications(!showNotifications)}>
-                  <BellIcon className="h-6 w-6 text-[#73664B]" />
-                  {notificationCount > 0 && <span className="badge">{notificationCount}</span>}
-                </div>
-
-                {showNotifications && (
-                  <div className="alert-list">
-                    <ul>
-                      {lowStockAlerts.map(alert => (
-                        <li key={alert.noti_id} className="notification-item">
-                          วัตถุดิบ {alert.ind_name} ปริมาณต่ำกว่าเกณฑ์ขั้นต่ำ
-                          <button className="mark-read-btn" onClick={() => handleMarkAsRead(alert.noti_id)}>
-                            Mark as Read
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div> */}
-
-              {/* ��ู้ใช้ */}
+            <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
               <div onClick={handleBellClick} className="border-r border-r-[#C5B182] mr-2 pr-2" style={{ position: 'relative' }}>
                 <BellIcon className="h-6 w-6 text-[#73664B]" />
                 {hasNotifications && (
@@ -490,32 +413,11 @@ const Sidebar = ({ children, className }) => {
                     backgroundColor: 'red',
                   }} />
                 )}
-
-                {/* แสดงกล่องการแจ้งเตือน */}
                 {isNotificationVisible && (
-                  // <div className="notification-box" style={{
-                  //   position: 'absolute',
-                  //   top: '30px', // ปรับตำแหน่งตามต้องการ
-                  //   right: '0',
-                  //   backgroundColor: 'white',
-                  //   border: '1px solid #ccc',
-                  //   borderRadius: '8px',
-                  //   boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                  //   zIndex: 1000,
-                  //   padding: '10px',
-                  //   width: '250px', // ปรับความกว้างตามต้องการ
-                  // }}>
                   <div className="absolute right-0 z-10 mt-2 w-96 origin-top-right rounded-md bg-white shadow-md ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in">
-                    {/* <button onClick={() => setIsNotificationVisible(false)} style={{
-                      background: 'none',
-                      border: 'none',
-                      float: 'right',
-                      cursor: 'pointer',
-                      fontSize: '16px',
-                    }}>✖️</button> ปุ่มปิดกล่อง */}
                     {allNotifications.length > 0 ? (
                       <>
-                        <div className="flex justify-center items-centerpx-5 py-3 mx-1 mt-2 text-[#73664B] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]">การแจ้งเตือน</div>
+                        <div className="flex justify-center items-center px-5 py-3 mx-1 mt-2 text-[#73664B] data-[focus]:bg-[#F5F1E8] data-[focus]:text-[#73664B]">การแจ้งเตือน</div>
                         {allNotifications.slice(0, 7).map(notification => (
                           <div
                             key={notification.id}
@@ -524,9 +426,8 @@ const Sidebar = ({ children, className }) => {
                             <div className="flex-grow">
                               {notification.ind_name} ใกล้หมดสต็อก
                             </div>
-                            <span className="ml-auto text-xs text-gray-500">{notification.timeAgo}</span> {/* จัดให้อยู่ขวาสุดและเล็กลง */}
+                            <span className="ml-auto text-xs text-gray-500">{notification.timeAgo}</span>
                           </div>
-
                         ))}
                         {allNotifications.length > 7 && (
                           <div
@@ -535,43 +436,35 @@ const Sidebar = ({ children, className }) => {
                               cursor: 'pointer',
                               color: '#73664B',
                               textDecoration: 'underline',
-                              width: '100%', // ทำให้ div กว้างเต็ม
+                              width: '100%',
                             }}
                             onClick={() => window.location.href = '/notification/noti'}>
                             ดูทั้งหมด
                           </div>
-
-
                         )}
                       </>
                     ) : (
-                      <div>No new notifications</div> // แสดงข้อความเมื่อไม่มีการแจ้งเตือน
+                      <div>No new notifications</div>
                     )}
                   </div>
                 )}
-
-
               </div>
-
-
-
-
               <UserCircleIcon className="h-6 w-6 text-[#73664B] justify-end" />
               <span className="text-[#73664B] pl-2">นายฉันทกร อุดรพันธ์</span>
             </div>
             <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
               <ul className="flex flex-col font-medium p-0 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
                 <li>
-                  <a href="#" className="block py-2 px-3 text-white rounded md:bg-transparent md:text-[#73664B] md:p-0 " aria-current="page">ซอฟโดว์ แอดมิน</a>
+                  <a href="#" className="block py-2 px-3 text-white rounded md:bg-transparent md:text-[#73664B] md:p-0" aria-current="page">ซอฟโดว์ แอดมิน</a>
                 </li>
-
               </ul>
             </div>
           </div>
         </nav>
 
-        <main className="flex-grow bg-white h-full w-full">{children}</main>
-
+        <main className="flex-grow bg-white">
+          {children}
+        </main>
       </div>
     </div>
 

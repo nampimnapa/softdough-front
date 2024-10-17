@@ -6,6 +6,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import { Button, Input } from "@nextui-org/react";
 import Head from 'next/head'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -16,6 +18,20 @@ const kanit = Kanit({
 
 function Add() {
     const [isOpen, setIsOpen] = useState(false);
+    const MySwal = withReactContent(Swal);
+    const [statusButton, setStatusButton] = useState(true);
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          router.push('/ingredients/all');
+        }
+      });
 
     const closeModal = () => {
         setIsOpen(false);
@@ -36,13 +52,19 @@ function Add() {
         qtyminimum: '',
         un_ind: '',
         qty_per_unit: '',
-        status: '',
     });
     interface UnitType {
         un_id: string;
         un_name: string;
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
+
+    useEffect(() => {
+        const isFormIncomplete = Object.values(formData).some(value => value === null || value === "" || value === undefined);
+
+        setStatusButton(isFormIncomplete);
+    }, [formData]);
+
     useEffect(() => {
         // Fetch unit data from the server and set the options
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/unit`)
@@ -75,11 +97,18 @@ function Add() {
         });
         const responseData = await response.json();
 
-        if (responseData.message === 'success') {
+        if (responseData.message === 'Ingredient added successfully') {
             setMessage('Data added successfully');
-            router.push('/ingredients/all');
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มข้อมูลวัตถุดิบสำเร็จ</p>
+              });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มข้อมูลวัตถุดิบไม่สำเร็จ</p>
+              });
         }
 
         // Reset the form after submission
@@ -265,7 +294,7 @@ function Add() {
                         )
                         }
                     </>
-                    <button onClick={openModal} type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">บันทึก</button>
+                    <button onClick={openModal} disabled = {statusButton} type="button" className={`ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ${statusButton ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#73664B]'}`}>บันทึก</button>
                 </div >
             </div >
         </div >

@@ -59,3 +59,12 @@ body {
   font-weight: normal;
   font-style: normal;
 }
+
+.rounded-button {
+  border-radius: 20px; /* ปรับความโค้งของปุ่ม */
+}
+
+.custom-font {
+  font-family: 'Kanit', sans-serif; /* ตัวอย่างฟอนต์จาก Google Fonts */
+  font-size: 18px;
+}

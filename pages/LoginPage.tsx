@@ -29,10 +29,9 @@ const LoginPage = () => {
   const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try {
-      const formData = {
-        username: username,
-        password: password
-      };
+      const formData = { username, password };
+
+      console.log('Form data:', formData);
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login/login`, {
         method: 'POST',
@@ -40,36 +39,42 @@ const LoginPage = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
-        credentials: 'include', // ตรวจสอบว่าใช้ 'include' หรือไม่
-
+        credentials: 'include',
       });
 
       if (!response.ok) {
-        throw new Error('ไม่สามารถเข้าสู่ระบบได้');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'ไม่สามารถเข้าสู่ระบบได้');
       }
 
-      // ทำสิ่งที่ต้องการหลังจากเข้าสู่ระบบสำเร็จ
       const data = await response.json();
-      console.log(data,"data"); // เพิ่มบรรทัดนี้เพื่อตรวจสอบ
+      console.log('Login response:', data);
 
-      // บันทึก userId ใน localStorage หลังจากเข้าสู่ระบบสำเร็จ
-      localStorage.setItem('userId', data.st_id); // Adjust according to the response structure
+      if (data.st_id) {
+        localStorage.setItem('userId', data.st_id.toString());
+        console.log('User ID saved in localStorage:', data.st_id);
+      } else {
+        console.warn('User ID not found in response');
+      }
 
-      // ตรวจสอบว่า userId ถูกบันทึกใน localStorage
-      // localStorage.setItem('userId', data.st_id);
-      console.log('User ID saved in localStorage:', data.st_id); // เพิ่มบรรทัดนี้เพื่อตรวจสอบ
-
-      if (data.message.includes('admin')) {
-        router.push('/expenses/add');
-      } else if (data.message.includes('production')) {
-        router.push('/production/dashboard');
-      } else if (data.message.includes('order')) {
-        router.push('/staffsell/test');
+      switch (true) {
+        case data.message.includes('admin'):
+          router.push('/expenses/add');
+          break;
+        case data.message.includes('production'):
+          router.push('/production/dashboard');
+          break;
+        case data.message.includes('order'):
+          router.push('/staffsell/test');
+          break;
+        default:
+          console.warn('Unknown user type');
+          // อาจจะ redirect ไปยังหน้า default หรือแสดงข้อความแจ้งเตือน
       }
 
     } catch (error) {
       console.error('เกิดข้อผิดพลาดในการเข้าสู่ระบบ:', error.message);
-      // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)
+      // แสดงข้อความผิดพลาดให้ผู้ใช้เห็น (เช่น ใช้ state เพื่อแสดงข้อความใน UI)
     }
   };
 
