@@ -159,7 +159,7 @@ function Detailproduction() {
 
             if (responseData.status === 200) {
                 setMessage('Data update successfully');
-                // router.push('/product/all');
+                router.push('/product/all');
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
@@ -169,24 +169,72 @@ function Detailproduction() {
 
     console.log("id", `${id}`)
     const handleConfirmModal = async () => {
-        if (
-            // !isChecked && detail && 
-            detail.pdo_status === '2') {
+        // if (
+        //     // !isChecked && detail && 
+        //     detail.pdo_status === '2') {
+        //     const idpdo = `${id}`;
+        //     // const allChecked = Object.values(checkedItems3).every(value => value === true);
+        //     const pdoStatus = isChecked3 ? 3 : 5;
+
+        //     const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+        //     const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
+        //     const requestBody = {
+        //         pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
+        //         pdo_id: idpdo, // Add the pdo_id
+        //         pdo_status: pdoStatus
+
+        //     };
+
+        //     console.log("console.log(requestBody);", requestBody);
+        //     router.push('/manufacture/listorder');
+        //     if (checkedIds.length === 0) {
+        //         setMessage('No items selected');
+        //         return;
+        //     }
+
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+        //         method: 'PATCH',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(requestBody),
+        //     });
+
+        //     const responseData = await response.json();
+        //     console.log(requestBody)
+
+
+
+        //     if (responseData.status === 200) {
+        //         setMessage('Data update successfully');
+        //         // router.push('/product/all');
+        //     } else {
+        //         setMessage(responseData.message || 'Error occurred');
+        //     }
+        // }
+
+        if (detail.pdo_status === '2') {
             const idpdo = `${id}`;
-            // const allChecked = Object.values(checkedItems3).every(value => value === true);
             const pdoStatus = isChecked3 ? 3 : 5;
 
             const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
-            const checkedIdsAsNumbers = checkedIds.map(id => Number(id)); // Convert to numbers
+
+            // Create array of pdod_ids with broken and over values from inputValues
+            const pdodDetailList = checkedIds.map(id => ({
+                pdod_id: Number(id),
+                broken: inputValues[id]?.broken || 0, // Default value for broken
+                over: inputValues[id]?.over || 0    // Default value for over
+            }));
+
             const requestBody = {
-                pdod_ids: checkedIdsAsNumbers, // Array of pdod_ids
+                pdod_ids: pdodDetailList, // Array of objects with pdod_id, broken, and over
                 pdo_id: idpdo, // Add the pdo_id
                 pdo_status: pdoStatus
-
             };
 
             console.log("console.log(requestBody);", requestBody);
             router.push('/manufacture/listorder');
+
             if (checkedIds.length === 0) {
                 setMessage('No items selected');
                 return;
@@ -201,17 +249,15 @@ function Detailproduction() {
             });
 
             const responseData = await response.json();
-            console.log(requestBody)
-
-
+            console.log(requestBody);
 
             if (responseData.status === 200) {
                 setMessage('Data update successfully');
-                // router.push('/product/all');
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
         }
+
     };
 
 
@@ -265,6 +311,19 @@ function Detailproduction() {
 
 
     };
+    const [inputValues, setInputValues] = useState({});
+
+    const handleInputChange = (pdod_id, field, value) => {
+        setInputValues((prevValues) => ({
+            ...prevValues,
+            [pdod_id]: {
+                ...prevValues[pdod_id],
+                [field]: Number(value),  // เก็บค่า broken หรือ over ในรูปแบบตัวเลข
+            },
+        }));
+    };
+
+
     return (
         <div>
             <button className='my-3 mx-5 '>
@@ -290,58 +349,93 @@ function Detailproduction() {
 
                         <div className="relative overflow-x-auto mx-6 mt-2">
 
-                            <table className="w-full text-sm text-center text-gray-500 ">
-                                <thead >
-                                    <tr className="text-white  font-normal  bg-[#908362] ">
-                                        <td scope="col" className="px-6 py-3">
-                                            ประเภทสินค้า
-                                        </td>
-                                        <td scope="col" className="px-6 py-3">
-                                            สินค้า
-                                        </td>
-                                        <td scope="col" className="px-6 py-3">
-                                            จำนวน
-                                        </td>
-                                        <td scope="col" className="px-6 py-3">
-                                            การผลิต
-                                        </td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {detail.pdodetail.map((pdodetail, idx) => (
-                                        <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                            <td
-                                                scope="row"
-                                                className="px-6 py-1 whitespace-nowrap dark:text-white"
-                                            >
-                                                {pdodetail.pdc_name}
-                                            </td>
-                                            <td className="px-6 py-1">{pdodetail.pd_name}</td>
+                        <table className="w-full text-sm text-center text-gray-500 ">
+  <thead>
+    <tr className="text-white font-normal bg-[#908362]">
+      <td scope="col" className="px-6 py-3">ประเภทสินค้า</td>
+      <td scope="col" className="px-6 py-3">สินค้า</td>
+      <td scope="col" className="px-6 py-3">จำนวน</td>
+      {/* Only display "จำนวนผลิตเสีย" and "จำนวนผลิตเกิน" columns if status is not 1 */}
+      {detail.pdodetail[0]?.status !== '1' && (
+        <>
+          <td scope="col" className="px-6 py-3">จำนวนผลิตเสีย</td>
+          <td scope="col" className="px-6 py-3">จำนวนผลิตเกิน</td>
+        </>
+      )}
+      <td scope="col" className="px-6 py-3">การผลิต</td>
+    </tr>
+  </thead>
 
-                                            <td className="px-6 py-1 h-10 ">
-                                                {pdodetail.qty}
-                                            </td>
+  <tbody>
+    {detail.pdodetail.map((pdodetail, idx) => (
+      <tr key={idx} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+        <td scope="row" className="px-6 py-1 whitespace-nowrap dark:text-white">
+          {pdodetail.pdc_name}
+        </td>
+        <td className="px-6 py-1">{pdodetail.pd_name}</td>
+        <td className="px-6 py-1 h-10">{pdodetail.qty}</td>
 
-                                            <td className={`text-sm px-6 py-2 
-    ${pdodetail.status === '3' ? 'text-green-500' :
-                                                    pdodetail.status === '1' ? 'text-[#C5B182]' : ''
-                                                }`}>
-                                                {pdodetail.status === '3' ? 'เสร็จสิ้นแล้ว' : pdodetail.status === '1' ? 'รอยืนยันดำเนินการ' : ''}
-                                                {pdodetail.status === '2' && (
-                                                    <Checkbox
-                                                        color="success"
-                                                        onChange={() => handleCheckboxChangeDetail(pdodetail.pdod_id)}
-                                                        isSelected={checkedItems[pdodetail.pdod_id]} // ใช้ค่าจาก checkedItems เพื่อกำหนดสถานะ checked หรือ unchecked
-                                                    >
-                                                    </Checkbox>
-                                                )}
-                                            </td>
+        {/* Display Broken input or value based on status */}
+        {pdodetail.status !== '1' && (
+          <td className="px-6 py-1 h-10">
+            {pdodetail.status === '3' ? (
+              <span>{pdodetail.pdod_broken}</span> // Display value when status is 3
+            ) : (
+              <input
+                type="number"
+                placeholder="Broken"
+                min="0"
+                defaultValue={0}
+                onChange={(e) =>
+                  handleInputChange(pdodetail.pdod_id, 'broken', e.target.value)
+                }
+                className="ml-2 px-2 py-1 border rounded-md"
+              />
+            )}
+          </td>
+        )}
 
-                                        </tr>
+        {/* Display Over input or value based on status */}
+        {pdodetail.status !== '1' && (
+          <td className="px-6 py-1 h-10">
+            {pdodetail.status === '3' ? (
+              <span>{pdodetail.pdod_over}</span> // Display value when status is 3
+            ) : (
+              <input
+                type="number"
+                placeholder="Over"
+                min="0"
+                defaultValue={0}
+                onChange={(e) =>
+                  handleInputChange(pdodetail.pdod_id, 'over', e.target.value)
+                }
+                className="ml-2 px-2 py-1 border rounded-md"
+              />
+            )}
+          </td>
+        )}
 
-                                    ))}
-                                </tbody>
-                            </table>
+        {/* Status display */}
+        <td className={`text-sm px-6 py-2 ${pdodetail.status === '3' ? 'text-green-500' : pdodetail.status === '1' ? 'text-[#C5B182]' : ''}`}>
+          {pdodetail.status === '3'
+            ? 'เสร็จสิ้นแล้ว'
+            : pdodetail.status === '1'
+              ? 'รอยืนยันดำเนินการ'
+              : ''}
+
+          {pdodetail.status === '2' && (
+            <Checkbox
+              color="success"
+              onChange={() => handleCheckboxChangeDetail(pdodetail.pdod_id)}
+              isSelected={checkedItems[pdodetail.pdod_id]} // Use checkedItems to set checked status
+            />
+          )}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
                         </div>
                     </div>
                 ) : (
@@ -641,7 +735,7 @@ function Detailproduction() {
 
 
                             {isChecked && detail && detail.pdo_status === '3' && (
-                            // {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (
+                                // {isChecked && detail && detail.pdodetail.some(item => item.status === '3') && (
                                 // {/* // Modal แสดงเมื่อ isChecked เป็น false และ detail.pdo_status เท่ากับ '2' */}
                                 <>
                                     {isOpen && (

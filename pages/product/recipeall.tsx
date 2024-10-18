@@ -449,9 +449,9 @@ function Recipeall() {
                 setEditProduct(data);
                 setIngredientsFoodSaveEdit(data.recipedetail);
                 setUploadedImage(data.picture);
-                if(data.status == "A"){
+                if (data.status == "A") {
                     setSwitchStatus(true)
-                }else if(data.status == "N"){
+                } else if (data.status == "N") {
                     setSwitchStatus(false)
                 }
                 onOpenEdit();
@@ -477,17 +477,17 @@ function Recipeall() {
     const changeStatus = () => {
         setSwitchStatus(!switchStatus);
         if (switchStatus) {
-          setEditProduct((prevProduct) => ({
-            ...prevProduct,
-            status: "N"
-          }));
+            setEditProduct((prevProduct) => ({
+                ...prevProduct,
+                status: "N"
+            }));
         } else {
             setEditProduct((prevProduct) => ({
-            ...prevProduct,
-            status: "A"
-          }));
+                ...prevProduct,
+                status: "A"
+            }));
         }
-      }
+    }
 
     // แก้ไขวัถตุดิบเข้าสินค้า
     const handleSubmitIngredientEdit = () => {
@@ -580,9 +580,9 @@ function Recipeall() {
                 setEditProduct(data);
                 setIngredientsFoodSaveEdit(data.recipedetail);
                 setUploadedImage(data.picture);
-                if(data.status == "A"){
+                if (data.status == "A") {
                     setSwitchStatus(true)
-                }else if(data.status == "N"){
+                } else if (data.status == "N") {
                     setSwitchStatus(false)
                 }
                 onOpenRead();
@@ -680,7 +680,7 @@ function Recipeall() {
                                                     </div>
                                                     <button className="flex justify-end" onClick={() => handleRead(recipe.pd_id)}>
                                                         {/* <Link href={`./recipedetail/${recipe.pd_id}`}> */}
-                                                            <div className="badge badge-outline">สูตรอาหาร</div>
+                                                        <div className="badge badge-outline">สูตรอาหาร</div>
                                                         {/* </Link> */}
                                                     </button>
                                                 </div>
@@ -746,14 +746,18 @@ function Recipeall() {
                                             style={{ display: 'none' }}
                                             ref={inputRef}
                                             type="file"
+                                            accept="image/*"  // Restrict to image files
+                                            multiple={false}  // Prevent multiple file selection
+
                                             onChange={handleFileChange}
                                         />
+
                                     </div>
 
                                     <div className="w-2/3">
                                         <Select
                                             isRequired
-                                            label="ประเภทสินต้า"
+                                            label="ประเภทสินค้า"
                                             className="mb-3 bg-fourth text-primary"
                                             size="sm"
                                             color="primary"
@@ -776,7 +780,7 @@ function Recipeall() {
                                             color="primary"
                                             name="pd_name"
                                             onChange={handleProductInputChangeFix}
-                                            // value={editProduct?.pd_name}
+                                        // value={editProduct?.pd_name}
                                         />
                                         <Input
                                             isRequired
@@ -1349,14 +1353,14 @@ function Recipeall() {
                                                 src={uploadedImage || "/images/logo.svg"}
                                                 width={400}
                                             />
-                                            
+
                                         </Card>
                                     </div>
 
                                     <div className="w-2/3">
                                         <Select
                                             isDisabled
-                                            label="ประเภทสินต้า"
+                                            label="ประเภทสินค้า"
                                             className="mb-3 bg-fourth text-primary"
                                             size="sm"
                                             color="primary"
@@ -1452,7 +1456,7 @@ function Recipeall() {
                                     </div>
                                 </div>
                                 <p className="font-medium text-[#C5B182]  border-b-1 border-b-[#C5B182] ">รายละเอียดวัตถุดิบ</p>
-                                
+
 
                                 <div className="h-[200px] overflow-x-auto ">
                                     <table className="w-full text-sm text-center text-gray-500">

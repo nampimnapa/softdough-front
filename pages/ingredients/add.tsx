@@ -143,11 +143,13 @@ function Add() {
                             value={formData.un_purchased}
                             onChange={handleInputChange}>
                             <option value="">เลือกหน่วยวัตถุดิบที่ซื้อ </option>
-                            {Array.isArray(unitOptions) && unitOptions.map((unit: UnitType) => (
-                                <option key={unit.un_id} value={unit.un_id}>
-                                    {unit.un_name}
-                                </option>
-                            ))}
+                            {Array.isArray(unitOptions) && unitOptions
+                                .sort((a, b) => a.un_name.localeCompare(b.un_name, 'th')) // Sorting by Thai alphabet
+                                .map((unit: UnitType) => (
+                                    <option key={unit.un_id} value={unit.un_id}>
+                                        {unit.un_name}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                 </div>

@@ -136,16 +136,88 @@ function Type() {
 
     };
 
+    // error กรณีที่แอดเมนูใหม่
+    // const handleSaveChanges1 = async () => {
+    //     if (!selectedId) {
+    //         console.error('No selected ID.');
+    //         return;
+    //     }
+
+    //     const updatedMenu = Salesmenu.map(menu => {
+    //         // หา pricedeli item ที่ตรงกับ selectedId
+    //         // console.log(menu, "menu")
+    //         console.log(`odt_id${selectedId}`, "odt_id${selectedId}")
+    //         console.log(menu.pricedeli,'.menu.pricedeli');
+
+    //         const priceDetail = menu.pricedeli?.find(p => p[`odt_id${selectedId}`] !== undefined);
+
+    //         return {
+    //             sm_id: menu.sm_id,
+    //             // ใช้ค่า odtd_price${selectedId} จาก menu ถ้ามี, มิฉะนั้นใช้จาก priceDetail
+    //             price: menu?.[`odtd_price${selectedId}`] || (priceDetail ? priceDetail[`odtd_price${selectedId}`] : 0),
+    //             odt_id: selectedId
+    //         };
+    //     });
+
+
+    //     // อันไหนไม่แก้แล้วมันเป็น undefine
+    //     // const updatedMenu = Salesmenu1.map(menu => {
+
+
+    //     //     return {
+    //     //         sm_id: menu.sm_id,
+    //     //         price: menu?.[`odtd_price${selectedId}`],
+    //     //         odt_id: selectedId
+    //     //     };
+    //     // });
+
+
+    //     console.log(updatedMenu, "updatedMenu");
+
+    //     try {
+    //         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/setting/updatepricesdeli`, {
+    //             method: 'PATCH',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify(updatedMenu)
+    //         });
+
+    //         if (response.ok) {
+    //             console.log('อัปเดตราคาสำเร็จ');
+    //             // Optionally, add logic to refresh the page or update UI
+    //             window.location.reload();
+    //         } else {
+    //             console.error('ข้อผิดพลาดในการอัปเดตราคา');
+    //         }
+    //     } catch (error) {
+    //         console.error('ข้อผิดพลาด:', error);
+    //     }
+
+    //     setOpenInput1(0); // ปิด input หลังจากบันทึกแล้ว
+    // };
+
+    //ลองใหม่ถามแชท งงตอนแรกน่าจะได้
     const handleSaveChanges1 = async () => {
         if (!selectedId) {
             console.error('No selected ID.');
             return;
         }
-
+    
         const updatedMenu = Salesmenu.map(menu => {
-            // หา pricedeli item ที่ตรงกับ selectedId
-            const priceDetail = menu.pricedeli?.find(p => p[`odt_id${selectedId}`] !== undefined);
-
+            console.log(`odt_id${selectedId}`, "odt_id${selectedId}");
+            console.log(menu.pricedeli, '.menu.pricedeli');
+    
+            let priceDetail;
+    
+            // ตรวจสอบให้แน่ใจว่า menu.pricedeli เป็น Array ก่อนใช้งาน .find
+            if (Array.isArray(menu.pricedeli)) {
+                priceDetail = menu.pricedeli.find(p => p[`odt_id${selectedId}`] !== undefined);
+            } else {
+                console.warn('menu.pricedeli is not an array:', menu.pricedeli);
+                priceDetail = null;
+            }
+    
             return {
                 sm_id: menu.sm_id,
                 // ใช้ค่า odtd_price${selectedId} จาก menu ถ้ามี, มิฉะนั้นใช้จาก priceDetail
@@ -153,22 +225,9 @@ function Type() {
                 odt_id: selectedId
             };
         });
-
-
-        // อันไหนไม่แก้แล้วมันเป็น undefine
-        // const updatedMenu = Salesmenu1.map(menu => {
-
-
-        //     return {
-        //         sm_id: menu.sm_id,
-        //         price: menu?.[`odtd_price${selectedId}`],
-        //         odt_id: selectedId
-        //     };
-        // });
-
-
+    
         console.log(updatedMenu, "updatedMenu");
-
+    
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/setting/updatepricesdeli`, {
                 method: 'PATCH',
@@ -177,20 +236,20 @@ function Type() {
                 },
                 body: JSON.stringify(updatedMenu)
             });
-
+    
             if (response.ok) {
                 console.log('อัปเดตราคาสำเร็จ');
-                // Optionally, add logic to refresh the page or update UI
-                window.location.reload();
+                window.location.reload(); // รีเฟรชหน้าเว็บหลังจากอัปเดต
             } else {
                 console.error('ข้อผิดพลาดในการอัปเดตราคา');
             }
         } catch (error) {
             console.error('ข้อผิดพลาด:', error);
         }
-
-        setOpenInput1(0); // ปิด input หลังจากบันทึกแล้ว
+    
+        setOpenInput1(0); // ปิดอินพุตหลังจากบันทึกแล้ว
     };
+    
 
 
 

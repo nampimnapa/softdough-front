@@ -154,8 +154,11 @@ export default function Unit() {
             if (!response.ok) {
                 throw new Error('ไม่สามารถเพิ่ม');
             }
+            alert("เพิ่มเรียบร้อยแล้ว");
 
             console.log('เพิ่มเรียบร้อยแล้ว!');
+            window.location.reload();
+
         } catch (error) {
             console.error('เกิดข้อผิดพลาด:', error.message);
             // Handle error (e.g., show error message to user)
@@ -178,8 +181,10 @@ export default function Unit() {
             if (!response.ok) {
                 throw new Error('ไม่สามารถเพิ่ม');
             }
+            alert("เพิ่มเรียบร้อยแล้ว");
 
             console.log('เพิ่มเรียบร้อยแล้ว!');
+            window.location.reload();
         } catch (error) {
             console.error('เกิดข้อผิดพลาด:', error.message);
             // Handle error (e.g., show error message to user)

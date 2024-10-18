@@ -88,6 +88,8 @@ function Approve() {
         const responseData = await response.json();
         console.log(selectedId);
 
+        window.location.reload();
+
         if (responseData.status === 200) {
             setMessage('Data update successfully');
             setIngredientAll((prevInd) =>

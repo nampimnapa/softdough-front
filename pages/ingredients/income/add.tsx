@@ -137,11 +137,14 @@ function Add() {
                         <p className="text-sm ml-6 mr-3 py-2 text-[#73664B] flex justify-center items-center">วัตถุดิบ: </p>
                         <select id="ingredients"
                             className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
-                            {Array.isArray(ingredientsOptions) && ingredientsOptions.map((ind: Ingredients) => (
-                                <option key={ind.ind_id} value={ind.ind_name}>
-                                    {ind.ind_name}
-                                </option>
-                            ))}
+                            {Array.isArray(ingredientsOptions) && ingredientsOptions
+                                .sort((a, b) => a.ind_name.localeCompare(b.ind_name, 'th')) // Sorting by Thai alphabet
+
+                                .map((ind: Ingredients) => (
+                                    <option key={ind.ind_id} value={ind.ind_name}>
+                                        {ind.ind_name}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                     <div className="flex items-center justify-center mr-5">

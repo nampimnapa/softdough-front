@@ -454,6 +454,9 @@ export default function AddSell({
                       <small className="text-default-400">รองรับไฟล์ .png .jpg</small>
 
                       <input
+                        accept="image/*"  // Restrict to image files
+                        multiple={false}  // Prevent multiple file selection
+
                         style={{ display: 'none' }}
                         ref={inputRef}
                         type="file"
@@ -589,15 +592,15 @@ export default function AddSell({
                               onChange={(e) => handleProductChange(index, e.target.value)}
                             >
                               {
-                                    doughAllData.map((prod) => (
-                                      prod.pdc_id.toString() === productType[index]?.pdc_id ? (
-                                        <SelectItem key={prod.pd_id} value={prod.pd_id}>
-                                          {prod.pd_name}
-                                        </SelectItem>
-                                      ) : null
-                                    ))
+                                doughAllData.map((prod) => (
+                                  prod.pdc_id.toString() === productType[index]?.pdc_id ? (
+                                    <SelectItem key={prod.pd_id} value={prod.pd_id}>
+                                      {prod.pd_name}
+                                    </SelectItem>
+                                  ) : null
+                                ))
 
-                                  }
+                              }
                             </Select>
                           </div>
                           <div className="flex w-full">

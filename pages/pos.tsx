@@ -504,12 +504,59 @@ function Pos() {
     const closeModal3 = () => {
         setIsOpen3(false);
     };
-    // Function to format address
-    const formatAddress = (data) => {
-        if (!data) return 'ไม่มีข้อมูลที่อยู่';
-        return `${data.sh_address}, เขต ${data.sh_ampher}, อำเภอ ${data.sh_district}, จังหวัด ${data.sh_province}, รหัสไปรษณีย์ ${data.sh_zipcode}`;
-    };
 
+    const formatAddress = (data) => {
+        if (!data || !thaiAddressData) return 'ไม่มีข้อมูลที่อยู่';
+    
+        let provinceName = data.sh_province;
+        let amphureName = data.sh_ampher;
+        let tambonName = data.sh_district;
+    
+        // ค้นหาข้อมูลจังหวัด
+        const province = thaiAddressData.find(p => 
+            p.id.toString() === data.sh_province || p.name_th === data.sh_province
+        );
+    
+        if (province) {
+            provinceName = province.name_th;
+    
+            // ค้นหาข้อมูลอำเภอ
+            const amphure = province.amphure.find(a => {
+                const amphurId = data.sh_ampher.length > 4 ? data.sh_ampher.substring(0, 4) : data.sh_ampher;
+                return a.id.toString() === amphurId || a.name_th === data.sh_ampher;
+            });
+    
+            if (amphure) {
+                amphureName = amphure.name_th;
+    
+                // ค้นหาข้อมูลตำบล
+                // ถ้า sh_district เป็นรหัสอำเภอ ให้ใช้ตำบลแรกของอำเภอนั้น
+                if (data.sh_district === amphure.id.toString()) {
+                    tambonName = amphure.tambon[0]?.name_th || 'ไม่ระบุตำบล';
+                } else {
+                    const tambon = amphure.tambon.find(t => {
+                        const tambonId = data.sh_district.length > 6 ? data.sh_district.substring(0, 6) : data.sh_district;
+                        return t.id.toString() === tambonId || t.name_th === data.sh_district;
+                    });
+    
+                    if (tambon) {
+                        tambonName = tambon.name_th;
+                    } else {
+                        console.log(`ไม่พบข้อมูลตำบลสำหรับ: ${data.sh_district}`);
+                        tambonName = 'ไม่ระบุตำบล';
+                    }
+                }
+            } else {
+                console.log(`ไม่พบข้อมูลอำเภอสำหรับ: ${data.sh_ampher}`);
+                amphureName = 'ไม่ระบุอำเภอ';
+            }
+        } else {
+            console.log(`ไม่พบข้อมูลจังหวัดสำหรับ: ${data.sh_province}`);
+            provinceName = 'ไม่ระบุจังหวัด';
+        }
+    
+        return `${data.sh_address}, ตำบล${tambonName}, อำเภอ${amphureName}, จังหวัด${provinceName}, รหัสไปรษณีย์ ${data.sh_zipcode}`;
+    };
     // Debug: Check what data is being fetched
     // console.log('address data:', addressData);
     const [selectedPdIds, setSelectedPdIds] = useState([]);
@@ -697,8 +744,15 @@ function Pos() {
     //         console.error("Failed to open test window");
     //     }
     // };
+    const [thaiAddressData, setThaiAddressData] = useState(null);
 
-
+    useEffect(() => {
+        fetch("https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json")
+            .then((response) => response.json())
+            .then((result) => {
+                setThaiAddressData(result);
+            });
+    }, []);
 
 
     return (
@@ -947,7 +1001,7 @@ function Pos() {
                                                             <Image
                                                                 alt={product.picture}
                                                                 src={product.picture}
-                                                                className="h-full w-full object-cover object-center"
+                                                                className="h-full w-full object-cover object-center rounded-none"
                                                             />
                                                         </div>
                                                         <div className="ml-4 flex flex-1 flex-col">

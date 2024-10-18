@@ -83,9 +83,18 @@ function List() {
                                 <td scope="row" className="px-1 py-1 text-[#73664B] whitespace-nowrap dark:text-white">
                                     {ingredients.checkk === "production" ? ingredients.id : null}
                                 </td>
-                                <td className="px-6 py-1  text-[#73664B] text-center">
-                                    {ingredients.created_at}
+                                <td className="px-6 py-1 text-[#73664B] text-center">
+                                    {new Date(ingredients.created_at).toLocaleString('th-TH', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: false  // 24-hour format
+                                    }).replace(/\//g, '-')}  {/* Replace all "/" with "-" */}
                                 </td>
+
+
                                 <td className="">
                                     {ingredients.checkk === "other" ? ingredients.note : ingredients.name}
                                 </td>

@@ -2,7 +2,7 @@ import React, { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/router";
-import { Spinner, useDisclosure, Image } from "@nextui-org/react";
+import { Spinner, useDisclosure, Image, Card, CardBody, CardFooter } from "@nextui-org/react";
 import AddSell from "../../components/forms/addSell";
 import EditSalesFixOne from "../../components/forms/editSalesFixOne";
 import EditSalesFixTwo from "../../components/forms/editSalesFixTwo";
@@ -113,46 +113,47 @@ function Sell_all() {
                 </div>
             </div>
             <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">เมนูสำหรับขาย</p>
-                {/* card */}
+            {/* card */}
+            <div className="mx-5 relative overflow-x-auto ">
+
                 {statusLoading ? (
-                    <div className="flex flex-wrap">
+                    <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
                         {Sale && Sale.length > 0 ? (
                             Sale.map((sale, index) => (
-                                <div key={index} className="card w-60 bg-base-100 shadow-md mx-2 h-60 ml-5 mb-4 ">
-                                    <figure className="w-full h-3/4">
-                                        <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
-                                    </figure>
-                                    <div className="card-body">
-                                        <div className="flex justity-between">
-                                            <p className="text-mediem text-[#73664B]">
-                                                {sale.sm_name}
-                                            </p>
-
-
-                                            <button type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
+                                <Card key={index}
+                                    shadow="sm" isPressable onPress={() => console.log("item pressed")}
+                                    className="card w-40 max-w-xs  bg-base-100 shadow-md mx-2 h-48 ml-1 mb-4 ">
+                                    <CardBody className="overflow-visible p-0">
+                                        <div className="flex justify-end">
+                                            <button className="mr-2" type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
                                                 <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
                                             </button>
 
                                             <button type="submit" onClick={() => openRead(sale.sm_id)}>
                                                 <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
                                             </button>
-
                                         </div>
-                                        <div className="flex justify-center">
-                                            {/* <div className="flex justify-start">
-                                        <p className="text-sm text-[#73664B]">ราคา : </p>
-                                    </div> */}
-                                            <div className="flex ">
-                                                <p className=" text-[#73664B] text-lg">{sale.sm_price} บาท</p>
-                                            </div>
-                                        </div>
+                                        <Image
+                                            // shadow="sm"
+                                            // radius="lg"
+                                            width="100%"
+                                            alt={sale.picture}
+                                            className="w-full object-cover h-[140px]"
+                                            src={sale.picture}
+                                        />
 
-                                    </div>
-                                </div>
+                                    </CardBody>
+                                    <CardFooter className="text-small justify-between " >
+                                        <p className='text-[#73664B]'>{sale.sm_name}</p>
+                                        <p className="text-[#F2B461]">{sale.sm_price} บาท</p>
+
+                                    </CardFooter>
+                                </Card>
+
                             ))
                         ) : (
                             <div className="flex justify-center items-center w-full">
-                                <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
+                                <p className="text-sm text-gray-400">ไม่มีข้อมูล</p>
                             </div>
                         )}
 
@@ -160,8 +161,10 @@ function Sell_all() {
                 ) : (
                     <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
                 )}
+            </div>
             {/* Show Model Add Sell */}
             <AddSell
+
                 isOpen={isOpenModalAdd}
                 onOpenChange={onOpenChangeModalAdd}
                 onClose={onCloseModelAdd}

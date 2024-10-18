@@ -547,6 +547,10 @@ function Address() {
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
+
+            alert("เพิ่มที่อยู่เรียบร้อยแล้ว")
+            window.location.reload();
+
         } catch (error) {
             console.error('Error adding address:', error);
             setMessage('Failed to fetch');
@@ -573,6 +577,9 @@ function Address() {
             } else {
                 setMessage(responseData.message || 'Error occurred');
             }
+            
+            alert("แก้ไขที่อยู่เรียบร้อยแล้ว")
+            window.location.reload();
         } catch (error) {
             console.error('Error editing address:', error);
             setMessage('Failed to fetch');
@@ -632,6 +639,8 @@ function Address() {
                                 className="block text-sm leading-6 text-[#73664B] mt-3 text-left w-full border rounded-md p-2"
                             />
                             <DropdownList
+    // list={provinces.sort((a, b) => a.province_name.localeCompare(b.province_name, 'th'))}  // Sorting by the province_name field
+
                                 label="จังหวัด"
                                 id="sh_province"
                                 list={provinces}

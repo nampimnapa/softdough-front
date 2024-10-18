@@ -187,7 +187,9 @@ function All() {
             body: JSON.stringify({ pdc_name: newProductName }),
         });
         const responseData = await response.json();
+        alert("เพิ่มเรียบร้อยแล้ว");
 
+        window.location.reload();
         if (responseData.message === 'success') {
             setMessage('Data added successfully');
 
@@ -224,6 +226,7 @@ function All() {
             if (!response.ok) {
                 throw new Error('ไม่สามารถเพิ่ม');
             }
+            alert("เพิ่มเรียบร้อยแล้ว");
 
             handeClear();
             onClose();
