@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState, ChangeEvent } from "react";
 import Link from "next/link";
-import { Tabs, Tab, Chip, Select, SelectItem, Spinner, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/react";
 import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
@@ -8,6 +7,8 @@ import Datepicker from "react-tailwindcss-datepicker";
 import { useRouter } from "next/router";
 import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
 import Head from 'next/head'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -19,7 +20,19 @@ function Add() {
     const [addedIngredients, setAddedIngredients] = useState([]);
     const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
     const [isOpen, setIsOpen] = useState(false);
-
+    const MySwal = withReactContent(Swal);
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          router.push('/ingredients/using/list');
+        }
+      });
 
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
@@ -190,9 +203,16 @@ function Add() {
 
             if (responseData.message === 'success') {
                 setMessage('Data added successfully');
-                router.push('/ingredients/using/list'); // Navigate to the specified route
+                Toast.fire({
+                    icon: "success",
+                    title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้สำเร็จ</p>
+                  });
             } else {
                 setMessage(responseData.message || 'Error occurred');
+                Toast.fire({
+                    icon: "error",
+                    title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้ไม่สำเร็จ</p>
+                  });
             }
         } catch (error) {
             setMessage('Error occurred while submitting data');
@@ -270,9 +290,16 @@ function Add() {
             const responseData = await response.json();
             if (responseData.message === 'success') {
                 setMessage('Data added successfully');
-                router.push('/ingredients/using/list'); // Navigate to the specified route
+                Toast.fire({
+                    icon: "success",
+                    title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้สำเร็จ</p>
+                  });
             } else {
                 setMessage(responseData.message || 'Error occurred');
+                Toast.fire({
+                    icon: "error",
+                    title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้ไม่สำเร็จ</p>
+                  });
             }
         } catch (error) {
             setMessage('Error occurred while submitting data');

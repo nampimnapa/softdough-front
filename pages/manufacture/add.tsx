@@ -10,6 +10,8 @@ import {
 import { CheckboxGroup, Checkbox, Input, colors, Button } from "@nextui-org/react";
 import { Dialog, Transition } from '@headlessui/react';
 import { useRouter } from "next/router";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -25,7 +27,19 @@ function Add() {
     const [Ingredientall, setIngredientall] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
-
+    const MySwal = withReactContent(Swal);
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          closeModal();
+        }
+      });
     interface Ingredients {
         ind_id: string;
         ind_name: string;
@@ -199,9 +213,11 @@ function Add() {
             if (!response.ok) {
                 throw new Error('ไม่สามารถเพิ่มใบสั่งผลิตได้');
             }
-
-            console.log('เพิ่มใบสั่งผลิตเรียบร้อยแล้ว!');
-            closeModal();
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มใบสั่งผลิตสำเร็จ</p>
+              });
+            
         } catch (error) {
             console.error('เกิดข้อผิดพลาดในการเพิ่มใบสั่งผลิต:', error.message);
             // จัดการข้อผิดพลาด (เช่น แสดงข้อความผิดพลาดให้ผู้ใช้เห็น)

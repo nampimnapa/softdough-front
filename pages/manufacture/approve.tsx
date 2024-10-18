@@ -1,11 +1,9 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Link from "next/link";
-import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
-import { Kanit } from "next/font/google";
-import { HiOutlineTrash } from "react-icons/hi";
-import { FiSave } from "react-icons/fi";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Tabs, Tab, Button } from "@nextui-org/react";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 function Approve() {
     const [message, setMessage] = useState('Loading');
@@ -14,7 +12,21 @@ function Approve() {
 
     const [loading, setLoading] = useState(true);
     const [production, setproduction] = useState([]);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState(""); // เก็บคำค้นหา
+
+    const MySwal = withReactContent(Swal);
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            getReadall();
+        }
+    });
 
     interface Production {
         pdo_id: string;
@@ -28,7 +40,6 @@ function Approve() {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/readall`)
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
                 setproduction(data); // Assuming the response is an array of staff objects
                 setLoading(false);
             })
@@ -37,6 +48,21 @@ function Approve() {
                 setLoading(false);
             });
     }, []);
+
+    const getReadall = () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/readall`)
+            .then((response) => response.json())
+            .then((data) => {
+                setproduction(data); // Assuming the response is an array of staff objects
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                setLoading(false);
+            });
+    }
+
+
     const handleStatusChange = async (id) => {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatus/${id}`, {
             method: 'PATCH',
@@ -47,13 +73,18 @@ function Approve() {
         });
 
         const responseData = await response.json();
-        console.log(responseData);
-
-        if (responseData.status === 200) {
+        if (responseData.message == "Update success") {
             setMessage('Data update successfully');
-            // router.push('/product/all');
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>อนุมัติสำเร็จ</p>
+            });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>อนุมัติไม่สำเร็จ</p>
+            });
         }
     };
     const handle = async (id) => {
@@ -66,13 +97,19 @@ function Approve() {
         });
 
         const responseData = await response.json();
-        console.log(responseData);
 
-        if (responseData.status === 200) {
+        if (responseData.message == "Update successful") {
             setMessage('Data update successfully');
-            // router.push('/product/all');
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>อนุมัติสำเร็จ</p>
+            });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>อนุมัติไม่สำเร็จ</p>
+            });
         }
     };
 
@@ -81,6 +118,14 @@ function Approve() {
     const filteredProduction = production.filter((data) => data.pdo_status === "5");
     const filtered1 = production.filter((data) => data.pdo_status === "1");
 
+    // ค้นหา
+    const filteredProd = filteredProduction.filter((lot) =>
+        lot.pdo_id_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredRed = filtered1.filter((lot1) =>
+        lot1.pdo_id_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     return (
         <div>
             <p className='text-[#F2B461] font-medium m-4'>รออนุมัติ</p>
@@ -90,14 +135,15 @@ function Approve() {
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
                             <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
                         </div>
-                        <input type="text"
+                        <input
+                            type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา" required ></input>
+                            placeholder="ค้นหา"
+                            value={searchTerm} // เชื่อมต่อกับ state
+                            onChange={(e) => setSearchTerm(e.target.value)} // อัปเดต searchTerm เมื่อผู้ใช้พิมพ์
+                        />
                     </div>
-                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
-                        ค้นหา
-                    </button>
                 </form>
             </div>
             <div className="w-full">
@@ -140,26 +186,36 @@ function Approve() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {filteredProduction.map((data) => (
-                                            <tr key={data.pdo_id} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
-                                                <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
-                                                    {data.updated_at}
-                                                </td>
-                                                <td className="py-1  w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                    {data.pdo_id_name}
-                                                </td>
-                                                <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
-                                                    {/* Add details here if available */}
-                                                </td>
-                                                <td className="px-12 py-1 whitespace-nowrap overflow-hidden">
-                                                    <Button className="mr-2 bg-red-500 text-white" size="sm">ยกเลิก</Button>
-                                                    <Button
-                                                        onClick={() => handle(data.pdo_id)}
-                                                        size="sm"
-                                                        className="bg-green-500 text-white">ยืนยัน</Button>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {
+                                            filteredProd.length > 0 ? (
+                                                filteredProd.map((data) => (
+                                                    <tr key={data.pdo_id} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+                                                        <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
+                                                            {data.updated_at}
+                                                        </td>
+                                                        <td className="py-1  w-96 text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                            {data.pdo_id_name}
+                                                        </td>
+                                                        <td className="ms-7 py-1 text-left text-[#73664B] whitespace-nowrap overflow-hidden">
+                                                            {/* Add details here if available */}
+                                                        </td>
+                                                        <td className="px-12 py-1 whitespace-nowrap overflow-hidden">
+                                                            <Button className="mr-2 bg-red-500 text-white" size="sm">ยกเลิก</Button>
+                                                            <Button
+                                                                onClick={() => handle(data.pdo_id)}
+                                                                size="sm"
+                                                                className="bg-green-500 text-white">ยืนยัน</Button>
+                                                        </td>
+                                                    </tr>
+                                                ))) : (
+                                                <tr>
+                                                    <td colSpan={4}>
+                                                        <div className="flex justify-center items-center w-full">
+                                                            <p className="text-sm text-gray-400">ไม่พบข้อมูล</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
 
                                     </tbody>
                                 </table>
@@ -199,7 +255,7 @@ function Approve() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {filtered1.map((data) => (
+                                            {filteredRed.map((data) => (
                                                 <tr key={data.pdo_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                     <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
                                                         {data.updated_at}

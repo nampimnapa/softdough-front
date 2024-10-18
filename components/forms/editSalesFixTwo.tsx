@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { CheckboxGroup, Checkbox, Switch, Input, Card, CardBody, Radio, Avatar, cn, RadioGroup, Button, CardFooter, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Image } from "@nextui-org/react";
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 export const CustomRadio = (props) => {
   const { children, ...otherProps } = props;
@@ -51,6 +53,22 @@ export default function EditSalesFixTwo({
   const [statusLoadingApi, setStatusLoadingApi] = useState(false);
   const [selected, setSelected] = React.useState("");
   const [sellSelectMix, setSellSelectMix] = React.useState([]);
+  const MySwal = withReactContent(Swal);
+  const Toast = MySwal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+        setIsChanged(false);
+        setIsLoading(false);
+        onClose();
+        updateSaleData();
+      }
+    });
 
   const inputRef = useRef(null);
 
@@ -203,10 +221,10 @@ export default function EditSalesFixTwo({
       })
       .then(data => {
         console.log('Success:', data);
-        setIsChanged(false);
-        setIsLoading(false);
-        onClose();
-        updateSaleData();
+        Toast.fire({
+          icon: "success",
+          title: <p style={{ fontFamily: 'kanit' }}>แก้ไขเมนูสำหรับขายสำเร็จ</p>
+        });
       })
       .catch(error => {
         console.error('Error:', error);
