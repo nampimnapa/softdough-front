@@ -240,21 +240,32 @@ function Detailproduction() {
                 return;
             }
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody),
-            });
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody),
+                });
 
-            const responseData = await response.json();
-            console.log(requestBody);
+                console.log("Request Body:", requestBody);
 
-            if (responseData.status === 200) {
-                setMessage('Data update successfully');
-            } else {
-                setMessage(responseData.message || 'Error occurred');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const responseData = await response.json();
+                console.log("Response Data:", responseData);
+
+                if (response.status === 200) {
+                    setMessage('Data updated successfully');
+                } else {
+                    setMessage(responseData.message || 'Error occurred');
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                setMessage(`Error: ${error.message}`);
             }
         }
 
@@ -349,92 +360,92 @@ function Detailproduction() {
 
                         <div className="relative overflow-x-auto mx-6 mt-2">
 
-                        <table className="w-full text-sm text-center text-gray-500 ">
-  <thead>
-    <tr className="text-white font-normal bg-[#908362]">
-      <td scope="col" className="px-6 py-3">ประเภทสินค้า</td>
-      <td scope="col" className="px-6 py-3">สินค้า</td>
-      <td scope="col" className="px-6 py-3">จำนวน</td>
-      {/* Only display "จำนวนผลิตเสีย" and "จำนวนผลิตเกิน" columns if status is not 1 */}
-      {detail.pdodetail[0]?.status !== '1' && (
-        <>
-          <td scope="col" className="px-6 py-3">จำนวนผลิตเสีย</td>
-          <td scope="col" className="px-6 py-3">จำนวนผลิตเกิน</td>
-        </>
-      )}
-      <td scope="col" className="px-6 py-3">การผลิต</td>
-    </tr>
-  </thead>
+                            <table className="w-full text-sm text-center text-gray-500 ">
+                                <thead>
+                                    <tr className="text-white font-normal bg-[#908362]">
+                                        <td scope="col" className="px-6 py-3">ประเภทสินค้า</td>
+                                        <td scope="col" className="px-6 py-3">สินค้า</td>
+                                        <td scope="col" className="px-6 py-3">จำนวน</td>
+                                        {/* Only display "จำนวนผลิตเสีย" and "จำนวนผลิตเกิน" columns if status is not 1 */}
+                                        {detail.pdodetail[0]?.status !== '1' && (
+                                            <>
+                                                <td scope="col" className="px-6 py-3">จำนวนผลิตเสีย</td>
+                                                <td scope="col" className="px-6 py-3">จำนวนผลิตเกิน</td>
+                                            </>
+                                        )}
+                                        <td scope="col" className="px-6 py-3">การผลิต</td>
+                                    </tr>
+                                </thead>
 
-  <tbody>
-    {detail.pdodetail.map((pdodetail, idx) => (
-      <tr key={idx} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
-        <td scope="row" className="px-6 py-1 whitespace-nowrap dark:text-white">
-          {pdodetail.pdc_name}
-        </td>
-        <td className="px-6 py-1">{pdodetail.pd_name}</td>
-        <td className="px-6 py-1 h-10">{pdodetail.qty}</td>
+                                <tbody>
+                                    {detail.pdodetail.map((pdodetail, idx) => (
+                                        <tr key={idx} className="odd:bg-white even:bg-[#F5F1E8] border-b h-10">
+                                            <td scope="row" className="px-6 py-1 whitespace-nowrap dark:text-white">
+                                                {pdodetail.pdc_name}
+                                            </td>
+                                            <td className="px-6 py-1">{pdodetail.pd_name}</td>
+                                            <td className="px-6 py-1 h-10">{pdodetail.qty}</td>
 
-        {/* Display Broken input or value based on status */}
-        {pdodetail.status !== '1' && (
-          <td className="px-6 py-1 h-10">
-            {pdodetail.status === '3' ? (
-              <span>{pdodetail.pdod_broken}</span> // Display value when status is 3
-            ) : (
-              <input
-                type="number"
-                placeholder="Broken"
-                min="0"
-                defaultValue={0}
-                onChange={(e) =>
-                  handleInputChange(pdodetail.pdod_id, 'broken', e.target.value)
-                }
-                className="ml-2 px-2 py-1 border rounded-md"
-              />
-            )}
-          </td>
-        )}
+                                            {/* Display Broken input or value based on status */}
+                                            {pdodetail.status !== '1' && (
+                                                <td className="px-6 py-1 h-10">
+                                                    {pdodetail.status === '3' ? (
+                                                        <span>{pdodetail.pdod_broken}</span> // Display value when status is 3
+                                                    ) : (
+                                                        <input
+                                                            type="number"
+                                                            placeholder="Broken"
+                                                            min="0"
+                                                            defaultValue={0}
+                                                            onChange={(e) =>
+                                                                handleInputChange(pdodetail.pdod_id, 'broken', e.target.value)
+                                                            }
+                                                            className="ml-2 px-2 py-1 border rounded-md"
+                                                        />
+                                                    )}
+                                                </td>
+                                            )}
 
-        {/* Display Over input or value based on status */}
-        {pdodetail.status !== '1' && (
-          <td className="px-6 py-1 h-10">
-            {pdodetail.status === '3' ? (
-              <span>{pdodetail.pdod_over}</span> // Display value when status is 3
-            ) : (
-              <input
-                type="number"
-                placeholder="Over"
-                min="0"
-                defaultValue={0}
-                onChange={(e) =>
-                  handleInputChange(pdodetail.pdod_id, 'over', e.target.value)
-                }
-                className="ml-2 px-2 py-1 border rounded-md"
-              />
-            )}
-          </td>
-        )}
+                                            {/* Display Over input or value based on status */}
+                                            {pdodetail.status !== '1' && (
+                                                <td className="px-6 py-1 h-10">
+                                                    {pdodetail.status === '3' ? (
+                                                        <span>{pdodetail.pdod_over}</span> // Display value when status is 3
+                                                    ) : (
+                                                        <input
+                                                            type="number"
+                                                            placeholder="Over"
+                                                            min="0"
+                                                            defaultValue={0}
+                                                            onChange={(e) =>
+                                                                handleInputChange(pdodetail.pdod_id, 'over', e.target.value)
+                                                            }
+                                                            className="ml-2 px-2 py-1 border rounded-md"
+                                                        />
+                                                    )}
+                                                </td>
+                                            )}
 
-        {/* Status display */}
-        <td className={`text-sm px-6 py-2 ${pdodetail.status === '3' ? 'text-green-500' : pdodetail.status === '1' ? 'text-[#C5B182]' : ''}`}>
-          {pdodetail.status === '3'
-            ? 'เสร็จสิ้นแล้ว'
-            : pdodetail.status === '1'
-              ? 'รอยืนยันดำเนินการ'
-              : ''}
+                                            {/* Status display */}
+                                            <td className={`text-sm px-6 py-2 ${pdodetail.status === '3' ? 'text-green-500' : pdodetail.status === '1' ? 'text-[#C5B182]' : ''}`}>
+                                                {pdodetail.status === '3'
+                                                    ? 'เสร็จสิ้นแล้ว'
+                                                    : pdodetail.status === '1'
+                                                        ? 'รอยืนยันดำเนินการ'
+                                                        : ''}
 
-          {pdodetail.status === '2' && (
-            <Checkbox
-              color="success"
-              onChange={() => handleCheckboxChangeDetail(pdodetail.pdod_id)}
-              isSelected={checkedItems[pdodetail.pdod_id]} // Use checkedItems to set checked status
-            />
-          )}
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+                                                {pdodetail.status === '2' && (
+                                                    <Checkbox
+                                                        color="success"
+                                                        onChange={() => handleCheckboxChangeDetail(pdodetail.pdod_id)}
+                                                        isSelected={checkedItems[pdodetail.pdod_id]} // Use checkedItems to set checked status
+                                                    />
+                                                )}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
 
                         </div>
                     </div>

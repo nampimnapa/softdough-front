@@ -9,7 +9,7 @@ import { Tabs, Tab, } from "@nextui-org/react";
 import { Spinner, useDisclosure, Image } from "@nextui-org/react";
 import { Card, CardBody, CardFooter } from "@nextui-org/react";
 
- import generatePDF from "../../components/puppeteer/generatepdf";
+import generatePDF from "../../components/puppeteer/generatepdf";
 
 
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -699,7 +699,7 @@ function Pos() {
     //         console.error("Failed to open test window");
     //     }
     // };
-    
+
 
 
 

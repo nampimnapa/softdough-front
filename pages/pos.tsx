@@ -336,19 +336,20 @@ function Pos() {
     //     return freeItems.map(item => item.smfree_id);
     // };
     const getFreeItemNames = (saleId: number) => {
-        if (!selectedPromotionfree) {
+        if (!Array.isArray(selectedPromotionfree)) {
             return [];
         }
 
         // ดึงข้อมูลรายการฟรีที่ตรงกับ saleId
-        const freeItems = selectedPromotionfree.flatMap(promotion =>
-            promotion.detail
-        ).filter(detail => detail.smbuy_id === saleId);
-        // console.log('Free Items:', freeItems); // ตรวจสอบค่าของ freeItems
+        const freeItems = selectedPromotionfree
+            .map(promotion => promotion.detail) // ใช้ map เพื่อดึง detail
+            .flat() // ใช้ flat เพื่อรวม array ที่ซ้อนกัน
+            .filter(detail => detail.smbuy_id === saleId);
 
         // ส่งกลับเป็น smfree_id
         return freeItems.map(item => item.smfree_id);
     };
+
 
     // const isRadioDisabled = (sm_id) => {
     //     if (!selectedSale) {
@@ -507,28 +508,28 @@ function Pos() {
 
     const formatAddress = (data) => {
         if (!data || !thaiAddressData) return 'ไม่มีข้อมูลที่อยู่';
-    
+
         let provinceName = data.sh_province;
         let amphureName = data.sh_ampher;
         let tambonName = data.sh_district;
-    
+
         // ค้นหาข้อมูลจังหวัด
-        const province = thaiAddressData.find(p => 
+        const province = thaiAddressData.find(p =>
             p.id.toString() === data.sh_province || p.name_th === data.sh_province
         );
-    
+
         if (province) {
             provinceName = province.name_th;
-    
+
             // ค้นหาข้อมูลอำเภอ
             const amphure = province.amphure.find(a => {
                 const amphurId = data.sh_ampher.length > 4 ? data.sh_ampher.substring(0, 4) : data.sh_ampher;
                 return a.id.toString() === amphurId || a.name_th === data.sh_ampher;
             });
-    
+
             if (amphure) {
                 amphureName = amphure.name_th;
-    
+
                 // ค้นหาข้อมูลตำบล
                 // ถ้า sh_district เป็นรหัสอำเภอ ให้ใช้ตำบลแรกของอำเภอนั้น
                 if (data.sh_district === amphure.id.toString()) {
@@ -538,7 +539,7 @@ function Pos() {
                         const tambonId = data.sh_district.length > 6 ? data.sh_district.substring(0, 6) : data.sh_district;
                         return t.id.toString() === tambonId || t.name_th === data.sh_district;
                     });
-    
+
                     if (tambon) {
                         tambonName = tambon.name_th;
                     } else {
@@ -554,7 +555,7 @@ function Pos() {
             console.log(`ไม่พบข้อมูลจังหวัดสำหรับ: ${data.sh_province}`);
             provinceName = 'ไม่ระบุจังหวัด';
         }
-    
+
         return `${data.sh_address}, ตำบล${tambonName}, อำเภอ${amphureName}, จังหวัด${provinceName}, รหัสไปรษณีย์ ${data.sh_zipcode}`;
     };
     // Debug: Check what data is being fetched
@@ -650,6 +651,7 @@ function Pos() {
             second: '2-digit',
             hour12: false // ใช้รูปแบบ 24 ชั่วโมง
         }).replace('T', ' '); // แปลงเป็นฟอร์แมต "YYYY-MM-DD HH:MM:SS"
+
         const allItems = selectedItems.map(product => {
             const isFreeItem = product.id !== null && smfreeIdNameMap.has(parseInt(product.id));
             return {
@@ -657,7 +659,7 @@ function Pos() {
                 quantity: product.quantity,
                 price: isFreeItem ? 0 : product.sm_price,
                 isFreeItem: isFreeItem,
-                smfree_id: isFreeItem ? parseInt(smfreeIdNameMap.get(parseInt(product.id))) : null
+                smfree_id: isFreeItem ? parseInt(product.id) : null // Use the ID directly
             };
         });
         const dataOrder = {
@@ -677,7 +679,7 @@ function Pos() {
             dc_id: selectedPromotion?.dc_id || null,
             // user_id: "",
             selectedItems,
-            allItems
+            freeItems: allItems.filter(item => item.isFreeItem)
         };
         console.log("dataOrder : ", dataOrder)
 
@@ -695,9 +697,8 @@ function Pos() {
             if (response.ok) {
                 console.log("Order created successfully");
                 alert("Order created successfully");
-                // Fetch ข้อมูลออร์เดอร์ที่เพิ่งบันทึกจาก DB
-                // const od_id = result.od_id; // สมมติว่าผลลัพธ์คืน od_id กลับมา
-                const fetchOrderResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/latest`, {
+
+                const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pdf-viewer`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -705,27 +706,16 @@ function Pos() {
                     credentials: 'include',
                 });
 
-                const orderData = await fetchOrderResponse.json();
-                // Call the API route to generate the PDF
-                const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/generate-pdf`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData),
-                });
-
                 if (pdfResponse.ok) {
-                    console.log("PDF generation completed successfully.");
-                    alert("PDF generated successfully!");
-                    const pdfBlob = await pdfResponse.blob(); // รับข้อมูล PDF เป็น Blob
-                    const pdfUrl = URL.createObjectURL(pdfBlob); // สร้าง URL สำหรับ Blob
-                    window.open(pdfUrl, '_blank'); // เปิด PDF ในแท็บใหม่
+                    const pdfBlob = await pdfResponse.blob();
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    window.open(pdfUrl, '_blank');
+                    console.log('PDF Blob:', pdfBlob);
 
                 } else {
-                    console.error("Error generating PDF:", await pdfResponse.json());
+                    const errorData = await pdfResponse.json();
+                    console.error('Error displaying PDF:', errorData.error);
                 }
-
                 closeModal3
                 closeModal2
             } else {
@@ -1001,7 +991,7 @@ function Pos() {
                                                             <Image
                                                                 alt={product.picture}
                                                                 src={product.picture}
-                                                                className="h-full w-full object-cover object-center rounded-none"
+                                                                className="h-full w-full object-cover rounded-none"
                                                             />
                                                         </div>
                                                         <div className="ml-4 flex flex-1 flex-col">
@@ -1014,7 +1004,7 @@ function Pos() {
                                                                 </div>
 
                                                                 <p className="mt-1 text-sm text-gray-500">
-                                                                    {product.id !== null
+                                                                    {product.id !== null && smfreeIdNameMap.has(parseInt(product.id))
                                                                         ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
                                                                         : ''
                                                                     }
