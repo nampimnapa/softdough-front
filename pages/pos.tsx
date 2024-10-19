@@ -3,11 +3,11 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import Link from "next/link";
-import { Button, Input, RadioGroup, Radio, Checkbox } from "@nextui-org/react";
+import { Button, Input, RadioGroup, Radio, Checkbox, User, cn, CheckboxGroup } from "@nextui-org/react";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, Transition } from '@headlessui/react';
 import { Tabs, Tab, } from "@nextui-org/react";
 import { Spinner, useDisclosure, Image } from "@nextui-org/react";
-import { Card, CardBody, CardFooter } from "@nextui-org/react";
+import { Card, CardBody, CardFooter, Chip } from "@nextui-org/react";
 // import generatePDF from "../components/puppeteer/generatepdf";
 
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -735,14 +735,6 @@ function Pos() {
     //     }
     // };
     const [thaiAddressData, setThaiAddressData] = useState(null);
-
-    useEffect(() => {
-        fetch("https://raw.githubusercontent.com/kongvut/thai-province-data/master/api_province_with_amphure_tambon.json")
-            .then((response) => response.json())
-            .then((result) => {
-                setThaiAddressData(result);
-            });
-    }, []);
 
 
     return (
@@ -1588,174 +1580,187 @@ function Pos() {
                                             leaveFrom="opacity-100 scale-100"
                                             leaveTo="opacity-0 scale-95"
                                         >
-                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                                {/* <Dialog.Title
-                                                    as="h3"
-                                                    className="text-lg font-medium leading-6 text-[73664B]"
-                                                >
-                                                    {selectedSale.sm_name}
-                                                </Dialog.Title> */}
-                                                <div className='flex'>
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                                <div>
                                                     {selectedSale && (
                                                         <Card shadow="sm">
                                                             <CardBody className="overflow-visible p-0">
                                                                 <Image
                                                                     alt={'/default-image.png'}
                                                                     shadow="sm"
-                                                                    radius="lg"
-                                                                    width={200}
+                                                                    width={448}
                                                                     src={selectedSale.picture || '/default-image.png'}  // Fallback if picture is missing
                                                                     className="object-cover h-[140px]"
                                                                 />
                                                             </CardBody>
-                                                            <CardFooter className="text-small justify-between">
-                                                                <p className='text-[#73664B]'>{selectedSale.sm_name || 'No Name Available'}</p> {/* Fallback for name */}
-                                                                <p className="text-[#F2B461]">{selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}</p> {/* Fallback for price */}
-                                                            </CardFooter>
                                                         </Card>
                                                     )}
 
-                                                    <div className="ml-6">
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-lg font-medium leading-6 text-[73664B] px-4 pt-4"
+                                                    >
+                                                        <p>{selectedSale.sm_name} <span className="text-[#F2B461]">{selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}</span></p>
+                                                    </Dialog.Title>
+                                                    <div className='p-4'>
                                                         {selectedSale && (
-                                                            <p className="text-lg text-[#73664B] font-medium">
-                                                                คละ <span className='text-sm text-[#73664B] font-normal'>เลือกได้ {selectedSale.qty_per_unit} รายการ</span>
-                                                            </p>
+                                                            <div className='flex justify-between items-center'>
+                                                                <div>
+                                                                    <p className="text-lg font-medium">
+                                                                        สินค้า
+                                                                    </p>
+                                                                    <p className='text-sm text-[#73664B] font-normal'>กรุณาเลือก {selectedSale.qty_per_unit} รายการ</p>
+                                                                </div>
+                                                                <div>
+                                                                    <Chip size="sm">0/{selectedSale.qty_per_unit}</Chip>
+                                                                </div>
+                                                            </div>
                                                         )}
-
-                                                        <div>
-                                                            {Mix.length > 0 ? (
-                                                                Mix.map(id => (
-                                                                    <div key={id} className="flex items-center space-x-2">
+                                                        <div className="flex flex-col gap-1 w-full max-h-80 overflow-y-auto">
+                                                                {Mix.length > 0 ? (
+                                                                    Mix.map(id => (
                                                                         <Checkbox
+                                                                            aria-label={id.pd_name}
+                                                                            classNames={{
+                                                                                base: cn(
+                                                                                    "inline-flex max-w-md w-full bg-content1 m-0",
+                                                                                    "hover:bg-content2 items-center justify-start",
+                                                                                    "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                    "data-[selected=true]:border-primary"
+                                                                                  ),
+                                                                                label: "w-full",
+                                                                            }}
                                                                             disabled={
                                                                                 selectedSale && // Ensure selectedSale exists before using its properties
                                                                                 quantities[id.pd_id] === undefined &&
                                                                                 Object.values(quantities).reduce((acc, qty) => acc + qty, 0) >= selectedSale.qty_per_unit
                                                                             }
-                                                                            size="md"
-                                                                            color="warning"
                                                                             checked={selectedPdIds.includes(id.pd_id)}
                                                                             onChange={() => handleCheckboxChange(id.pd_id)}
                                                                         >
-                                                                            {id.pd_name || 'No Name Available'}
-                                                                        </Checkbox>
-
-                                                                        {/* Quantity controls */}
-                                                                        {selectedPdIds.includes(id.pd_id) && (
-                                                                            <>
-                                                                                <div className="flex items-center mt-2">
-                                                                                    <button
-                                                                                        onClick={() => decrementQuantitymix(id.pd_id)}
-                                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
-                                                                                        disabled={quantities[id.pd_id] <= 1}
-                                                                                    >
-                                                                                        <svg
-                                                                                            className="text-[#73664B]"
-                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                            width="1em"
-                                                                                            height="1em"
-                                                                                            viewBox="0 0 256 256"
-                                                                                        >
-                                                                                            <path
-                                                                                                fill="currentColor"
-                                                                                                d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
-                                                                                            />
-                                                                                        </svg>
-                                                                                    </button>
-                                                                                    <span className="w-4 text-center mx-2">{quantities[id.pd_id] || 1}</span>
-                                                                                    <button
-                                                                                        onClick={() => incrementQuantitymix(id.pd_id)}
-                                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
-                                                                                        disabled={
-                                                                                            selectedSale && // Ensure selectedSale exists before using qty_per_unit
-                                                                                            (quantities[id.pd_id] || 1) >= selectedSale.qty_per_unit
-                                                                                        }
-                                                                                    >
-                                                                                        <svg
-                                                                                            className="text-[#73664B]"
-                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                            width="1em"
-                                                                                            height="1em"
-                                                                                            viewBox="0 0 256 256"
-                                                                                        >
-                                                                                            <path
-                                                                                                fill="currentColor"
-                                                                                                d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
-                                                                                            />
-                                                                                        </svg>
-                                                                                    </button>
+                                                                            <div className="w-full flex justify-between gap-2">
+                                                                                <User
+                                                                                    avatarProps={{ size: "md", src: id.picture }}
+                                                                                    description={id.pdc_name}
+                                                                                    name={id.pd_name || 'No Name Available'}
+                                                                                />
+                                                                                <div className="flex flex-col items-end gap-1">
+                                                                                    {selectedPdIds.includes(id.pd_id) && (
+                                                                                        <>
+                                                                                            <div className="flex items-center mt-2">
+                                                                                                <button
+                                                                                                    onClick={() => decrementQuantitymix(id.pd_id)}
+                                                                                                    className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                    disabled={quantities[id.pd_id] <= 1}
+                                                                                                >
+                                                                                                    <svg
+                                                                                                        className="text-[#73664B]"
+                                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                                        width="1em"
+                                                                                                        height="1em"
+                                                                                                        viewBox="0 0 256 256"
+                                                                                                    >
+                                                                                                        <path
+                                                                                                            fill="currentColor"
+                                                                                                            d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                                                        />
+                                                                                                    </svg>
+                                                                                                </button>
+                                                                                                <span className="w-4 text-center mx-2">{quantities[id.pd_id] || 1}</span>
+                                                                                                <button
+                                                                                                    onClick={() => incrementQuantitymix(id.pd_id)}
+                                                                                                    className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                    disabled={
+                                                                                                        selectedSale && // Ensure selectedSale exists before using qty_per_unit
+                                                                                                        (quantities[id.pd_id] || 1) >= selectedSale.qty_per_unit
+                                                                                                    }
+                                                                                                >
+                                                                                                    <svg
+                                                                                                        className="text-[#73664B]"
+                                                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                                                        width="1em"
+                                                                                                        height="1em"
+                                                                                                        viewBox="0 0 256 256"
+                                                                                                    >
+                                                                                                        <path
+                                                                                                            fill="currentColor"
+                                                                                                            d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                                                        />
+                                                                                                    </svg>
+                                                                                                </button>
+                                                                                            </div>
+                                                                                        </>
+                                                                                    )}
                                                                                 </div>
-                                                                            </>
-                                                                        )}
-                                                                    </div>
-                                                                ))
-                                                            ) : (
-                                                                <p>ไม่มีรายการฟรี</p>
-                                                            )}
+                                                                            </div>
+                                                                        </Checkbox>
+                                                                    ))
+                                                                ) : (
+                                                                    <p>ไม่มีรายการฟรี</p>
+                                                                )}
+                                                        </div>
 
-                                                            <div>
-                                                                <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
+                                                        <div>
+                                                            <p className="text-lg font-medium mt-2">จำนวน</p>
 
-                                                                <button
-                                                                    onClick={decrementQuantity}
-
-                                                                    className="mt-2 btn btn-square bg-[#D9CAA7] btn-xs "
+                                                            <button
+                                                                onClick={decrementQuantity}
+                                                                className="mt-2 btn btn-square bg-[#D9CAA7] btn-xs "
+                                                            >
+                                                                <svg
+                                                                    className="text-[#73664B]"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    width="1em"
+                                                                    height="1em"
+                                                                    viewBox="0 0 256 256"
                                                                 >
-                                                                    <svg
-                                                                        className="text-[#73664B]"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width="1em"
-                                                                        height="1em"
-                                                                        viewBox="0 0 256 256"
-                                                                    >
-                                                                        <path
-                                                                            fill="currentColor"
-                                                                            d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
-                                                                        />
-                                                                    </svg>
-                                                                </button>
-                                                                <span className="w-4 text-center mx-2">{quantity}</span>
-                                                                <button
-                                                                    onClick={incrementQuantity}
+                                                                    <path
+                                                                        fill="currentColor"
+                                                                        d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                    />
+                                                                </svg>
+                                                            </button>
+                                                            <span className="w-4 text-center mx-2">{quantity}</span>
+                                                            <button
+                                                                onClick={incrementQuantity}
 
-                                                                    className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
 
+                                                            >
+                                                                <svg
+                                                                    className="text-[#73664B]"
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    width="1em"
+                                                                    height="1em"
+                                                                    viewBox="0 0 256 256"
                                                                 >
-                                                                    <svg
-                                                                        className="text-[#73664B]"
-                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                        width="1em"
-                                                                        height="1em"
-                                                                        viewBox="0 0 256 256"
-                                                                    >
-                                                                        <path
-                                                                            fill="currentColor"
-                                                                            d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
-                                                                        />
-                                                                    </svg>
-                                                                </button>
-                                                            </div>
+                                                                    <path
+                                                                        fill="currentColor"
+                                                                        d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                    />
+                                                                </svg>
+                                                            </button>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                {/*  choose */}
-                                                <div className="flex justify-end mt-5">
-                                                    <div className="inline-flex justify-end">
-                                                        <button
-                                                            type="button"
-                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={closeModalmix}
-                                                        >
-                                                            ยกเลิก
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={handleAddToCart}
-                                                        ><Link href="#">
-                                                                ยืนยัน
-                                                            </Link></button>
+                                                    {/*  choose */}
+                                                    <div className="flex justify-end mt-5">
+                                                        <div className="inline-flex justify-end">
+                                                            <button
+                                                                type="button"
+                                                                className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={closeModalmix}
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+                                                            <button
+                                                                type="button"
+                                                                className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={handleAddToCart}
+                                                            ><Link href="#">
+                                                                    ยืนยัน
+                                                                </Link></button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </Dialog.Panel>
