@@ -88,7 +88,9 @@ function List() {
                         </tr>
                     </thead>
                     <tbody>
-                        {ind.map((ingredients, idx) => (
+                        {
+                        ind.length > 0 ? (
+                        ind.map((ingredients, idx) => (
                             <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10 items-center">
                                 <td scope="row" className="px-1 py-1 text-[#73664B] whitespace-nowrap dark:text-white">
                                     {ingredients.checkk === "production" ? ingredients.id : null}
@@ -133,7 +135,7 @@ function List() {
                                             ไม่มีข้อมูล
                                         </td>
                                     </tr>
-                                ))}
+                                )}
                     </tbody>
                 </table>
             </div>
