@@ -134,7 +134,7 @@ function Listorder() {
                                                     <td className="px-6 py-1">{order.od_net}</td>
                                                     <td className="px-6 py-4 flex items-center justify-center">
                                                         <Link
-                                                            href={`./detail/${order.pdo_id}`}
+                                                            href={`./detail/${order.od_id}`}
                                                             className="w-full flex justify-center items-center"
                                                         >
                                                             <button type="submit">

@@ -5,6 +5,8 @@ import { FaTrash } from 'react-icons/fa';
 // import { revalidatePath } from 'next/cache';
 import { useRouter } from 'next/router';
 import sell_all from '../../pages/product/sell_all';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 export const CustomRadio = (props) => {
   const { children, ...otherProps } = props;
@@ -79,6 +81,24 @@ export default function AddSell({
 
   const [productCategory, setProductCategory] = React.useState([]);
   const [productType, setProductType] = React.useState([]);
+
+  const MySwal = withReactContent(Swal);
+  const Toast = MySwal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+        setIsLoading(false);
+        setSubmitRequested(false);
+        onClose();
+        clearData();
+        updateSaleData();
+      }
+    });
 
   // console.log(sellSelectMix)
 
@@ -160,20 +180,6 @@ export default function AddSell({
       };
     });
   };
-
-
-  // const handleQuantityChange = (index, delta) => {
-  //     setSellMenuFix(prevState => {
-  //         const updatedProducts = [...prevState.product];
-  //         updatedProducts[index].quantity = Math.max(updatedProducts[index].quantity + delta);
-
-
-  //         return {
-  //             ...prevState,
-  //             product: updatedProducts
-  //         };
-  //     });
-  // };
 
   const handleQuantityChange = (index, delta) => {
     setSellMenuFix(prevState => {
@@ -348,15 +354,21 @@ export default function AddSell({
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        const result = await response.json();
-        updateSaleData();
+        const responseData = await response.json();
+        if (responseData.message == "salesmenu and salesmenudetail added successfully!") {
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มเมนูสำหรับขายสำเร็จ</p>
+              });
+        } else {
+            console.log(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มเมนูสำหรับขายไม่สำเร็จ</p>
+              });
+        }
       } catch (error) {
         // handle error
-      } finally {
-        setIsLoading(false);
-        setSubmitRequested(false);
-        onClose();
-        clearData();
       }
     }, 0);
   };

@@ -8,11 +8,58 @@ function classNames(...classes) {
 }
 
 let dataSet = null;
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 function All() {
     const router = useRouter();
     const { id } = router.query;
     const [SaleMenu, setSaleMenu] = useState([]);
+    const MySwal = withReactContent(Swal);
+    const ToastCat = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          getCat();
+        }
+      });
+
+      const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          handeClear();
+          onClose();
+          setIsLoading(false);
+          getSMT()
+        }
+      });
+
+      const ToastEdit = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          handeClear();
+          onCloseEdit();
+          setIsLoading(false);
+          getSMT()
+        }
+      });
     interface SaleMenu {
         smt_id: string;
         smt_name: string;
@@ -62,6 +109,18 @@ function All() {
 
     }, [id]);
 
+    const getCat = () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
+        .then(response => response.json())
+        .then(data => {
+            setTypeProduct(data);
+
+        })
+        .catch(error => {
+            console.error('Error fetching unit data:', error);
+        });
+    }
+
     const getSMT = () => {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/salesmenu/readsmt`)
             .then(response => response.json())
@@ -89,12 +148,22 @@ function All() {
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit, onClose: onCloseEdit } = useDisclosure();
     const [isLoanding, setIsLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState(""); // เก็บคำค้นหา
     const changeInput = (id: any) => {
         setOpenInput(id);
         setIsEditing(true);
     }
-
     const [newValue, setNewValue] = useState('');
+    // ค้นหา
+    const filteredType = TypeProduct.filter((type) =>
+        type.pdc_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const filteredMenu = SaleMenu.filter((indlots) =>
+        indlots.smt_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    console.log(TypeProduct)
+    console.log(SaleMenu)
 
     const handleInputChange = async (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
         const newValueData = event.target.value;
@@ -125,16 +194,11 @@ function All() {
         setOpenInput(0);
         setIsEditing(false);
 
-
-
-        // console.log(dataProduct.find(idData))
-
         const fountItem = TypeProduct.find(item => item.pdc_id == idData);
         console.log(fountItem);
 
         const requestData = {
-            pdc_name: fountItem.pdc_name, // ข้อมูลที่ต้องการอัปเดต
-            // ข้อมูลอื่น ๆ ที่ต้องการส่งไปด้วย request
+            pdc_name: fountItem.pdc_name,
         };
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/updatecat/${idData}`, {
@@ -145,10 +209,18 @@ function All() {
             body: JSON.stringify(requestData), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
         });
         const responseData = await response.json();
-        if (responseData.message === 'update success') {
+        if (responseData.message === 'Category updated successfully') {
             setMessage('Data updated successfully');
+            ToastCat.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มประเภทสินค้าสำเร็จ</p>
+              });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            ToastCat.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มประเภทสินค้าไม่สำเร็จ</p>
+              });
         }
 
 
@@ -189,12 +261,18 @@ function All() {
         const responseData = await response.json();
         alert("เพิ่มเรียบร้อยแล้ว");
 
-        window.location.reload();
-        if (responseData.message === 'success') {
+        if (responseData.message == 'Category added successfully') {
             setMessage('Data added successfully');
-
+            ToastCat.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มประเภทสินค้าสำเร็จ</p>
+              });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            ToastCat.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มประเภทสินค้าไม่สำเร็จ</p>
+              });
         }
     };
 
@@ -223,15 +301,23 @@ function All() {
                 body: JSON.stringify(formData),
             });
 
-            if (!response.ok) {
-                throw new Error('ไม่สามารถเพิ่ม');
+            const responseData = await response.json();
+
+            if (responseData.message == 'Category added successfully') {
+                setMessage('Data added successfully');
+                Toast.fire({
+                    icon: "success",
+                    title: <p style={{ fontFamily: 'kanit' }}>เพิ่มประเภทเมนูสำหรับขายสำเร็จ</p>
+                  });
+            } else {
+                setMessage(responseData.message || 'Error occurred');
+                Toast.fire({
+                    icon: "error",
+                    title: <p style={{ fontFamily: 'kanit' }}>เพิ่มประเภทเมนูสำหรับขายไม่สำเร็จ</p>
+                  });
             }
             alert("เพิ่มเรียบร้อยแล้ว");
 
-            handeClear();
-            onClose();
-            setIsLoading(false);
-            getSMT()
         } catch (error) {
             console.error('เกิดข้อผิดพลาด:', error.message);
         }
@@ -279,28 +365,47 @@ function All() {
             },
             body: JSON.stringify({
                 smt_name: formData.smt_name,
-                un_id: unitOptions.find(unit => unit.un_name === formData.un_id)?.un_id,
+                un_id: typeof formData.un_id === "string" ? unitOptions.find(unit => unit.un_name === formData.un_id)?.un_id : typeof formData.un_id === "number" ? formData.un_id : 0,
                 qty_per_unit: formData.qty_per_unit
             }),
 
         });
         const responseData = await response.json();
-        if (responseData.message === "update success") {
-            handeClear();
-            onCloseEdit();
-            setIsLoading(false);
-            getSMT()
+        if (responseData.message === "Sales menu type updated successfully") {
+            ToastEdit.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>แก้ไขประเภทเมนูสำหรับขายสำเร็จ</p>
+              });
         } else {
             setMessage(responseData.message || 'Error occurred');
+            ToastEdit.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>แก้ไขประเภทเมนูสำหรับขายไม่สำเร็จ</p>
+              });
         }
+
+        // console.log(unitOptions.find(unit => unit.un_name === formData.un_id)?.un_id)
+        // console.log(typeof formData.un_id)
+        // console.log(formData.un_id)
     }
 
 
+    const getDataType = () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/readcat`)
+            .then(response => response.json())
+            .then(data => {
+                setTypeProduct(data);
+                setStatusLoading(true);
 
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }
 
     return (
 
-        <div className="">
+        <div>
             <Head>
                 <title>ประเภทสินค้า/สำหรับขาย - Softdough</title>
             </Head>
@@ -311,14 +416,16 @@ function All() {
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
                             <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
                         </div>
-                        <input type="text"
+                        <input
+                            type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา" required ></input>
+                            placeholder="ค้นหา"
+                            value={searchTerm} // เชื่อมต่อกับ state
+                            onChange={(e) => setSearchTerm(e.target.value)} // อัปเดต searchTerm เมื่อผู้ใช้พิมพ์
+                        />
                     </div>
-                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
-                        ค้นหา
-                    </button>
+
                 </form>
 
             </div>
@@ -410,8 +517,8 @@ function All() {
                                         ))} */}
 
                                         {statusLoading ? (
-                                            TypeProduct.length > 0 ? (
-                                                TypeProduct.map((type, index) => (
+                                            filteredType.length > 0 ? (
+                                                filteredType.map((type, index) => (
                                                     <tr key={type.pdc_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                         <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
                                                             {index + 1}
@@ -534,7 +641,7 @@ function All() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {SaleMenu.map((menu, index) => (
+                                            {filteredMenu.map((menu, index) => (
                                                 <tr key={menu.smt_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                                     <td scope="row" className="text-[#73664B] px-6 py-1   whitespace-nowrap dark:text-white">
                                                         {index + 1}

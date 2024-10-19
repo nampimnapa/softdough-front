@@ -10,10 +10,9 @@ import { Card, CardBody, CardHeader } from "@nextui-org/react";
 
 
 function Listorder() {
-
-
     const [loading, setLoading] = useState(true);
     const [Production, setProduction] = useState([]);
+    const [searchTerm, setSearchTerm] = useState(""); // เก็บคำค้นหา
     interface Production {
         pdo_id: string;
         pdo_id_name: string;
@@ -43,7 +42,10 @@ function Listorder() {
         { id: 4, name: "เสร็จสิ้น" }
         ];
 
-
+    // ค้นหา
+    const filteredProduction = Production.filter((Productio) =>
+        Productio.pdo_id_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div>
@@ -54,23 +56,24 @@ function Listorder() {
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
                             <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
                         </div>
-                        <input type="text"
+                        <input
+                            type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา" required ></input>
+                            placeholder="ค้นหา"
+                            value={searchTerm} // เชื่อมต่อกับ state
+                            onChange={(e) => setSearchTerm(e.target.value)} // อัปเดต searchTerm เมื่อผู้ใช้พิมพ์
+                        />
                     </div>
-                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
-                        ค้นหา
-                    </button>
                 </form>
             </div>
             <div className="flex w-full flex-col ">
                 <Tabs aria-label="Dynamic tabs" items={StatusTabs} variant="underlined" className="mx-2">
                     {(selectedTab) => (
                         <Tab key={selectedTab.id} title={selectedTab.name}>
-                            <div className="relative overflow-x-auto mx-4 ">
-                                <table className="w-full text-sm text-center text-gray-500 ">
-                                    <thead >
+                            <div className="relative max-h-[calc(100vh-225px)] overflow-y-auto">
+                                <table className="w-full text-sm text-center text-gray-500 mb-10">
+                                    <thead className="sticky top-0 bg-[#908362]">
                                         <tr className="text-white  font-normal  bg-[#908362] ">
                                             <td scope="col" className="px-6 py-3">
                                                 วันที่สั่งผลิต
@@ -87,7 +90,7 @@ function Listorder() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {Array.isArray(Production) && Production.filter((order) => {
+                                        {Array.isArray(filteredProduction) && filteredProduction.filter((order) => {
                                             if (selectedTab.name === "ทั้งหมด") {
                                                 return true; // แสดงทุก pdo_status เมื่อเลือกแท็บ "ทั้งหมด"
                                             } else {
@@ -127,7 +130,7 @@ function Listorder() {
                                                                     order.pdo_status === '4' ? 'text-green-500' : ''
                                                         }`}>
                                                         {/* 3 เสร็จสิ้นแล้วแบบยังไม่เพิ่มวัตถุดิบที่ใช้   4 เสร็จสิ้นแล้วเพิ่มแล้ว */}
-                                                        {order.pdo_status === '5' ? 'รออนุมัติ' :order.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : order.pdo_status === '3' ? 'เสร็จสิ้นแล้วยังไม่เพิ่มวัตถุดิบ' : order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
+                                                        {order.pdo_status === '5' ? 'รออนุมัติ' : order.pdo_status === '4' ? 'เสร็จสิ้นแล้ว' : order.pdo_status === '3' ? 'เสร็จสิ้นแล้วยังไม่เพิ่มวัตถุดิบ' : order.pdo_status === '2' ? 'กำลังดำเนินการ' : order.pdo_status === '1' ? 'สั่งผลิตแล้ว' : order.pdo_status}
                                                     </td>
                                                     <td className="px-6 py-4 flex items-center justify-center">
 

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Switch, CheckboxGroup, Tabs, Chip, User, Tab, cn, Input, Avatar, Card, CardHeader, CardBody, Divider, ScrollShadow, Button, Select, SelectItem, CardFooter, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Textarea, RadioGroup, Radio, Breadcrumbs, BreadcrumbItem, Image } from "@nextui-org/react";
 import { CiTrash } from "react-icons/ci";
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 interface EditSellProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
@@ -40,6 +41,20 @@ export default function EditSalesFixOne({
   const [statusLoadingApi, setStatusLoadingApi] = useState(false);
   const [productCategory, setProductCategory] = React.useState([]);
   const [productType, setProductType] = React.useState([]);
+  const MySwal = withReactContent(Swal);
+  const Toast = MySwal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+        onClose();
+        updateSaleData();
+      }
+    });
 
   // console.log(sellSelectMix)
 
@@ -224,17 +239,17 @@ export default function EditSalesFixOne({
       body: JSON.stringify(dataLog),
     })
       .then(response => {
-        console.log('Success:', response);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         return response.json();
       })
       .then(data => {
-        console.log('Success:', data);
         setIsLoading(false);
-        onClose();
-        updateSaleData();
+        Toast.fire({
+          icon: "success",
+          title: <p style={{ fontFamily: 'kanit' }}>แก้ไขเมนูสำหรับขายสำเร็จ</p>
+        });
       })
       .catch(error => {
         console.error('Error:', error);
@@ -282,11 +297,49 @@ export default function EditSalesFixOne({
   const [isChanged, setIsChanged] = useState(false);
 
   useEffect(() => {
-    const changesInSm = hasChanges(dataSm, dataSmOld);
+    const normalizedDataSm = normalizeDataTypes(dataSm, dataSmOld);
+    const changesInSm = hasChanges(normalizedDataSm, dataSmOld);
     const changesInSmd = hasArrayChanges(dataSmd, dataSmdOld);
-    setIsChanged(changesInSm && changesInSmd);
+    setIsChanged(changesInSm || changesInSmd);
   }, [dataSm, dataSmd]);
-
+  
+  function normalizeDataTypes(newData, oldData) {
+    const normalizedData = { ...newData };
+  
+    for (let key in oldData) {
+      if (key in newData) {
+        const oldType = typeof oldData[key];
+        const newType = typeof newData[key];
+  
+        if (oldType !== newType) {
+          normalizedData[key] = convertToType(newData[key], oldType);
+        }
+      }
+    }
+  
+    return normalizedData;
+  }
+  
+  // ฟังก์ชันสำหรับแปลงค่าให้ตรงกับชนิดข้อมูลที่ต้องการ
+  function convertToType(value, targetType) {
+    switch (targetType) {
+      case 'number':
+        return Number(value);
+      case 'string':
+        return String(value);
+      case 'boolean':
+        return value === 'true' || value === true;
+      case 'object':
+        try {
+          return JSON.parse(value);
+        } catch {
+          return value;
+        }
+      default:
+        return value;
+    }
+  }
+  
   function hasChanges(newData, oldData) {
     for (let key in newData) {
       if (newData[key] !== oldData[key]) {
@@ -295,22 +348,30 @@ export default function EditSalesFixOne({
     }
     return false;
   }
-
+  
   function hasArrayChanges(newData, oldData) {
     if (newData.length !== oldData.length) {
       return true;
     }
-
+  
     for (let i = 0; i < newData.length; i++) {
       for (let key in newData[i]) {
         if (newData[i][key] !== oldData[i][key]) {
           return true;
         }
       }
+      for (let key in oldData[i]) {
+        if (newData[i][key] !== oldData[i][key]) {
+          return true;
+        }
+      }
     }
-
+  
     return false;
   }
+  
+  
+  
 
   const handleDelete = (index) => {
     setDataSmd(prevState => {

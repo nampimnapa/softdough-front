@@ -8,6 +8,8 @@ import { FiSave } from "react-icons/fi";
 import { Tabs, Tab, Button } from "@nextui-org/react";
 import { Dialog, Transition } from '@headlessui/react';
 import Head from 'next/head';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -32,9 +34,23 @@ function Approve() {
     const [isOpen2, setIsOpen2] = useState(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [message, setMessage] = useState('Loading');
-
+    const [searchTerm, setSearchTerm] = useState(""); // เก็บคำค้นหา
     const router = useRouter();
     const { id } = router.query;
+
+    const MySwal = withReactContent(Swal);
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            getDataUse();
+        }
+    });
 
     const closeModal = () => {
         setIsOpen(false);
@@ -59,18 +75,22 @@ function Approve() {
 
     useEffect(() => {
         // Fetch staff data on component mount
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/usedIngredients`)
-            .then((response) => response.json())
-            .then((data: IngredientData[]) => {
-                console.log(data);
-                setIngredientAll(data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                setLoading(false);
-            });
+        getDataUse()
     }, []);
+
+    const getDataUse = () => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/usedIngredients`)
+        .then((response) => response.json())
+        .then((data: IngredientData[]) => {
+            console.log(data);
+            setIngredientAll(data);
+            setLoading(false);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            setLoading(false);
+        });
+    }
 
     const filteredProduction = ind.filter((data) => data.status === "1");
 
@@ -88,19 +108,29 @@ function Approve() {
         const responseData = await response.json();
         console.log(selectedId);
 
-        window.location.reload();
-
-        if (responseData.status === 200) {
+        if (responseData.message == "Status updated and details fetched successfully") {
             setMessage('Data update successfully');
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>อนุมัติสำเร็จ</p>
+              });
             setIngredientAll((prevInd) =>
                 prevInd.map((item) => (item.indU_id === selectedId ? { ...item, status: "2" } : item))
             );
         } else {
             setMessage(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>อนุมัติไม่สำเร็จ</p>
+              });
         }
         closeModal();
     };
 
+        // ค้นหา
+        const filteredInd = filteredProduction.filter((lot) =>
+            lot.id?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
     return (
         <div>
             <Head>
@@ -113,14 +143,16 @@ function Approve() {
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
                             <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
                         </div>
-                        <input type="text"
+                        <input
+                            type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา" required />
+                            placeholder="ค้นหาล็อตสินค้า"
+                            value={searchTerm} // เชื่อมต่อกับ state
+                            onChange={(e) => setSearchTerm(e.target.value)} // อัปเดต searchTerm เมื่อผู้ใช้พิมพ์
+                        />
                     </div>
-                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
-                        ค้นหา
-                    </button>
+
                 </form>
             </div>
             <div className="w-full">
@@ -147,7 +179,7 @@ function Approve() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredProduction.map((data, idx) => (
+                                {filteredInd.map((data, idx) => (
                                     <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
                                         <td scope="row" className="px-3 py-1 w-96 text-[#73664B] whitespace-nowrap dark:text-white">
                                             {data.checkk === "production" ? data.id : null}

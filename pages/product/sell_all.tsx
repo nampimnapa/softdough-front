@@ -52,6 +52,7 @@ function Sell_all() {
     const { isOpen: isOpenModalEditTwo, onOpen: onOpenModalEditTwo, onOpenChange: onOpenChangeModalEditTwo, onClose: onCloseModelEditTwo } = useDisclosure();
     const { isOpen: isOpenModalRead, onOpen: onOpenModalRead, onOpenChange: onOpenChangeModalRead, onClose: onCloseModelRead } = useDisclosure();
     const [editFix, setEditFix] = useState("");
+    const [searchTerm, setSearchTerm] = useState(""); // เก็บคำค้นหา
 
     const changeFix = (idfix: any, smid: any) => {
         setEditFix(smid);
@@ -81,6 +82,11 @@ function Sell_all() {
             });
     };
 
+    // ค้นหา
+    const filteredSale = Sale.filter((sale) =>
+        sale.sm_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     // console.log(Sale);
 
 
@@ -96,14 +102,15 @@ function Sell_all() {
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
                             <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
                         </div>
-                        <input type="text"
+                        <input
+                            type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา" required ></input>
+                            placeholder="ค้นหา"
+                            value={searchTerm} // เชื่อมต่อกับ state
+                            onChange={(e) => setSearchTerm(e.target.value)} // อัปเดต searchTerm เมื่อผู้ใช้พิมพ์
+                        />
                     </div>
-                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
-                        ค้นหา
-                    </button>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
                     <button onClick={onOpenModalAdd} className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex">
@@ -114,54 +121,52 @@ function Sell_all() {
             </div>
             <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182] ">เมนูสำหรับขาย</p>
             {/* card */}
-            <div className="mx-5 relative overflow-x-auto ">
+            {statusLoading ? (
+                <div className="max-h-[calc(100vh-217px)] overflow-y-auto flex flex-wrap">
+                    {filteredSale && filteredSale.length > 0 ? (
+                        filteredSale.map((sale, index) => (
+                            <div key={index} className="card w-60 bg-base-100 shadow-md mx-2 h-60 ml-5 mb-4 ">
+                                <figure className="w-full h-3/4">
+                                    <Image src={sale.picture} alt="Recipe Image" className="object-cover" />
+                                </figure>
+                                <div className="card-body">
+                                    <div className="flex justity-between">
+                                        <p className="text-mediem text-[#73664B]">
+                                            {sale.sm_name}
+                                        </p>
 
-                {statusLoading ? (
-                    <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
-                        {Sale && Sale.length > 0 ? (
-                            Sale.map((sale, index) => (
-                                <Card key={index}
-                                    shadow="sm" isPressable onPress={() => console.log("item pressed")}
-                                    className="card w-40 max-w-xs  bg-base-100 shadow-md mx-2 h-48 ml-1 mb-4 ">
-                                    <CardBody className="overflow-visible p-0">
-                                        <div className="flex justify-end">
-                                            <button className="mr-2" type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
-                                                <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                            </button>
 
-                                            <button type="submit" onClick={() => openRead(sale.sm_id)}>
-                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
-                                            </button>
+                                        <button type="button" onClick={() => changeFix(sale.fix, sale.sm_id)} >
+                                            <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
+                                        </button>
+
+                                        <button type="submit" onClick={() => openRead(sale.sm_id)}>
+                                            <MagnifyingGlassIcon className="h-4 w-4 text-[#73664B] " />
+                                        </button>
+
+                                    </div>
+                                    <div className="flex justify-center">
+                                        {/* <div className="flex justify-start">
+                                        <p className="text-sm text-[#73664B]">ราคา : </p>
+                                    </div> */}
+                                        <div className="flex ">
+                                            <p className=" text-[#73664B] text-lg">{sale.sm_price} บาท</p>
                                         </div>
-                                        <Image
-                                            // shadow="sm"
-                                            // radius="lg"
-                                            width="100%"
-                                            alt={sale.picture}
-                                            className="w-full object-cover h-[140px]"
-                                            src={sale.picture}
-                                        />
+                                    </div>
 
-                                    </CardBody>
-                                    <CardFooter className="text-small justify-between " >
-                                        <p className='text-[#73664B]'>{sale.sm_name}</p>
-                                        <p className="text-[#F2B461]">{sale.sm_price} บาท</p>
-
-                                    </CardFooter>
-                                </Card>
-
-                            ))
-                        ) : (
-                            <div className="flex justify-center items-center w-full">
-                                <p className="text-sm text-gray-400">ไม่มีข้อมูล</p>
+                                </div>
                             </div>
-                        )}
+                        ))
+                    ) : (
+                        <div className="flex justify-center items-center w-full">
+                            <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
+                        </div>
+                    )}
 
-                    </div>
-                ) : (
-                    <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
-                )}
-            </div>
+                </div>
+            ) : (
+                <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
+            )}
             {/* Show Model Add Sell */}
             <AddSell
 

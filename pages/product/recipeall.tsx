@@ -8,7 +8,8 @@ import { Icon } from '@iconify/react';
 import { useRouter } from "next/router";
 import { Divider, Switch, Popover, PopoverTrigger, PopoverContent, Tooltip, Input, Select, SelectItem, Card, CardFooter, Spinner, Image, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button } from "@nextui-org/react";
 import Head from 'next/head'
-
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const conversionFactors = {
     "กรัม": 1,
@@ -44,6 +45,7 @@ function Recipeall() {
     const { id } = router.query;
     const [Recipe, setRecipe] = useState([]);
     const [statusLoading, setStatusLoading] = useState(false);
+    const [buttonStatus, setButtonStatus] = useState(false);
     const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
     const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit, onClose: onCloseEdit } = useDisclosure();
     const { isOpen: isOpenRead, onOpen: onOpenRead, onOpenChange: onOpenChangeRead, onClose: onCloseRead } = useDisclosure();
@@ -54,6 +56,24 @@ function Recipeall() {
     const [imageUpload, setImageUpload] = useState(null);
     const [Ingredientall, setIngredientall] = React.useState([]);
     const [isOpenPop, setIsOpenPop] = React.useState(false);
+    const [searchTerm, setSearchTerm] = useState(""); // เก็บคำค้นหา
+    const MySwal = withReactContent(Swal);
+    const Toast = MySwal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+          getRecipe();
+          setButtonStatus(false);
+          onClose();
+          onCloseEdit();
+        }
+      });
+
 
     // สูตรการคำนวณ //
     const UnitDetail = [
@@ -111,6 +131,7 @@ function Recipeall() {
         pdc_name: string;
 
     }
+
     useEffect(() => {
         setStatusLoading(false)
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/productsall`)
@@ -387,6 +408,7 @@ function Recipeall() {
     };
 
     const handleSubmitAdd = async () => {
+        setButtonStatus(true)
         const productData = {
             pd_name: product.pd_name,
             pd_qtyminimum: typeof product.pd_qtyminimum === 'string' ? parseInt(product.pd_qtyminimum) : product.pd_qtyminimum,
@@ -413,13 +435,16 @@ function Recipeall() {
         console.log(responseData)
 
         if (responseData.status === 200) {
-
-            console.log('Data added successfully');
-            getRecipe();
-            onClose();
-
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มสูตรอาหารสำเร็จ</p>
+              });
         } else {
             console.log(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>เพิ่มสูตรอาหารไม่สำเร็จ</p>
+              });
         }
     }
 
@@ -534,11 +559,12 @@ function Recipeall() {
 
     // Submit Edit
     const handleSubmitEdit = async () => {
+        setButtonStatus(true);
         const productData = {
             pd_name: editProduct.pd_name,
             pd_qtyminimum: typeof editProduct.pd_qtyminimum === 'string' ? parseInt(editProduct.pd_qtyminimum) : editProduct.pd_qtyminimum,
             status: editProduct.status,
-            picture: editProduct.picture,
+            picture: product.picture,
             pdc_id: productCat.find(cat => cat.pdc_name == editProduct.pdc_name)?.pdc_id,
             recipe: {
                 qtylifetime: typeof editProduct.qtylifetime === 'string' ? parseInt(editProduct.qtylifetime) : editProduct.qtylifetime,
@@ -559,15 +585,18 @@ function Recipeall() {
 
         });
         const responseData = await response.json();
-        console.log(responseData)
-
         if (responseData.message === 'Product updated successfully!') {
-
             console.log('Product updated successfully!');
-            getRecipe();
-            onCloseEdit();
+            Toast.fire({
+                icon: "success",
+                title: <p style={{ fontFamily: 'kanit' }}>แก้ไขสูตรอาหารสำเร็จ</p>
+              });
         } else {
             console.log(responseData.message || 'Error occurred');
+            Toast.fire({
+                icon: "error",
+                title: <p style={{ fontFamily: 'kanit' }}>แก้ไขสูตรอาหารไม่สำเร็จ</p>
+              });
         }
     }
 
@@ -592,12 +621,17 @@ function Recipeall() {
 
     }
 
+        // ค้นหา
+        const filteredRecipe = Recipe.filter((rec) =>
+            rec.pd_name?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
     // console.log("editProduct: ", editProduct)
     // console.log("convert", convertData)
     // console.log("ingredientsFoodSave", ingredientsFoodSave)
 
     return (
-        <div className="overflow-auto flex flex-col">
+        <div>
             <Head>
                 <title>สูตรอาหาร - Softdough</title>
             </Head>
@@ -608,14 +642,15 @@ function Recipeall() {
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
                             <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
                         </div>
-                        <input type="text"
+                        <input
+                            type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา" required ></input>
+                            placeholder="ค้นหา"
+                            value={searchTerm} // เชื่อมต่อกับ state
+                            onChange={(e) => setSearchTerm(e.target.value)} // อัปเดต searchTerm เมื่อผู้ใช้พิมพ์
+                        />
                     </div>
-                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
-                        ค้นหา
-                    </button>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
                     {/* <Link href={`./addrecipe`}> */}
@@ -629,59 +664,50 @@ function Recipeall() {
                 </div>
             </div>
 
+            <div className="max-h-[calc(100vh-160px)] overflow-y-auto">
+                {statusLoading ? (
+                    TypeProduct.map(product => (
+                        <section key={product.pdc_id} className="group-section mb-10">
+                            {/* Sticky header for each section */}
+                            <div className="sticky top-0 z-10 bg-white ">
+                                <p className="font-medium m-4 text-[#C5B182] border-b-1 border-b-[#C5B182]">{product.pdc_name}</p>
+                            </div>
 
-            {statusLoading ? (
-                TypeProduct.map(product =>
-                    <div key={product.pdc_id}>
-                        <p className="font-medium m-4 text-[#C5B182]  border-b-1 border-b-[#C5B182] ">{product.pdc_name}</p>
-
-                        <div className="flex flex-wrap ">
-                            {
-                                Recipe && Recipe.length > 0 ? (
-                                    Recipe.filter(recipe => recipe.pdc_id === product.pdc_id).map((recipe, index) => (
-                                        <div key={index} className="card w-60 bg-base-100 shadow-xl mx-2 h-80 ml-5 mb-4">
-                                            <figure className="w-full h-96">
-                                                <Image src={recipe.picture == null ? "/images/logo.svg" : recipe.picture} alt="Recipe Image" className="object-cover" />
+                            <div className="flex flex-wrap">
+                                {filteredRecipe && filteredRecipe.filter(recipe => recipe.pdc_id === product.pdc_id).length > 0 ? (
+                                    filteredRecipe.filter(recipe => recipe.pdc_id === product.pdc_id).map((recipe, index) => (
+                                        <div key={index} className="card z-1 w-60 bg-base-100 shadow-xl mx-2 h-80 ml-5 mb-4">
+                                            <figure className="w-full h-96 z-0">
+                                                <Image
+                                                    src={recipe.picture == null ? "/images/logo.svg" : recipe.picture}
+                                                    alt="Recipe Image"
+                                                    className="object-cover z-0"
+                                                />
                                             </figure>
                                             <div className="card-body">
-                                                <div className="flex justity-between">
-                                                    <p className="text-mediem text-[#73664B]">
-                                                        {recipe.pd_name}
-                                                    </p>
+                                                <div className="flex justify-between">
+                                                    <p className="text-medium text-[#73664B]">{recipe.pd_name}</p>
                                                     <button type="button" onClick={() => handleEdit(recipe.pd_id)}>
-                                                        {/* <Link href={`/product/recipeedit/${recipe.pd_id}`} className="w-full flex justify-center items-center"> */}
-
                                                         <PencilSquareIcon className="h-4 w-4 text-[#73664B]" />
-                                                        {/* </Link> */}
                                                     </button>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                    <div className="flex justify-start">
-                                                        <p className="text-sm text-[#73664B]">จำนวนที่ทำได้ : </p>
-                                                    </div>
-                                                    <div className="flex justify-end">
-                                                        <p className="text-sm text-[#73664B]">{recipe.produced_qty} ชิ้น</p>
-                                                    </div>
+                                                    <p className="text-sm text-[#73664B]">จำนวนที่ทำได้ :</p>
+                                                    <p className="text-sm text-[#73664B]">{recipe.produced_qty} ชิ้น</p>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                    <div className="flex justify-start">
-                                                        <p className="text-sm text-[#73664B]">จำนวนขั้นต่ำ</p>
-                                                    </div>
-                                                    <div className="flex justify-end">
-                                                        <p className="text-sm text-[#73664B]">{recipe.pd_qtyminimum} ชิ้น</p>
-                                                    </div>
+                                                    <p className="text-sm text-[#73664B]">จำนวนขั้นต่ำ :</p>
+                                                    <p className="text-sm text-[#73664B]">{recipe.pd_qtyminimum} ชิ้น</p>
                                                 </div>
                                                 <div className="card-actions flex justify-between">
-                                                    <div className="flex justify-items-center">
+                                                    <div className="flex items-center">
                                                         <p className="text-sm text-[#DACB46]">ขั้นต่ำใหม่</p>
                                                         <button>
-                                                            <Icon icon="system-uicons:reset" className="my-1 mx-1 text-sm text-[#DACB46] font-bold" />
+                                                            <Icon icon="system-uicons:reset" className="mx-1 text-sm text-[#DACB46]" />
                                                         </button>
                                                     </div>
-                                                    <button className="flex justify-end" onClick={() => handleRead(recipe.pd_id)}>
-                                                        {/* <Link href={`./recipedetail/${recipe.pd_id}`}> */}
-                                                        <div className="badge badge-outline">สูตรอาหาร</div>
-                                                        {/* </Link> */}
+                                                    <button className="badge badge-outline" onClick={() => handleRead(recipe.pd_id)}>
+                                                        สูตรอาหาร
                                                     </button>
                                                 </div>
                                             </div>
@@ -692,12 +718,14 @@ function Recipeall() {
                                         <p className="text-sm text-gray-400">ไม่มีข้อมูลสูตรอาหาร</p>
                                     </div>
                                 )}
-                        </div>
-                    </div>
-                )) : (
-                <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
-            )}
+                            </div>
+                        </section>
+                    ))
+                ) : (
+                    <Spinner label="Loading..." color="warning" className="flex justify-center m-60" />
+                )}
 
+            </div>
 
             {/* Model Add */}
             <Modal isOpen={isOpen} onOpenChange={onOpenChange} isDismissable={false} isKeyboardDismissDisabled={true} size="3xl">
@@ -996,10 +1024,10 @@ function Recipeall() {
                             </ModalBody>
                             <ModalFooter>
                                 <Button className="bg-[#C5B182] text-white" onPress={() => handleModalClose()}>
-                                    ปิด
+                                    <p style={{ fontFamily: 'kanit' }}>ปิด</p>
                                 </Button>
-                                <Button className="text-white bg-[#736648]" onClick={handleSubmitAdd}>
-                                    บันทึก
+                                <Button className="text-white bg-[#736648]" onClick={handleSubmitAdd} {...buttonStatus ? { isDisabled: true } : { isDisabled: false }}>
+                                    {buttonStatus ? (<><Spinner size="sm" className={`text-white`} color="default" /> <p style={{ fontFamily: 'kanit' }}>กำลังบันทึก</p></>) : <p style={{ fontFamily: 'kanit' }}>บันทึก</p>}
                                 </Button>
                             </ModalFooter>
                         </>
@@ -1324,10 +1352,10 @@ function Recipeall() {
                             </ModalBody>
                             <ModalFooter>
                                 <Button className="bg-[#C5B182] text-white" onPress={onCloseEdit}>
-                                    ปิด
+                                <p style={{ fontFamily: 'kanit' }}>ปิด</p>
                                 </Button>
-                                <Button className="text-white bg-[#736648]" onClick={() => handleSubmitEdit()}>
-                                    บันทึก
+                                <Button className="text-white bg-[#736648]" onClick={() => handleSubmitEdit()} {...buttonStatus ? { isDisabled: true } : { isDisabled: false }}>
+                                {buttonStatus ? (<><Spinner size="sm" className={`text-white`} color="default" /> <p style={{ fontFamily: 'kanit' }}>กำลังบันทึก</p></>) : <p style={{ fontFamily: 'kanit' }}>บันทึก</p>}
                                 </Button>
                             </ModalFooter>
                         </>
