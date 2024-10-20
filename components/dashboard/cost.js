@@ -155,7 +155,7 @@ const CostChart = ({ startDate, endDate }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/getIngredientUsedDetails?startDate=${startDate}&endDate=${endDate}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dash/getIngredientUsedDetails?startDate=${startDate}&endDate=${endDate}`);
                 const result = await response.json();
 
                 // จัดเตรียมข้อมูลสำหรับ chart
@@ -272,8 +272,12 @@ const CostChart = ({ startDate, endDate }) => {
                         },
                         y: {
                             formatter: function (val, { series, seriesIndex, dataPointIndex, w }) {
-                                const usedItem = chartData[seriesIndex].used[dataPointIndex];
-                                return `${usedItem.sumCost.toFixed(2)} บาท ( ${usedItem.perPiece.toFixed(2)} บาท/${usedItem.un_name} )`;
+                                const usedItem = chartData[seriesIndex]?.used[dataPointIndex];
+                                if (usedItem) {
+                                    return `${usedItem.sumCost.toFixed(2)} บาท ( ${usedItem.perPiece.toFixed(2)} บาท/${usedItem.un_name} )`;
+                                } else {
+                                    return 'No data'; // กรณีที่ไม่มีข้อมูล
+                                }
                             },
                         },
                         marker: {
@@ -285,6 +289,7 @@ const CostChart = ({ startDate, endDate }) => {
                             },
                         },
                     },
+                    
                     fill: {
                         opacity: 1,
                     },

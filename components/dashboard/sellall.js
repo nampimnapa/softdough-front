@@ -11,7 +11,7 @@ const OrderChart = ({ startDate, endDate }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/getOrderDetails?startDate=${startDate}&endDate=${endDate}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dash/getOrderDetails?startDate=${startDate}&endDate=${endDate}`);
                 const result = await response.json();
 
                 // Map through the results and prepare data for chart
@@ -37,10 +37,75 @@ const OrderChart = ({ startDate, endDate }) => {
                 }));
 
                 // Define chart options
+                // const chartOptions = {
+                //     chart: {
+                //         type: 'bar',
+                //         height: 350,
+                //         stacked: true,
+                //     },
+                //     plotOptions: {
+                //         bar: {
+                //             horizontal: false,
+                //             borderRadius: 10,
+                //             dataLabels: {
+                //                 total: {
+                //                     enabled: true,
+                //                     style: {
+                //                         fontSize: '12px',
+                //                         fontWeight: 600,
+                //                         colors: ['#73664B'],  // สีของผลรวมบนกราฟ
+                //                     }
+                //                 }
+                //             }
+                //         },
+                //     },
+                //     dataLabels: {
+                //         enabled: true,
+                //         formatter: function (val) {
+                //             return val.toFixed(2); // แสดงค่าเป็นทศนิยม 2 ตำแหน่งบนแท่งกราฟ
+                //         },
+                //         style: {
+                //             fontSize: '12px',
+                //             colors: ['#FFFFFF'],  // สีของค่าบนแท่งกราฟเป็นสีขาว
+                //         },
+                //     },
+                //     colors: ['#73664B', '#C5B182', '#E3D8BF', '#F5F1E8', '#F2B461'],
+                //     xaxis: {
+                //         categories: orderCategories,
+                //         labels: {
+                //             style: {
+                //                 colors: '#73664B',
+                //                 fontSize: '12px',
+                //             },
+                //         },
+                //     },
+                //     yaxis: {
+                //         labels: {
+                //             style: {
+                //                 colors: '#73664B',
+                //             },
+                //         },
+                //     },
+                //     tooltip: {
+                //         y: {
+                //             formatter: (val) => `${val.toFixed(2)} บาท` // แสดงค่าใน tooltip เป็นทศนิยม 2 ตำแหน่ง
+                //         },
+                //     },
+                //     fill: {
+                //         opacity: 1,
+                //     },
+                //     legend: {
+                //         position: 'top',
+                //         labels: {
+                //             colors: '#73664B',
+                //         },
+                //     },
+                // };      
+
                 const chartOptions = {
                     chart: {
                         type: 'bar',
-                        height: 350,
+                        height: 350, // ขนาดปกติ
                         stacked: true,
                     },
                     plotOptions: {
@@ -53,7 +118,7 @@ const OrderChart = ({ startDate, endDate }) => {
                                     style: {
                                         fontSize: '12px',
                                         fontWeight: 600,
-                                        colors: ['#73664B'],  // สีของผลรวมบนกราฟ
+                                        colors: ['#73664B'],
                                     }
                                 }
                             }
@@ -62,11 +127,11 @@ const OrderChart = ({ startDate, endDate }) => {
                     dataLabels: {
                         enabled: true,
                         formatter: function (val) {
-                            return val.toFixed(2); // แสดงค่าเป็นทศนิยม 2 ตำแหน่งบนแท่งกราฟ
+                            return val.toFixed(2);
                         },
                         style: {
                             fontSize: '12px',
-                            colors: ['#FFFFFF'],  // สีของค่าบนแท่งกราฟเป็นสีขาว
+                            colors: ['#FFFFFF'],
                         },
                     },
                     colors: ['#73664B', '#C5B182', '#E3D8BF', '#F5F1E8', '#F2B461'],
@@ -88,7 +153,7 @@ const OrderChart = ({ startDate, endDate }) => {
                     },
                     tooltip: {
                         y: {
-                            formatter: (val) => `${val.toFixed(2)} บาท` // แสดงค่าใน tooltip เป็นทศนิยม 2 ตำแหน่ง
+                            formatter: (val) => `${val.toFixed(2)} บาท`,
                         },
                     },
                     fill: {
@@ -100,7 +165,72 @@ const OrderChart = ({ startDate, endDate }) => {
                             colors: '#73664B',
                         },
                     },
-                };                
+                    // Responsive settings
+                    responsive: [
+                        {
+                            breakpoint: 1024, // เมื่อหน้าจอเล็กกว่า 1024px
+                            options: {
+                                chart: {
+                                    height: 300, // ลดความสูง
+                                },
+                                plotOptions: {
+                                    bar: {
+                                        borderRadius: 5, // ลดมุมโค้ง
+                                    },
+                                },
+                                dataLabels: {
+                                    style: {
+                                        fontSize: '10px', // ลดขนาดฟอนต์
+                                    },
+                                },
+                                xaxis: {
+                                    labels: {
+                                        style: {
+                                            fontSize: '10px', // ลดขนาดฟอนต์ในแกน x
+                                        },
+                                    },
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            fontSize: '10px', // ลดขนาดฟอนต์ในแกน y
+                                        },
+                                    },
+                                },
+                                legend: {
+                                    position: 'bottom', // ย้าย legend ไว้ด้านล่าง
+                                },
+                            },
+                        },
+                        {
+                            breakpoint: 768, // เมื่อหน้าจอเล็กกว่า 768px
+                            options: {
+                                chart: {
+                                    height: 250, // ลดความสูงอีก
+                                },
+                                dataLabels: {
+                                    style: {
+                                        fontSize: '8px', // ลดขนาดฟอนต์มากขึ้น
+                                    },
+                                },
+                                xaxis: {
+                                    labels: {
+                                        style: {
+                                            fontSize: '8px', // ลดขนาดฟอนต์ในแกน x
+                                        },
+                                    },
+                                },
+                                yaxis: {
+                                    labels: {
+                                        style: {
+                                            fontSize: '8px', // ลดขนาดฟอนต์ในแกน y
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                };
                 
 
                 setOptions(chartOptions);

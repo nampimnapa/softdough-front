@@ -161,7 +161,7 @@ const SalesComparisonChart = ({ startDate, endDate }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/getOrderDetails?startDate=${startDate}&endDate=${endDate}`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dash/getOrderDetails?startDate=${startDate}&endDate=${endDate}`);
                 const result = await response.json();
 
                 // Group data by odt_name (sales type)
@@ -231,7 +231,7 @@ const SalesComparisonChart = ({ startDate, endDate }) => {
                                 dashArray: [0, 8, 5]
                             },
                             title: {
-                                text: `Sales for ${salesType}`,
+                                text: `${salesType}`,
                                 align: 'left',
                                 style: {
                                     color: '#73664B'
@@ -276,28 +276,51 @@ const SalesComparisonChart = ({ startDate, endDate }) => {
 
         fetchData();
     }, [startDate, endDate]);
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsSmallScreen(window.innerWidth < 640); // Check if the window width is less than 640px
+        };
+
+        // Set initial screen size
+        handleResize();
+
+        // Add resize event listener
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup event listener on component unmount
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
 
     return (
         <div>
-            {/* Render shared legend */}
-            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', fontSize: '12px' }}>
-                {sharedSeries.map((sm, index) => (
-                    <div key={index} style={{ display: 'flex', alignItems: 'center', marginRight: '1em' }}>
-                        <div style={{ width: '10px', height: '10px', backgroundColor: sm.color, marginRight: '5px' }}></div>
-                        <span style={{ color: '#73664B' }}>{sm.name}</span>
-                    </div>
-                ))}
-            </div>
-
-            {/* Render individual charts */}
-            <div style={{ display: 'flex', overflowX: 'auto' }}>
-                {chartsData.map((chartData, index) => (
-                    <div key={index} style={{ minWidth: '400px', marginRight: '0.5em', overflowX: 'auto' }}>
-                        <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
-                    </div>
-                ))}
-            </div>
+        {/* Render shared legend */}
+        <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center', fontSize: '12px' }}>
+            {sharedSeries.map((sm, index) => (
+                <div key={index} style={{ display: 'flex', alignItems: 'center', marginRight: '1em' }}>
+                    <div style={{ width: '10px', height: '10px', backgroundColor: sm.color, marginRight: '5px' }}></div>
+                    <span style={{ color: '#73664B' }}>{sm.name}</span>
+                </div>
+            ))}
         </div>
+
+        {/* Render individual charts */}
+        <div
+            style={{
+                display: 'flex',
+                flexDirection: isSmallScreen ? 'column' : 'row',
+                overflowX: 'auto'
+            }}
+        >
+            {chartsData.map((chartData, index) => (
+                <div key={index} style={{ minWidth: '400px', marginRight: '0.5em' }}>
+                    <Chart options={chartData.options} series={chartData.series} type="line" height={350} />
+                </div>
+            ))}
+        </div>
+    </div>
     );
 };
 
