@@ -692,12 +692,12 @@ function Recipeall() {
                                                     </button>
                                                 </div>
                                                 <div className="flex justify-between">
-                                                    <p className="text-sm text-[#73664B]">จำนวนที่ทำได้ :</p>
-                                                    <p className="text-sm text-[#73664B]">{recipe.produced_qty} ชิ้น</p>
+                                                    <p className="text-sm text-[#73664B] ">จำนวนที่ทำได้ :</p>
+                                                    <p className="text-sm text-[#73664B] text-right">{recipe.produced_qty} ชิ้น</p>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <p className="text-sm text-[#73664B]">จำนวนขั้นต่ำ :</p>
-                                                    <p className="text-sm text-[#73664B]">{recipe.pd_qtyminimum} ชิ้น</p>
+                                                    <p className="text-sm text-[#73664B] text-right">{recipe.pd_qtyminimum} ชิ้น</p>
                                                 </div>
                                                 <div className="card-actions flex justify-between">
                                                     <div className="flex items-center">

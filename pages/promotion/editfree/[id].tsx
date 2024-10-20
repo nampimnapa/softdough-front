@@ -6,7 +6,7 @@ import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import { Button, Checkbox, Input, Select, SelectItem } from "@nextui-org/react";
-import Datepicker from "react-tailwindcss-datepicker";
+import Datepicker, { DateRangeType } from "react-tailwindcss-datepicker";
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -294,21 +294,29 @@ const AddPromotion: React.FC = () => {
 
     console.log("pro", promotion);
 
-    const handleDateChange = (field: 'pm_datestart' | 'pm_dateend', date: { startDate: Date, endDate: Date }) => {
+    // const handleDateChange = (field: 'pm_datestart' | 'pm_dateend', date: { startDate: Date, endDate: Date }) => {
+    //     console.log('Date changed:', date);
+    //     setPromotion((prevFormIn) => ({
+    //         ...prevFormIn,
+    //         [field]: date.startDate || date.endDate,
+    //     }));
+    // };
+
+    const handleDateChange = (field: 'pm_datestart' | 'pm_dateend', date: DateRangeType) => {
         console.log('Date changed:', date);
         setPromotion((prevFormIn) => ({
             ...prevFormIn,
             [field]: date.startDate || date.endDate,
         }));
+        console.log(promotion)
     };
-
 
     return (
         <div className='h-screen'>
             <button className='my-3 mx-5'>
                 <Link href={`/promotion/${id}`} className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
-                    
+
                 </Link>
             </button>
             <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>แก้ไขโปรโมชันของแถม</p>
@@ -320,11 +328,11 @@ const AddPromotion: React.FC = () => {
                         </label>
                         <div className="col-span-2">
                             <Datepicker
-                                useRange={false}
-                                asSingle={true}
+                                useRange={false}  // เลือกเพียงวันเดียว ไม่ใช้ช่วงเวลา
+                                asSingle={true}   // ใช้ในโหมดที่เลือกวันเดียว
                                 value={{
-                                    startDate: promotion.pm_datestart ? new Date(promotion.pm_datestart) : null,
-                                    endDate: promotion.pm_datestart ? new Date(promotion.pm_datestart) : null,
+                                    startDate: promotion.pm_datestart ? new Date(promotion.pm_datestart) : null,  // ค่าเริ่มต้นวันที่ ถ้ามี pm_datestart
+                                    endDate: promotion.pm_datestart ? new Date(promotion.pm_datestart) : null,  // ค่าเดียวกับ startDate
                                 }}
                                 onChange={(date) => handleDateChange('pm_datestart', date)}
                             />
@@ -390,8 +398,8 @@ const AddPromotion: React.FC = () => {
 
                     </div>
                     <p className="mb-3 text-sm font-medium text-[#73664B] text-sm ">
-                    เลือกสินค้าที่ต้องซื้อใหม่
-                </p>
+                        เลือกสินค้าที่ต้องซื้อใหม่
+                    </p>
 
 
                     <div className="flex flex-row">
@@ -454,7 +462,7 @@ const AddPromotion: React.FC = () => {
 
 
                 {/* ของแถม       */}
-                
+
                 <div className="flex flex-col ml-6 mt-3 mr-6">
                     <div className="flex items-center mt-3">
                         <div className="text-sm font-medium leading-6 text-[#73664B] mr-2 ">
@@ -478,8 +486,8 @@ const AddPromotion: React.FC = () => {
                         </div>
                     </div>
                     <p className="mb-3 text-sm font-medium text-[#73664B] text-sm ">
-                    เลือกของแถมใหม่
-                </p>
+                        เลือกของแถมใหม่
+                    </p>
                     <div className="flex flex-row">
                         <div className="flex basis-1/4">
                             <label className="text-sm font-medium leading-6 text-[#73664B] ">
@@ -564,8 +572,8 @@ const AddPromotion: React.FC = () => {
                     </button>
                     <>
                         {isOpen && (
-                            <Transition appear show={isOpen} as={Fragment} className={kanit.className}>
-                                <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                            <Transition appear show={isOpen} as={Fragment} >
+                                <Dialog as="div" className={`relative z-10 ${kanit.className}`} onClose={closeModal} >
                                     <Transition.Child as={Fragment} enter="ease-out duration-300" enterFrom="opacity-0" enterTo="opacity-100" leave="ease-in duration-200" leaveFrom="opacity-100" leaveTo="opacity-0">
                                         <div className="fixed inset-0 bg-black/25" />
                                     </Transition.Child>
