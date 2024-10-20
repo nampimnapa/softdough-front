@@ -49,11 +49,11 @@ function Notifications() {
                 </div>
 
                 {/* Notifications List */}
-                <div className="p-4 mx-7">
+                <div className="p-4 md:mx-7 sm:mx-4">
                     {notifications.length > 0 ? (
                         notifications.map((notification) => (
                             <div key={notification.noti_id} className="flex justify-between items-center p-4 mb-2 bg-white shadow rounded-md">
-                                <div>
+                                <div  className="flex-none w-5/6 ">
 
                                     <p className="text-[#73664B] font-medium">
                                     {notification.ind_id != null ? (
