@@ -728,49 +728,49 @@ function Pos() {
                 console.log("Order created successfully");
                 alert("Order created successfully");
 
-            const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/pdf-viewer`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            });
+                const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/pdf-viewer`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                });
 
-            if (pdfResponse.ok) {
-                const pdfBlob = await pdfResponse.blob();
-                const pdfUrl = URL.createObjectURL(pdfBlob);
-                window.open(pdfUrl, '_blank');
-                console.log('PDF Blob:', pdfBlob);
+                if (pdfResponse.ok) {
+                    const pdfBlob = await pdfResponse.blob();
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    window.open(pdfUrl, '_blank');
+                    console.log('PDF Blob:', pdfBlob);
 
-            } else {
-                const errorData = await pdfResponse.json();
-                console.error('Error displaying PDF:', errorData.error);
-            }
-            // if (response.ok) {
-            //     console.log("Order created successfully");
-            //     alert("Order created successfully");
+                } else {
+                    const errorData = await pdfResponse.json();
+                    console.error('Error displaying PDF:', errorData.error);
+                }
+                // if (response.ok) {
+                //     console.log("Order created successfully");
+                //     alert("Order created successfully");
 
 
-            //     // ส่ง request ไปที่ /generate-pdf พร้อมข้อมูล order ที่เพิ่งสร้าง
-            //     const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-pdf`, {
-            //         method: 'POST',
-            //         headers: {
-            //             'Content-Type': 'application/json',
-            //         },
-            //         body: JSON.stringify(dataOrder), // ส่งข้อมูล order เพื่อสร้าง PDF
-            //     });
+                //     // ส่ง request ไปที่ /generate-pdf พร้อมข้อมูล order ที่เพิ่งสร้าง
+                //     const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-pdf`, {
+                //         method: 'POST',
+                //         headers: {
+                //             'Content-Type': 'application/json',
+                //         },
+                //         body: JSON.stringify(dataOrder), // ส่งข้อมูล order เพื่อสร้าง PDF
+                //     });
 
-            //     if (pdfResponse.ok) {
-            //         const pdfBlob = await pdfResponse.blob();
-            //         const pdfUrl = URL.createObjectURL(pdfBlob);
-            //         window.open(pdfUrl, '_blank'); // เปิด PDF ในหน้าต่างใหม่
-            //     } else {
-            //         console.error('Error generating PDF');
-            //     }
-            // } else {
-            //     console.error("Failed to create order");
-            // }
-            
+                //     if (pdfResponse.ok) {
+                //         const pdfBlob = await pdfResponse.blob();
+                //         const pdfUrl = URL.createObjectURL(pdfBlob);
+                //         window.open(pdfUrl, '_blank'); // เปิด PDF ในหน้าต่างใหม่
+                //     } else {
+                //         console.error('Error generating PDF');
+                //     }
+                // } else {
+                //     console.error("Failed to create order");
+                // }
+
 
 
                 closeModal3
@@ -1636,7 +1636,7 @@ function Pos() {
                                 </Transition.Child>
 
                                 <div className="fixed inset-0 overflow-y-auto">
-                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center ">
                                         <Transition.Child
                                             as={Fragment}
                                             enter="ease-out duration-300"
@@ -1646,17 +1646,17 @@ function Pos() {
                                             leaveFrom="opacity-100 scale-100"
                                             leaveTo="opacity-0 scale-95"
                                         >
-                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-50 text-left align-middle shadow-xl transition-all">
                                                 <div>
                                                     {selectedSale && (
                                                         <Card shadow="sm">
-                                                            <CardBody className="overflow-visible p-0">
+                                                            <CardBody className="overflow-visible p-0 bg-white">
                                                                 <Image
                                                                     alt={'/default-image.png'}
                                                                     shadow="sm"
                                                                     width={448}
                                                                     src={selectedSale.picture || '/default-image.png'}  // Fallback if picture is missing
-                                                                    className="object-cover h-[140px]"
+                                                                    className="object-cover h-[140px] bg-white"
                                                                 />
                                                             </CardBody>
                                                         </Card>
@@ -1664,50 +1664,52 @@ function Pos() {
 
                                                     <Dialog.Title
                                                         as="h3"
-                                                        className="text-lg font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
+                                                        className="text-lg bg-white pb-3 font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
                                                     >
                                                         <p>{selectedSale.sm_name}</p>
                                                         <p className="text-[#F2B461]">ราคา {selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}฿</p>
                                                     </Dialog.Title>
-                                                    <div className="p-4">
-                                                        <div>
-                                                            <p className="text-lg font-medium">
-                                                                สินค้า
-                                                            </p>
-                                                            <p className='text-sm text-[#73664B] font-normal'>จำเป็นต้องระบุ</p>
-                                                        </div>
+                                                    <div className="px-4 pb-2 pt-2 mt-1 bg-white">
 
-                                                        {freeItemIds.length > 0 ? (
-                                                            <RadioGroup
-                                                                value={selectedFreeId}
-                                                                onChange={handleFreeIdChange}
-                                                                className='mt-2'
-                                                            >
-                                                                {freeItemIds.map(id => (
-                                                                    <Radio
-                                                                        key={id}
-                                                                        value={id.toString()}
-                                                                        classNames={{
-                                                                            base: cn(
-                                                                                "inline-flex max-w-full w-full bg-content1 m-0",
-                                                                                "hover:bg-content2 items-center justify-start",
-                                                                                "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
-                                                                                "data-[selected=true]:border-primary"
-                                                                            ),
-                                                                        }}
-                                                                    >
-                                                                        {smfreeIdNameMap.get(id) || 'No Name Available'}
-                                                                    </Radio>
-                                                                ))}
-                                                            </RadioGroup>
-                                                        ) : (
-                                                            <p>ไม่มีรายการฟรี</p>
+                                                        {freeItemIds.length > 0 && (
+                                                            <>
+                                                                <div>
+                                                                    <p className="text-lg font-medium">
+                                                                        ของแถม
+                                                                    </p>
+                                                                    <p className='text-sm text-[#73664B] font-normal'>จำเป็นต้องระบุ</p>
+                                                                </div>
+
+
+                                                                <RadioGroup
+                                                                    value={selectedFreeId}
+                                                                    onChange={handleFreeIdChange}
+                                                                    className='mt-2'
+                                                                >
+                                                                    {freeItemIds.map(id => (
+                                                                        <Radio
+                                                                            key={id}
+                                                                            value={id.toString()}
+                                                                            classNames={{
+                                                                                base: cn(
+                                                                                    "inline-flex max-w-full w-full bg-content1 m-0",
+                                                                                    "hover:bg-content2 items-center justify-start",
+                                                                                    "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                    "data-[selected=true]:border-primary"
+                                                                                ),
+                                                                            }}
+                                                                        >
+                                                                            {smfreeIdNameMap.get(id) || 'No Name Available'}
+                                                                        </Radio>
+                                                                    ))}
+                                                                </RadioGroup>
+                                                            </>
                                                         )}
 
+                                                    </div>
 
-
-                                                        <div>
-                                                            <p className="text-lg font-medium mt-2">จำนวน</p>
+                                                    <div className='px-4 pb-4 pt-2 mt-1 bg-white'>
+                                                            <p className="text-lg font-medium">จำนวน</p>
                                                             <div className="flex items-center justify-center mt-2">
                                                                 <button
                                                                     onClick={decrementQuantity}
@@ -1730,7 +1732,7 @@ function Pos() {
                                                             </div>
                                                         </div>
 
-                                                        <div className="mt-4 flex w-full">
+                                                        <div className="flex p-4 w-full bg-white mt-1">
 
                                                             <button
                                                                 type="button"
@@ -1748,7 +1750,7 @@ function Pos() {
                                                                 เพิ่มลงตะกร้า
                                                             </button>
                                                         </div>
-                                                    </div>
+
                                                 </div>
                                             </Dialog.Panel>
                                         </Transition.Child>
@@ -1764,7 +1766,7 @@ function Pos() {
                 <>
                     {isOpenmix && (
                         <Transition appear show={isOpenmix} as={Fragment} >
-                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className} bg-gray-500`}>
                                 <Transition.Child
                                     as={Fragment}
                                     enter="ease-out duration-300"
@@ -1777,7 +1779,7 @@ function Pos() {
                                     <div className="fixed inset-0 bg-black/25" />
                                 </Transition.Child>
 
-                                <div className="fixed inset-0 overflow-y-auto">
+                                <div className="fixed inset-0 overflow-y-auto ">
                                     <div className="flex min-h-full items-center justify-center p-4 text-center">
                                         <Transition.Child
                                             as={Fragment}
@@ -1788,17 +1790,17 @@ function Pos() {
                                             leaveFrom="opacity-100 scale-100"
                                             leaveTo="opacity-0 scale-95"
                                         >
-                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-50 text-left align-middle shadow-xl transition-all">
                                                 <div>
                                                     {selectedSale && (
-                                                        <Card shadow="sm">
-                                                            <CardBody className="overflow-visible p-0">
+                                                        <Card shadow="sm" className='bg-white'>
+                                                            <CardBody className="overflow-visible p-0 bg-white">
                                                                 <Image
                                                                     alt={'/default-image.png'}
                                                                     shadow="sm"
                                                                     width={448}
                                                                     src={selectedSale.picture || '/default-image.png'}  // Fallback if picture is missing
-                                                                    className="object-cover h-[140px]"
+                                                                    className="object-cover h-[140px] bg-white"
                                                                 />
                                                             </CardBody>
                                                         </Card>
@@ -1806,12 +1808,12 @@ function Pos() {
 
                                                     <Dialog.Title
                                                         as="h3"
-                                                        className="text-lg font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
+                                                        className="text-lg bg-white pb-3 font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
                                                     >
                                                         <p>{selectedSale.sm_name}</p>
                                                         <p className="text-[#F2B461]">ราคา {selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}฿</p>
                                                     </Dialog.Title>
-                                                    <div className='p-4'>
+                                                    <div className='px-4 pb-2 pt-2 mt-1 bg-white'>
                                                         {selectedSale && (
                                                             <div className='flex justify-between items-center'>
                                                                 <div>
@@ -1906,11 +1908,12 @@ function Pos() {
                                                                 <p>ไม่มีรายการสินค้า</p>
                                                             )}
                                                         </div>
+                                                    </div>
 
-                                                        <div>
-                                                            <p className="text-lg font-medium mt-2">จำนวน</p>
+                                                    <div className='px-4 pb-4 pt-2 mt-1 bg-white'>
+                                                            <p className="text-lg font-medium">จำนวน</p>
 
-                                                            <div className='flex items-center justify-center mt-2 w-full'>
+                                                            <div className='flex items-center justify-center mt-1 w-full'>
                                                                 <button
                                                                     onClick={decrementQuantity}
                                                                     className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
@@ -1950,10 +1953,9 @@ function Pos() {
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                    </div>
 
                                                     {/*  choose */}
-                                                    <div className="flex justify-end p-4 w-full">
+                                                    <div className="flex justify-end p-4 w-full bg-white mt-1">
                                                         <div className="inline-flex justify-end w-full">
                                                             <button
                                                                 type="button"
