@@ -96,7 +96,7 @@ const Sidebar = ({ children, className }) => {
   const [Notifications, setNotifications] = useState(false);
 
   useEffect(() => {
-    const socket = io('http://localhost:8080', {
+    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
       query: { userId: localStorage.getItem('userId') }, // ส่ง userId
     });
 
