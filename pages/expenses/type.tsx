@@ -108,28 +108,7 @@ function Type() {
   return (
     <div className="h-screen">
       <p className='text-[#F2B461] font-medium m-4'>ประเภทรายการจ่าย</p>
-      <div className="flex justify-between">
-        <form className="flex items-center w-full transform scale-75">
-          <div className="relative w-1/2">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <MagnifyingGlassIcon className="h-6 w-6 text-[#C5B182]" />
-            </div>
-            <input
-              type="text"
-              id="simple-search"
-              className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-              placeholder="ค้นหา"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            className="p-2 ms-2 text-sm rounded-full text-white bg-[#C5B182] border hover:bg-[#5E523C]"
-          >
-            ค้นหา
-          </button>
-        </form>
-      </div>
+      
       <div className="w-full">
         <div className="flex w-full flex-col">
           <div className="relative overflow-x-auto mx-4">
@@ -145,13 +124,13 @@ function Type() {
             <table className="w-full text-sm text-center table-fixed">
               <thead>
                 <tr className="text-white  bg-[#908362]">
-                  <td scope="col" className="px-3 py-3 w-64">
+                  <td scope="col" className="md:px-3 sm:px-1 py-3 md:w-56 sm:w-8">
                     ลำดับ
                   </td>
-                  <td scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden">
+                  <td scope="col" className="md:px-12 sm:px-6 py-3 whitespace-nowrap overflow-hidden">
                     ชื่อประเภทรายการจ่าย
                   </td>
-                  <th scope="col" className="px-12 py-3 whitespace-nowrap overflow-hidden"></th>
+                  <th scope="col" className="md:px-12 sm:px-6 py-3 w-16 whitespace-nowrap overflow-hidden"></th>
                 </tr>
               </thead>
               <tbody>

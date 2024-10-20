@@ -125,10 +125,11 @@ function Add() {
                 </Link>
             </button>
             <p className='my-1 mx-6 font-semibold text-[#C5B182]  border-b border-[#C5B182] py-2'>เพิ่มโปรโมชั่นส่วนลด</p>
-            <div className="mt-5 w-1/2 ">
+            <div className="ww mr-5 ml-5">
+            <div className="mt-5 md:w-5/6 sm:w-4/5 justify-center ">
                 <form >
-                    <div className="grid grid-cols-3 items-center ">
-                        <label className=" text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5 items-center">
+                    <div className="grid md:grid-cols-3 sm:grid-cols-2 items-center ">
+                        <label className=" text-sm font-medium leading-6 text-[#73664B]  mt-3 md:text-right sm:text-left mr-5 items-center">
                             วันที่เริ่มโปรโมชัน :</label>
                         <div className="col-span-2" >
                             <Datepicker
@@ -140,8 +141,8 @@ function Add() {
                             // name="st_start"
                             />
                         </div>
-                        <label className=" text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5 items-center">
-                            วันที่เริ่มโปรโมชัน :</label>
+                        <label className=" text-sm font-medium leading-6 text-[#73664B]  mt-3 md:text-right sm:text-left mr-5 items-center">
+                            วันที่สิ้นสุดโปรโมชัน :</label>
                         <div className="col-span-2" >
                             <Datepicker
                                 // className={`bg-[#FFFFDD] block w-full rounded-t-md  border-[#C5B182] py-1.5 text-[#C5B182] shadow-sm    sm:text-sm sm:leading-6 pl-2`}
@@ -153,8 +154,8 @@ function Add() {
                             />
                         </div>
                     </div>
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                    <div className="grid md:grid-cols-3 sm:grid-cols-2 items-center ">
+                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 md:text-right sm:text-left mr-5">
                             ชื่อโปรโมชัน :</label>
                         <div className="mt-2 col-span-2">
                             <input
@@ -170,8 +171,8 @@ function Add() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                    <div className="grid md:grid-cols-3 sm:grid-cols-2 items-center ">
+                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 md:text-right sm:text-left mr-5">
                             ส่วนลด :</label>
                         <div className="mt-2 col-span-2">
                             <input
@@ -187,8 +188,8 @@ function Add() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                    <div className="grid md:grid-cols-3 sm:grid-cols-2 items-center ">
+                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 md:text-right sm:text-left mr-5">
                             ยอดซื้อขั้นต่ำ :</label>
                         <div className="mt-2 col-span-2">
                             <input
@@ -204,8 +205,8 @@ function Add() {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-3 items-center ">
-                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 text-right mr-5">
+                    <div className="grid md:grid-cols-3 sm:grid-cols-2 items-center ">
+                        <label htmlFor="last-name" className="block text-sm font-medium leading-6 text-[#73664B]  mt-3 md:text-right sm:text-left mr-5">
                             รายละเอียด :</label>
                         <div className="mt-2 col-span-2">
                             <input
@@ -303,6 +304,7 @@ function Add() {
                         <button onClick={openModal} type="button" className="ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ">บันทึก</button>
                     </div >
                 </div >
+            </div>
             </div>
         </div >
     )

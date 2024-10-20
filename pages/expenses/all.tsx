@@ -242,25 +242,7 @@ function StaffIndex() {
     return (
         <div className="h-screen bg-white">
             <p className="text-[#F2B461] font-medium m-4">รายการจ่ายทั้งหมด</p>
-            <form className="flex items-center transform scale-75" onSubmit={(e) => e.preventDefault()}>
-                <div className="relative w-1/2">
-                    <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                        <MagnifyingGlassIcon className="h-6 w-6 text-[#C5B182]" />
-                    </div>
-                    <input
-                        type="text"
-                        id="simple-search"
-                        className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                        placeholder="ค้นหา"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <button type="submit" className="p-2 ms-2 text-sm rounded-full text-white bg-[#C5B182] border hover:bg-[#5E523C]">
-                    ค้นหา
-                    <span className="sr-only">Search</span>
-                </button>
-            </form>
+            
 
             {/* <div className="flex w-full max-w-xs flex-col gap-2">
                 <div className="flex items-center gap-2">
@@ -302,6 +284,8 @@ function StaffIndex() {
                             borderRadius: '0.375rem', /* Rounded corners */
                             boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)', /* Subtle shadow */
                             color: '#73664B', /* Text color */
+                            height: '2rem', /* Reduce height */
+                            padding: '0.25rem 0.5rem' /* Reduce padding */
                         }}
                     >
                         {ingredientsOptions.map((ingredient) => (
@@ -317,36 +301,37 @@ function StaffIndex() {
             </div>
 
 
+
             <div className="mt-2 p-4">
                 <div className="relative overflow-x-auto">
-                    
+                    {/* สร้างการตรวจสอบเงื่อนไขว่ากำลังโหลดหรือมีข้อผิดพลาดหรือไม่ */}
                     {!loading && !error && (
-                        <table className="w-full text-sm text-center text-gray-500">
+                        <table className="min-w-full table-auto text-sm text-center text-gray-500">
                             <thead>
                                 <tr className="text-white font-normal bg-[#908362]">
-                                    <td scope="col" className="px-6 py-3">วัน/เดือน/ปี</td>
-                                    <td scope="col" className="px-6 py-3">ประเภทรายการจ่าย</td>
-                                    <td scope="col" className="px-6 py-3">รายละเอียด</td>
-                                    <td scope="col" className="px-6 py-3">จำนวนเงิน</td>
-                                    <td scope="col" className="px-6 py-3">พนักงาน</td>
+                                    <td scope="col" className="px-6 py-3 whitespace-nowrap">วัน/เดือน/ปี</td>
+                                    <td scope="col" className="px-6 py-3 whitespace-nowrap">ประเภทรายการจ่าย</td>
+                                    <td scope="col" className="px-6 py-3 whitespace-nowrap">รายละเอียด</td>
+                                    <td scope="col" className="px-6 py-3 whitespace-nowrap">จำนวนเงิน</td>
+                                    <td scope="col" className="px-6 py-3 whitespace-nowrap">พนักงาน</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredStaff.map((staffItem, idx) => (
                                     <tr key={staffItem.ep_id} className={classNames(idx % 2 === 0 ? 'bg-[#F5F1E8]' : 'bg-white', 'border-b h-10', 'text-[#73664B]')}>
-                                        <td scope="row" className="px-6 py-1">
+                                        <td scope="row" className=" py-1">
                                             {staffItem.ep_date}
                                         </td>
-                                        <td className="px-6 py-1">
+                                        <td className="py-1">
                                             {staffItem.ept_name}
                                         </td>
-                                        <td className="px-6 py-1">
+                                        <td className="py-1">
                                             {staffItem.ep_note}
                                         </td>
-                                        <td className="px-6 py-1">
+                                        <td className="py-1">
                                             {staffItem.ep_sum_formatted}
                                         </td>
-                                        <td className="px-6 py-1">
+                                        <td className="py-1">
                                             {staffItem.st_name}
                                         </td>
                                     </tr>
@@ -361,6 +346,8 @@ function StaffIndex() {
                     )}
                 </div>
             </div>
+
+
         </div>
     );
 }

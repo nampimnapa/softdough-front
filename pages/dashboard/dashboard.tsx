@@ -98,96 +98,78 @@ const Home = () => {
     <div className="h-screen  flex">
       <div className="flex-1 overflow-y-auto">
         <p className='text-[#F2B461] font-medium m-4'>ภาพรวม</p>
-        <div className="grid grid-cols-2 gap-4 m-4">
-          <div className='text-[#73664B] text-center p-4 rounded-lg shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]'>
-            <p className='font-medium  mb-2'>รายการจ่าย</p>
-            <label htmlFor="month-select" className='mr-2'>เลือกเดือน :</label>
-            <input
-              type="month"
-              id="month-select"
-              value={selectedMonth}
-              onChange={handleMonthChange}
-            />
-            <h2>ยอดรวมทั้งหมด: {totalSum.toLocaleString()}</h2> {/* แสดงยอดรวมทั้งหมด */}
-            <Donut data={data} />
-          </div>
-          <div className='text-center text-[#73664B] p-4 rounded-lg shadow'>
-            <p className='font-medium mb-2'>ต้นทุนวัตถุดิบ</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 m-4">
+  <div className="text-[#73664B] text-center p-4 rounded-lg shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]">
+    <p className="font-medium mb-2 mt-2">รายการจ่าย</p>
+    <label htmlFor="month-select" className="mr-2">เลือกเดือน :</label>
+    <input
+      type="month"
+      id="month-select"
+      value={selectedMonth}
+      onChange={handleMonthChange}
+      className="border rounded p-1 text-sm md:text-base"
+    />
+    <h2 className="mt-2">ยอดรวมทั้งหมด: {totalSum.toLocaleString()}</h2>
+    <Donut data={data} />
+  </div>
 
-            {/* Input Fields สำหรับวันที่ */}
-            <div className="mb-4">
-              <label className="mr-2">Start Date:</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="border rounded p-1"
-              />
-              <label className="mr-2 ml-4">End Date:</label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border rounded p-1"
-              />
-            </div>
+  <div className="text-center text-[#73664B] p-4 rounded-lg shadow">
+    <p className="font-medium mb-2">ต้นทุนวัตถุดิบ</p>
 
-            {/* ส่งวันที่ไปที่ CostChart */}
-            <CostChart startDate={startDate} endDate={endDate} /> {/* Cost Breakdown Chart */}
-          </div>
-          {/* <!-- ... -->
-        <div>09</div> */}
+    {/* Input Fields สำหรับวันที่ */}
+    <div className="mb-4">
+      <label className="mr-2">วันที่เริ่มต้น:</label>
+      <input
+        type="date"
+        value={startDate}
+        onChange={(e) => setStartDate(e.target.value)}
+        className="border rounded p-1 text-sm md:text-base"
+      />
+      <label className="mr-2 ml-4">วันที่สิ้นสุด:</label>
+      <input
+        type="date"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+        className="border rounded p-1 text-sm md:text-base"
+      />
+    </div>
 
-          {/* <div className='text-[#73664B] text-center p-4 rounded-lg shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)]'>
-          <p className='font-medium  mb-2'>รายการจ่าย</p>
-          <label htmlFor="month-select" className='mr-2'>เลือกเดือน :</label>
-          <input
-            type="month"
-            id="month-select"
-            value={selectedMonth}
-            onChange={handleMonthChange}
-          />
-          <h2>ยอดรวมทั้งหมด: {totalSum.toLocaleString()}</h2>
-          <Donut data={data} /></div> */}
-        </div>
+    <CostChart startDate={startDate} endDate={endDate} />
+  </div>
+</div>
 
-        {/* Add the CostChart here */}
-        <div className="h-screen">
-          <div className="grid grid-cols-1 gap-1 m-4">
+<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-4 m-4">
+  <div className="text-center text-[#73664B] p-4 rounded-lg shadow">
+    <p className="font-medium mb-2">ยอดขายสินค้า</p>
 
-            <div className='text-center text-[#73664B] p-4 rounded-lg shadow'>
-              <p className='font-medium mb-2'>ยอดขายสินค้า</p>
+    {/* Input Fields สำหรับวันที่ */}
+    <div className="mb-4">
+      <label className="mr-2">วันที่เริ่มต้น:</label>
+      <input
+        type="date"
+        value={startDate1}
+        onChange={(e) => setStartDate1(e.target.value)}
+        className="border rounded p-1 text-sm md:text-base"
+      />
+      <label className="mr-2 ml-4">วันที่สิ้นสุด:</label>
+      <input
+        type="date"
+        value={endDate1}
+        onChange={(e) => setEndDate1(e.target.value)}
+        className="border rounded p-1 text-sm md:text-base"
+      />
+    </div>
 
-              {/* Input Fields สำหรับวันที่ */}
-              <div className="mb-4">
-                <label className="mr-2">Start Date:</label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate1(e.target.value)}
-                  className="border rounded p-1"
-                />
-                <label className="mr-2 ml-4">End Date:</label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate1(e.target.value)}
-                  className="border rounded p-1"
-                />
-              </div>
+    <OrderChart startDate={startDate1} endDate={endDate1} />
 
-             {/* ส่งวันที่ไปที่ CostChart */}
-              <OrderChart startDate={startDate1} endDate={endDate1} /> {/* Cost Breakdown Chart */}
-              <p className='font-medium mb-2'>ยอดขายสินค้าตามประเภทรายการขาย</p>
-              <SalesComparisonChart startDate={startDate1} endDate={endDate1} />
-            </div>
-            {/* <div className='text-center text-[#73664B] p-4 rounded-lg shadow'> */}
-              
-            {/* </div> */}
-          </div>
+    <p className="font-medium mb-2">ยอดขายสินค้าตามประเภทรายการขาย</p>
+    <SalesComparisonChart startDate={startDate1} endDate={endDate1} />
+  </div>
+
+
 
           <div className="grid grid-cols-1 gap-1 m-4">
-            
+
           </div>
         </div>
 
