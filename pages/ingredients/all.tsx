@@ -3,7 +3,6 @@ import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Tab } from '@headlessui/react';
 import Link from "next/link";
 import Head from 'next/head'
-import { Spinner } from "@nextui-org/react";
 
 
 function classNames(...classes) {
@@ -16,14 +15,16 @@ function All() {
 
     const [ind, setIngredientall] = useState<any[]>([]);
     const [indlot, setIngredientLot] = useState<any[]>([]);
+    // const [indandsafe, setindandsafe] = useState<any[]>([]);
+
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState(""); // เก็บคำค้นหา
 
     useEffect(() => {
         // Fetch staff data on component mount
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`)
             .then((response) => response.json())
             .then((data) => {
+                console.log(data);
                 setIngredientall(data); // Assuming the response is an array of staff objects
                 setLoading(false);
             })
@@ -35,27 +36,65 @@ function All() {
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlotdetail`)
             .then((response) => response.json())
             .then((data) => {
+                console.log(data);
                 setIngredientLot(data); // Assuming the response is an array of staff objects
-                // setLoading(false);
+                setLoading(false);
             })
             .catch((error) => {
                 console.error('Error:', error);
-                // setLoading(false);
+                setLoading(false);
+            });
+        // fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/ingredientmini`)
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //         console.log(data);
+        //         setsafe(data); // Assuming the response is an array of staff objects
+        //         setLoading(false);
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error:', error);
+        //         setLoading(false);
+        //     });
+
+        const fetchIngredientData = async () => {
+        try {
+            const [ingredientRes, lotDetailRes, ingredientMiniRes] = await Promise.all([
+                fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`).then(res => res.json()),
+                fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlotdetail`).then(res => res.json()),
+                fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/ingredientmini`).then(res => res.json())
+            ]);
+
+            // Combine the ingredient data with ingredientmini data
+            const mergedData = ingredientRes.map(ingredient => {
+                // Find matching data from ingredientmini based on ind_id
+                const matchingMini = ingredientMiniRes.find(mini => mini.indId === ingredient.ind_id);
+console.log(matchingMini,'matchingMini')
+                // If matchingMini is found, add MinimumqtyStock to ingredient object
+                if (matchingMini) {
+                    return {
+                        ...ingredient,
+                        MinimumqtyStock: matchingMini.MinimumqtyStock  // Add MinimumqtyStock to the ingredient data
+                    };
+                }
+
+                // If no match found, return ingredient as it is
+                return ingredient;
             });
 
-        // setLoading(false);
+            console.log('Merged Data:', mergedData);
+            setIngredientall(mergedData); // Set the merged data
+            setLoading(false);
+        } catch (error) {
+            console.error('Error:', error);
+            setLoading(false);
+        }
+    };
+
+    fetchIngredientData();
     }, []);
 
-    // ค้นหา
-    const filteredInd = ind.filter((lot) =>
-        lot.ind_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    const filteredIndlot = indlot.filter((indlots) =>
-        indlots.indl_id_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
-        <div className="bg-white">
+        <div className="h-screen  bg-white">
             <Head>
                 <title>วัตถุดิบทั้งหมด - Softdough</title>
             </Head>
@@ -66,15 +105,14 @@ function All() {
                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
                             <MagnifyingGlassIcon className="h-6 w-6  text-[#C5B182]" />
                         </div>
-                        <input
-                            type="text"
+                        <input type="text"
                             id="simple-search"
                             className="bg-[#FFFFF8] border border-[#C5B182] block w-full ps-10 p-2.5 rounded-full placeholder:text-[#C5B182] focus:outline-none"
-                            placeholder="ค้นหา"
-                            value={searchTerm} // เชื่อมต่อกับ state
-                            onChange={(e) => setSearchTerm(e.target.value)} // อัปเดต searchTerm เมื่อผู้ใช้พิมพ์
-                        />
+                            placeholder="ค้นหา" required ></input>
                     </div>
+                    <button type="submit" className="p-2 ms-2 text-sm  rounded-full text-white bg-[#C5B182] border  hover:bg-[#5E523C]">
+                        ค้นหา
+                    </button>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
                     <Link href="/ingredients/add">
@@ -86,7 +124,7 @@ function All() {
             </div>
             <div className="">
                 <Tab.Group>
-                    <Tab.List className="flex space-x-5  bg-white border-b-1 border-b-[#E3D8BF] mx-5">
+                    <Tab.List className="flex space-x-5  bg-white border-b border-b-1 border-b-[#E3D8BF] mx-5">
                         {allCategories.map((category) => (
                             <Tab
                                 key={category}
@@ -94,7 +132,7 @@ function All() {
                                     classNames(
                                         'w-sreen py-2.5 text-sm focus:outline-none',
                                         selected
-                                            ? 'bg-white  text-[#73664B] border-b-3 border-b-[#73664B] font-medium '
+                                            ? 'bg-white  text-[#73664B] border-b border-b-3 border-b-[#73664B] font-medium '
                                             : 'text-[#73664B] hover:bg-white/[0.12] hover:text-[#D9CAA7]'
                                     )
                                 }
@@ -109,10 +147,10 @@ function All() {
                                 ' bg-white p-4',
                             )}
                         >
-                            <div className="relative max-h-[calc(100vh-250px)] overflow-y-auto">
+                            <div className="relative overflow-x-auto ">
                                 <table className="w-full text-sm text-center">
-                                    <thead className="sticky top-0 bg-[#908362]">
-                                        <tr className="text-white  font-normal ">
+                                    <thead>
+                                        <tr className="text-white  font-normal  bg-[#908362]  ">
                                             <td scope="col" className="px-3 py-3">
                                                 ลำดับ
                                             </td>
@@ -129,6 +167,9 @@ function All() {
                                                 ขั้นต่ำ
                                             </td>
                                             <td scope="col" className="px-6 py-3">
+                                                ขั้นต่ำคำนวณจากการใช้งาน
+                                            </td>
+                                            <td scope="col" className="px-6 py-3">
                                                 สถานะ
                                             </td>
                                             <td scope="col" className="px-6 py-3">
@@ -137,56 +178,43 @@ function All() {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {
-                                            loading ? (
-                                                <tr>
-                                                    <td colSpan={7} className="text-center py-4 text-[#73664B]">
-                                                        <Spinner label="Loading..." color="warning" className="" />
-                                                    </td>
-                                                </tr>
-                                            ) : (
-                                                filteredInd.length > 0 ? (
-                                                    filteredInd.map((ingredients, idx) => (
-                                                        <tr key={ingredients.ind_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                            <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
-                                                                {idx + 1}
-                                                            </td>
-                                                            <td className="px-6 py-1 text-left">
-                                                                {ingredients.ind_name}
-                                                            </td>
-                                                            <td className="px-6 py-1">
-                                                                {ingredients.ind_stock}
-                                                            </td>
-                                                            <td className="px-6 py-1">
-                                                                {ingredients.un_purchased_name}
-                                                            </td>
-                                                            <td className="px-6 py-1">
-                                                                {ingredients.qtyminimum}
-                                                            </td>
-                                                            <td className={`px-6 py-1 
+                                        {Array.isArray(ind) && ind.map((ingredients, idx) => (
+                                            <tr key={ingredients.ind_id} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
+                                                    {idx + 1}
+                                                </td>
+                                                <td className="px-6 py-1 text-left">
+                                                    {ingredients.ind_name}
+                                                </td>
+                                                <td className="px-6 py-1">
+                                                    {ingredients.ind_stock}
+                                                </td>
+                                                <td className="px-6 py-1">
+                                                    {ingredients.un_purchased_name}
+                                                </td>
+                                                <td className="px-6 py-1">
+                                                    {ingredients.qtyminimum}
+                                                </td>
+                                                 <td className="px-6 py-1">
+                                                    {ingredients.MinimumqtyStock}
+                                                </td>
+                                                <td className={`px-6 py-1 
                                                     ${ingredients.status === '2' ? 'text-green-500'
-                                                                    : ingredients.status === '1' ? 'text-red-500'
-                                                                        : ingredients.status === '0' ? 'text-red-500' : ''}`}>
-                                                                {ingredients.status === '1' ? 'ซื้อเพิ่ม' : ingredients.status === '2' ? 'ปกติ' : ingredients.status === '0' ? 'ไม่มี' : ingredients.status}
+                                                        : ingredients.status === '1' ? 'text-red-500'
+                                                            : ingredients.status === '0' ? 'text-red-500' : ''}`}>
+                                                    {ingredients.status === '1' ? 'ซื้อเพิ่ม' : ingredients.status === '2' ? 'ปกติ' : ingredients.status === '0' ? 'ไม่มี' : ingredients.status}
 
-                                                            </td>
-                                                            <td className="px-6 py-4 flex items-center justify-center  ">
-                                                                <button type="submit" >
-                                                                    <Link href={`./${ingredients.ind_id}`} className="w-full flex justify-center items-center">
-                                                                        <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
-                                                                    </Link>
-                                                                </button>
+                                                </td>
+                                                <td className="px-6 py-4 flex items-center justify-center  ">
+                                                    <button type="submit" >
+                                                        <Link href={`./${ingredients.ind_id}`} className="w-full flex justify-center items-center">
+                                                            <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
+                                                        </Link>
+                                                    </button>
 
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                ) : (
-                                                    <tr>
-                                                        <td colSpan={7} className="text-center py-4 text-[#73664B]">
-                                                            ไม่มีข้อมูล
-                                                        </td>
-                                                    </tr>
-                                                ))}
+                                                </td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
@@ -199,10 +227,10 @@ function All() {
                         >
                             {/* // เลย์เอาท์สำหรับ Tab ที่ 2 */}
                             <div className="second-tab-layout">
-                                <div className="relative max-h-[calc(100vh-250px)] overflow-y-auto">
+                                <div className="relative overflow-x-auto ">
                                     <table className="w-full text-sm text-center ">
-                                        <thead className="sticky top-0 bg-[#908362]">
-                                            <tr className="text-white font-normal">
+                                        <thead>
+                                            <tr className="text-white  font-normal  bg-[#908362]  ">
                                                 <td scope="col" className="px-6 py-3">
                                                     ล็อตวัตถุดิบ
                                                 </td>
@@ -222,43 +250,28 @@ function All() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {
-                                                loading ? (
-                                                    <tr>
-                                                        <td colSpan={5} className="text-center py-4 text-[#73664B]">
-                                                            <Spinner label="Loading..." color="warning" className="" />
-                                                        </td>
-                                                    </tr>
-                                                ) : (
-                                                    filteredIndlot.length > 0 ? (
-                                                        filteredIndlot.map((ingredients, idx) => (
-                                                            <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
-                                                                <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
-                                                                    {ingredients.indl_id_name}</td>
-                                                                <td className="px-6 py-1 text-left">{ingredients.ind_name}
-                                                                </td>
-                                                                <td className="px-6 py-1">{ingredients.stock_quantity}
-                                                                </td>
+                                            {Array.isArray(indlot) && indlot.map((ingredients, idx) => (
+                                                <tr key={idx} className="odd:bg-white  even:bg-[#F5F1E8] border-b h-10">
+                                                    <td scope="row" className="px-6 py-1  text-gray-900 whitespace-nowrap dark:text-white">
+                                                        {ingredients.indl_id_name}</td>
+                                                    <td className="px-6 py-1 text-left">{ingredients.ind_name}
+                                                    </td>
+                                                    <td className="px-6 py-1">{ingredients.stock_quantity}
+                                                    </td>
 
-                                                                <td className="px-6 py-1">{ingredients.date_exp}
-                                                                </td>
+                                                    <td className="px-6 py-1">{ingredients.date_exp}
+                                                    </td>
 
-                                                                <td className="px-6 py-4 flex items-center justify-center  ">
-                                                                    <button type="submit" >
-                                                                        <Link href='#' className="w-full flex justify-center items-center">
-                                                                            <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
-                                                                        </Link>
-                                                                    </button>
+                                                    <td className="px-6 py-4 flex items-center justify-center  ">
+                                                        <button type="submit" >
+                                                            <Link href='#' className="w-full flex justify-center items-center">
+                                                                <MagnifyingGlassIcon className="h-4 w-4 text-[#C5B182] " />
+                                                            </Link>
+                                                        </button>
 
-                                                                </td>
-                                                            </tr>
-                                                        ))) : (
-                                                        <tr>
-                                                            <td colSpan={5} className="text-center py-4 text-[#73664B]">
-                                                                ไม่มีข้อมูล
-                                                            </td>
-                                                        </tr>
-                                                    ))}
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
