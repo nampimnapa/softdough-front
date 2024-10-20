@@ -137,22 +137,22 @@ function Pos() {
     }
 
     interface SelectEdit {
-            sm_id: number;
-            sm_name: string;
-            sm_price: number;
-            status: string;
-            fix: string;
-            picture: string;
-            smt_id: number;
-            smt_name: string;
-            qty_per_unit: number;
-            mixItems: MixItem[];
+        sm_id: number;
+        sm_name: string;
+        sm_price: number;
+        status: string;
+        fix: string;
+        picture: string;
+        smt_id: number;
+        smt_name: string;
+        qty_per_unit: number;
+        mixItems: MixItem[];
     }
 
     interface MixItem {
-            pd_id: number,
-            pd_name: string,
-            quantity: number
+        pd_id: number,
+        pd_name: string,
+        quantity: number
     }
 
     const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
@@ -186,8 +186,8 @@ function Pos() {
             setSelectedFreeId(null);
             closeModal();
             closeModalmix();
-            // console.log(selectedItems)
-            // console.log(smfreeIdNameMap)
+            console.log(selectedPdIds)
+            console.log(quantities)
         }
     };
 
@@ -390,7 +390,8 @@ function Pos() {
     const [isOpenmix, setIsOpenmix] = useState(false);
     const closeModalmix = () => {
         setIsOpenmix(false);
-
+        setIsOpenEditMix(false);
+        setSelectedPdIdEdit([]);
         setSelectedPdIds([]);
         setQuantities({});
         setQuantity(1);
@@ -807,20 +808,31 @@ function Pos() {
     const [editProduct, setEditProduct] = useState<SelectEdit | null>();
     const [freeItemIdEdit, setFreeItemIdEdit] = useState(null)
     const [indexEdit, setIndexEdit] = useState(null)
-    const openModalsEdit = (selectedid:any) => {
-        // const freeItemIdEdit = getFreeItemNames(selectedItems[selectedid].sm_id || 0);
+    const [selectedPdIdEdit, setSelectedPdIdEdit] = useState([]);
+    const openModalsEdit = (selectedid: any) => {
         setFreeItemIdEdit(getFreeItemNames(selectedItems[selectedid].sm_id || 0))
         setEditProduct(selectedItems[selectedid])
         setQuantityEdit(selectedItems[selectedid].quantity)
         setSelectedFreeIdEdit(selectedItems[selectedid].id)
+        const pdIds = selectedItems[selectedid].mixItems.map(item => item.pd_id) || [];
+        const QpdIds = selectedItems[selectedid].mixItems.reduce((acc, item) => {
+            acc[item.pd_id] = item.quantity;
+            return acc;
+        }, {});
+        setQuantitiesEdit(QpdIds);
+        setSelectedPdIdEdit(pdIds);
         setIndexEdit(selectedid);
-        if(selectedItems[selectedid].fix == "1"){
+        if (selectedItems[selectedid].fix == "1") {
             setIsOpenEdit(true);
-        }else if(selectedItems[selectedid].fix == "2"){
+        } else if (selectedItems[selectedid].fix == "2" && pdIds) {
+            // const pdIds = selectedItems[selectedid].mixItems.map(item => item.pd_id);
+            console.log(quantitiesEdit)
 
+            // setSelectedPdIdEdit(pdIds);
+            setIsOpenEditMix(true);
         }
-        
-        
+
+
         console.log(selectedItems[selectedid])
     }
 
@@ -840,7 +852,7 @@ function Pos() {
     };
 
     const updateItemAtIndex = (array, index, newValues) => {
-        return array.map((item, i) => 
+        return array.map((item, i) =>
             i === index ? { ...item, ...newValues } : item
         );
     };
@@ -851,40 +863,114 @@ function Pos() {
             const updatedItems = updateItemAtIndex(selectedItems, indexEdit, {
                 ...editProduct,
                 quantity: quantityEdit,
-                id: selectedFreeIdEdit
+                id: selectedFreeIdEdit,
+                mixItems: editProduct.fix === "2" ? selectedPdIdEdit.map(id => {
+                    const item = Mix.find(m => m.pd_id === id);
+                    return {
+                        pd_id: id,
+                        pd_name: item ? item.pd_name : 'Unknown',
+                        quantity: quantitiesEdit[id] || 1
+                    };
+                }) : []
             });
+            // const newItem = {
+            //     ...editProduct,
+            //     quantity: quantityEdit,
+            //     id: selectedFreeIdEdit,
+            //     mixItems: editProduct.fix === "2" ? selectedPdIdEdit.map(id => {
+            //         const item = Mix.find(m => m.pd_id === id);
+            //         return {
+            //             pd_id: id,
+            //             pd_name: item ? item.pd_name : 'Unknown',
+            //             quantity: quantitiesEdit[id] || 1
+            //         };
+            //     }) : []
+            // };
             setSelectedItems(updatedItems);
             setIsOpenEdit(false); // ปิด modal
+            setIsOpenEditMix(false); // ปิด modal
             // รีเซ็ตค่าต่างๆ
             setEditProduct(null);
             setIndexEdit(null);
             setQuantityEdit(1);
             setSelectedFreeIdEdit(null);
+
         }
     };
 
+    const handleCheckboxChangeEdit = (pd_id: number) => {
+        if (selectedPdIdEdit.includes(pd_id)) {
+            // If already selected, remove it from the list
+            const newSelectedIds = selectedPdIdEdit.filter(id => id !== pd_id);
+            setSelectedPdIdEdit(newSelectedIds);
 
-    const test = 
-        {
-            "sm_id": 5,
-            "sm_name": "ออริจินอล M",
-            "sm_price": 80,
-            "status": "c",
-            "fix": "1",
-            "picture": "images/logo.svg",
-            "smt_id": 1,
-            "smt_name": "กล่อง M",
-            "qty_per_unit": 4,
-            "quantity": 1,
-            "id": "3",
-            "mixItems": []
+            // Remove the quantity entry for this pd_id
+            const { [pd_id]: _, ...rest } = quantitiesEdit; // Remove the entry from quantities
+            setQuantitiesEdit(rest);
+        } else {
+            // Check if adding this item would exceed the limit
+            const currentTotal = Object.values(quantitiesEdit).reduce((acc, qty) => acc + qty, 0);
+            if (currentTotal < editProduct.qty_per_unit) {
+                setSelectedPdIdEdit([...selectedPdIdEdit, pd_id]);
+                setQuantitiesEdit({ ...quantitiesEdit, [pd_id]: 1 }); // Initialize with quantity 1
+            }
         }
-    
+    };
+
+    const [quantitiesEdit, setQuantitiesEdit] = useState<{ [key: number]: number }>({});
+    const getTotalSelectedItemsEdit = () => {
+        return selectedPdIdEdit.reduce((total, id) => total + (quantitiesEdit[id] || 1), 0);
+    };
+
+    // Functions to increment and decrement quantity
+    const incrementQuantitymixEdit = (pd_id: number) => {
+        const currentTotal = getTotalSelectedItemsEdit();
+        if (currentTotal < editProduct.qty_per_unit) {
+            setQuantitiesEdit({
+                ...quantitiesEdit,
+                [pd_id]: (quantitiesEdit[pd_id] || 1) + 1,
+            });
+        }
+    };
+
+    const decrementQuantitymixEdit = (pd_id: number) => {
+        if (quantitiesEdit[pd_id] > 1) {
+            setQuantitiesEdit({
+                ...quantitiesEdit,
+                [pd_id]: quantitiesEdit[pd_id] - 1,
+            });
+        } else {
+            // ถ้าจำนวนเหลือ 1 และกดลบ ให้นำรายการออกจากการเลือก
+            const newSelectedPdIds = selectedPdIds.filter(id => id !== pd_id);
+            setSelectedPdIds(newSelectedPdIds);
+
+            // ลบข้อมูลจำนวนของรายการนี้ออก
+            const { [pd_id]: _, ...restQuantities } = quantitiesEdit;
+            setQuantitiesEdit(restQuantities);
+        }
+    };
+
+    const test =
+    {
+        "sm_id": 5,
+        "sm_name": "ออริจินอล M",
+        "sm_price": 80,
+        "status": "c",
+        "fix": "1",
+        "picture": "images/logo.svg",
+        "smt_id": 1,
+        "smt_name": "กล่อง M",
+        "qty_per_unit": 4,
+        "quantity": 1,
+        "id": "3",
+        "mixItems": []
+    }
+
 
 
     return (
-        <div className={kanit.className}>
-            <div className="flex flex-col  h-screen">
+        <div className={`${kanit.className} max-h-[calc(100vh-50px)]`}>
+            <div className="flex flex-col ">
                 {/* nav ส่วนบน */}
                 <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1">
                     <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -911,9 +997,9 @@ function Pos() {
                     </div>
                 </nav>
 
-                <main className="flex flex-grow bg-white w-full overflow-hidden">
+                <main className="flex flex-grow bg-white">
                     {/* Left Content */}
-                    <div className="flex-grow overflow-y-auto p-4">
+                    <div className="flex-grow overflow-y-auto pl-4 pt-4">
                         {/* Content that can scroll independently */}
                         <div>
                             <p className='text-[#F2B461] font-medium m-1'>ทำรายการขาย</p>
@@ -956,10 +1042,10 @@ function Pos() {
                                                 </div>
                                             }
                                         >
-                                            <div className="second-tab-layout mx-1">
+                                            <div className="second-tab-layout mx-1  max-h-[calc(100vh-225px)] overflow-y-auto">
                                                 <div className="relative overflow-x-auto ">
                                                     {statusLoading ? (
-                                                        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-5 lg:grid-cols-3 2xl:grid-cols-7 gap-4">
                                                             {Sale && Sale.length > 0 ? (
                                                                 Sale.map((sale, index) => (
                                                                     <Card key={index}
@@ -978,7 +1064,7 @@ function Pos() {
                                                                         </CardBody>
                                                                         <CardFooter className="text-small justify-between">
                                                                             <p className='text-[#73664B]'>{sale.sm_name}</p>
-                                                                            <p className="text-[#F2B461]">{getPriceBasedOnDelivery(sale)} บาท</p>
+                                                                            <p className="text-[#F2B461]">{getPriceBasedOnDelivery(sale)}</p>
                                                                         </CardFooter>
                                                                     </Card>
 
@@ -1094,7 +1180,7 @@ function Pos() {
                     </div>
 
                     {/* Right Order Panel */}
-                    <div className="relative w-screen max-w-sm h-full overflow-hidden border-l-1">
+                    <div className="relative w-screen max-w-sm h-[calc(100vh-60px)] overflow-hidden border-l-1">
                         <div className="pointer-events-auto h-full w-full transform transition duration-500 ease-in-out bg-white shadow-xl flex flex-col">
                             {/* ส่วนหัว */}
                             <div className="px-4 py-4 sm:px-6">
@@ -1124,18 +1210,13 @@ function Pos() {
                                     {selectedItems.map((product, index) => (
                                         <li key={index} className="py-6 flex">
                                             <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 flex justify-center items-center">
-                                                {/* <Image
-                                                    alt={product.sm_name}
-                                                    src={product.picture}
-                                                    className="h-full w-full object-cover object-center"
-                                                /> */}
                                                 <p className='text-[#F2B461]'>{product.quantity}x</p>
                                             </div>
                                             <div className="ml-4 flex flex-1 flex-col">
                                                 <div>
                                                     <div className="flex justify-between text-base font-medium text-[#73664B]">
                                                         <h3>{product.sm_name}</h3>
-                                                        <p className="ml-4">{product.sm_price * product.quantity} บาท</p>
+                                                        <p className="ml-4">{(product.sm_price * product.quantity).toFixed(2)} บาท</p>
                                                     </div>
                                                     {product.id && smfreeIdNameMap.get(parseInt(product.id)) && (
                                                         <p className="mt-1 text-sm font-light ">
@@ -1256,18 +1337,33 @@ function Pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between" key={index + "select"}>
-
-                                                                <div key={index}>
-                                                                    <p>{product.quantity} {product.sm_name}</p>
-                                                                    <p className="text-sm text-gray-500">{product.id !== null
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
-                                                                        : ''
-                                                                    }</p>
+                                                            <li key={index} className="flex">
+                                                                <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 flex justify-center items-center">
+                                                                    <p className='text-[#F2B461] text-xs'>{product.quantity}x</p>
                                                                 </div>
-                                                                <p className="font-medium">{product.sm_price * product.quantity}</p>
-
-                                                            </div>
+                                                                <div className="ml-4 flex flex-1 flex-col">
+                                                                    <div>
+                                                                        <div className="flex justify-between text-base font-medium">
+                                                                            <h3 className='text-black'>{product.sm_name}</h3>
+                                                                            <p className="ml-4 text-black">{(product.sm_price * product.quantity).toFixed(2)} บาท</p>
+                                                                        </div>
+                                                                        {product.id && smfreeIdNameMap.get(parseInt(product.id)) && (
+                                                                            <p className="mt-1 text-sm font-light ">
+                                                                                x {smfreeIdNameMap.get(parseInt(product.id))}
+                                                                            </p>
+                                                                        )}
+                                                                        {product.mixItems && product.mixItems.length > 0 && (
+                                                                            <div className="mt-1 text-sm font-light ">
+                                                                                <ul className="list-disc list-inside pl-2">
+                                                                                    {product.mixItems.map((item, idx) => (
+                                                                                        <li key={idx}>{item.pd_name} x{item.quantity}</li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </li>
                                                         ))}
 
                                                     </div>
@@ -1415,19 +1511,33 @@ function Pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between" key={index + "selectItem"}>
-
-                                                                <div key={index}>
-                                                                    <p>{product.quantity} {product.sm_name}</p>
-                                                                    <p className="text-sm text-gray-500">{product.id !== null
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
-                                                                        : ''
-                                                                    }</p>
-
+                                                            <li key={index} className="flex">
+                                                                <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 flex justify-center items-center">
+                                                                    <p className='text-[#F2B461] text-xs'>{product.quantity}x</p>
                                                                 </div>
-                                                                <p className="font-medium">{product.sm_price * product.quantity}</p>
-
-                                                            </div>
+                                                                <div className="ml-4 flex flex-1 flex-col">
+                                                                    <div>
+                                                                        <div className="flex justify-between text-base font-medium">
+                                                                            <h3 className='text-black'>{product.sm_name}</h3>
+                                                                            <p className="ml-4 text-black">{(product.sm_price * product.quantity).toFixed(2)} บาท</p>
+                                                                        </div>
+                                                                        {product.id && smfreeIdNameMap.get(parseInt(product.id)) && (
+                                                                            <p className="mt-1 text-sm font-light ">
+                                                                                x {smfreeIdNameMap.get(parseInt(product.id))}
+                                                                            </p>
+                                                                        )}
+                                                                        {product.mixItems && product.mixItems.length > 0 && (
+                                                                            <div className="mt-1 text-sm font-light ">
+                                                                                <ul className="list-disc list-inside pl-2">
+                                                                                    {product.mixItems.map((item, idx) => (
+                                                                                        <li key={idx}>{item.pd_name} x{item.quantity}</li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </li>
                                                         ))}
 
                                                     </div>
@@ -2013,6 +2123,231 @@ function Pos() {
                             </Dialog>
                         </Transition>
                     )}
+                </>
+            </div>
+
+            <div className="w-1/2  mt-10  flex justify-start ">
+                <>
+                    {isOpenEditMix && (
+                        <Transition appear show={isOpenEditMix} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-black/25" />
+                                </Transition.Child>
+
+                                <div className="fixed inset-0 overflow-y-auto">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 scale-95"
+                                            enterTo="opacity-100 scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 scale-100"
+                                            leaveTo="opacity-0 scale-95"
+                                        >
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                                <div>
+                                                    {editProduct && (
+                                                        <Card shadow="sm">
+                                                            <CardBody className="overflow-visible p-0">
+                                                                <Image
+                                                                    alt={'/default-image.png'}
+                                                                    shadow="sm"
+                                                                    width={448}
+                                                                    src={editProduct.picture || '/default-image.png'}  // Fallback if picture is missing
+                                                                    className="object-cover h-[140px]"
+                                                                />
+                                                            </CardBody>
+                                                        </Card>
+                                                    )}
+
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-lg font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
+                                                    >
+                                                        <p>{editProduct.sm_name}</p>
+                                                        <p className="text-[#F2B461]">ราคา {editProduct.sm_price != null ? editProduct.sm_price : 'N/A'}฿</p>
+                                                    </Dialog.Title>
+                                                    <div className='p-4'>
+                                                        {editProduct && (
+                                                            <div className='flex justify-between items-center'>
+                                                                <div>
+                                                                    <p className="text-lg font-medium">
+                                                                        สินค้า
+                                                                    </p>
+                                                                    <p className='text-sm text-[#73664B] font-normal'>กรุณาเลือก {editProduct.qty_per_unit} รายการ</p>
+                                                                </div>
+                                                                <div>
+                                                                    <Chip size="sm">{getTotalSelectedItemsEdit()}/{editProduct.qty_per_unit}</Chip>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        <div className="flex flex-col gap-1 w-full max-h-80 overflow-y-auto">
+                                                            {Mix.length > 0 ? (
+                                                                Mix.map(id => (
+                                                                    <Checkbox
+                                                                        key={id.pd_id}
+                                                                        aria-label={id.pd_name}
+                                                                        classNames={{
+                                                                            base: cn(
+                                                                                "inline-flex max-w-md w-full bg-content1 m-0",
+                                                                                "hover:bg-content2 items-center justify-start",
+                                                                                "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                "data-[selected=true]:border-primary"
+                                                                            ),
+                                                                            label: "w-full",
+                                                                        }}
+                                                                        isDisabled={
+                                                                            editProduct &&
+                                                                            !selectedPdIdEdit.includes(id.pd_id) &&
+                                                                            getTotalSelectedItemsEdit() >= editProduct.qty_per_unit
+                                                                        }
+                                                                        checked={selectedPdIdEdit.includes(id.pd_id)}
+                                                                        isSelected={selectedPdIdEdit.includes(id.pd_id)}
+                                                                        onChange={() => handleCheckboxChangeEdit(id.pd_id)}
+                                                                    >
+                                                                        <div className="w-full flex justify-between gap-2">
+                                                                            <User
+                                                                                avatarProps={{ size: "md", src: id.picture }}
+                                                                                description={id.pdc_name}
+                                                                                name={id.pd_name || 'No Name Available'}
+                                                                            />
+                                                                            <div className="flex flex-col items-end gap-1">
+                                                                                {selectedPdIdEdit.includes(id.pd_id) && (
+                                                                                    <>
+                                                                                        <div className="flex items-center mt-2">
+                                                                                            <button
+                                                                                                onClick={() => decrementQuantitymixEdit(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={quantitiesEdit[id.pd_id] <= 1}
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                            <span className="w-4 text-center mx-2">{quantitiesEdit[id.pd_id] || 1}</span>
+                                                                                            <button
+                                                                                                onClick={() => incrementQuantitymixEdit(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={getTotalSelectedItemsEdit() >= editProduct.qty_per_unit}
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </Checkbox>
+                                                                ))
+                                                            ) : (
+                                                                <p>ไม่มีรายการสินค้า</p>
+                                                            )}
+                                                        </div>
+
+                                                        <div>
+                                                            <p className="text-lg font-medium mt-2">จำนวน</p>
+
+                                                            <div className='flex items-center justify-center mt-2 w-full'>
+                                                                <button
+                                                                    onClick={decrementQuantityEdit}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+                                                                    disabled={quantity == 1}
+                                                                >
+                                                                    <svg
+                                                                        className="text-[#73664B]"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="1em"
+                                                                        height="1em"
+                                                                        viewBox="0 0 256 256"
+                                                                    >
+                                                                        <path
+                                                                            fill="currentColor"
+                                                                            d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </button>
+                                                                <span className="w-10 text-center mx-2 text-lg">{quantityEdit}</span>
+                                                                <button
+                                                                    onClick={incrementQuantityEdit}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+
+                                                                >
+                                                                    <svg
+                                                                        className="text-[#73664B]"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="1em"
+                                                                        height="1em"
+                                                                        viewBox="0 0 256 256"
+                                                                    >
+                                                                        <path
+                                                                            fill="currentColor"
+                                                                            d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/*  choose */}
+                                                    <div className="flex justify-end p-4 w-full">
+                                                        <div className="inline-flex justify-end w-full">
+                                                            <button
+                                                                type="button"
+                                                                className="bg-gray-200 inline-flex justify-center rounded-md border border-transparent w-1/2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={closeModalmix}
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+                                                            <div className='mx-1'></div>
+                                                            <button
+                                                                type="button"
+                                                                className={`${getTotalSelectedItemsEdit() !== editProduct.qty_per_unit ? ('bg-[#c9c9c9] ') : ('bg-[#C5B182] hover:bg-[#A89362]')} text-white inline-flex justify-center rounded-md border border-transparent w-1/2 px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
+                                                                onClick={submitEdit}
+                                                                disabled={getTotalSelectedItemsEdit() !== editProduct.qty_per_unit}
+                                                            >
+                                                                เพิ่มลงตะกร้า</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                    )
+                    }
                 </>
             </div>
         </div >
