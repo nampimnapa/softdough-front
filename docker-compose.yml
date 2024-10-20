@@ -1,7 +1,7 @@
 version: '3'
 services:
-  softdough-front:
-    container_name: softdough-front
+  softdough-front-end:
+    container_name: softdough-front-end
     restart: always
     build: .
     ports:
