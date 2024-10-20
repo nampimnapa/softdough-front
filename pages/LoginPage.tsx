@@ -62,7 +62,7 @@ const LoginPage = () => {
           router.push('/expenses/add');
           break;
         case data.message.includes('production'):
-          router.push('/production/dashboard');
+          router.push('/staffpro/addusedind');
           break;
         case data.message.includes('order'):
           router.push('/staffsell/test');

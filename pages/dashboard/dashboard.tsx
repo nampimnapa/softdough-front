@@ -73,7 +73,7 @@ const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/readalldash?month=${selectedMonth}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dash/readalldash?month=${selectedMonth}`);
         const result = await response.json();
         setData(result || []);
 
@@ -176,7 +176,7 @@ const Home = () => {
                 />
               </div>
 
-              {/* ส่งวันที่ไปที่ CostChart */}
+             {/* ส่งวันที่ไปที่ CostChart */}
               <OrderChart startDate={startDate1} endDate={endDate1} /> {/* Cost Breakdown Chart */}
               <p className='font-medium mb-2'>ยอดขายสินค้าตามประเภทรายการขาย</p>
               <SalesComparisonChart startDate={startDate1} endDate={endDate1} />
@@ -198,3 +198,5 @@ const Home = () => {
 };
 
 export default Home;
+
+

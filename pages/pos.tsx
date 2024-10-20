@@ -693,29 +693,56 @@ function Pos() {
                 body: JSON.stringify(dataOrder),
             });
 
-            // const result = await response.json();
+            const result = await response.json();
             if (response.ok) {
                 console.log("Order created successfully");
                 alert("Order created successfully");
 
-                const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pdf-viewer`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                });
+            const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/pdf-viewer`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
 
-                if (pdfResponse.ok) {
-                    const pdfBlob = await pdfResponse.blob();
-                    const pdfUrl = URL.createObjectURL(pdfBlob);
-                    window.open(pdfUrl, '_blank');
-                    console.log('PDF Blob:', pdfBlob);
+            if (pdfResponse.ok) {
+                const pdfBlob = await pdfResponse.blob();
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                window.open(pdfUrl, '_blank');
+                console.log('PDF Blob:', pdfBlob);
 
-                } else {
-                    const errorData = await pdfResponse.json();
-                    console.error('Error displaying PDF:', errorData.error);
-                }
+            } else {
+                const errorData = await pdfResponse.json();
+                console.error('Error displaying PDF:', errorData.error);
+            }
+            // if (response.ok) {
+            //     console.log("Order created successfully");
+            //     alert("Order created successfully");
+
+
+            //     // ส่ง request ไปที่ /generate-pdf พร้อมข้อมูล order ที่เพิ่งสร้าง
+            //     const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-pdf`, {
+            //         method: 'POST',
+            //         headers: {
+            //             'Content-Type': 'application/json',
+            //         },
+            //         body: JSON.stringify(dataOrder), // ส่งข้อมูล order เพื่อสร้าง PDF
+            //     });
+
+            //     if (pdfResponse.ok) {
+            //         const pdfBlob = await pdfResponse.blob();
+            //         const pdfUrl = URL.createObjectURL(pdfBlob);
+            //         window.open(pdfUrl, '_blank'); // เปิด PDF ในหน้าต่างใหม่
+            //     } else {
+            //         console.error('Error generating PDF');
+            //     }
+            // } else {
+            //     console.error("Failed to create order");
+            // }
+            
+
+
                 closeModal3
                 closeModal2
             } else {
@@ -1617,87 +1644,87 @@ function Pos() {
                                                             </div>
                                                         )}
                                                         <div className="flex flex-col gap-1 w-full max-h-80 overflow-y-auto">
-                                                                {Mix.length > 0 ? (
-                                                                    Mix.map(id => (
-                                                                        <Checkbox
-                                                                            aria-label={id.pd_name}
-                                                                            classNames={{
-                                                                                base: cn(
-                                                                                    "inline-flex max-w-md w-full bg-content1 m-0",
-                                                                                    "hover:bg-content2 items-center justify-start",
-                                                                                    "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
-                                                                                    "data-[selected=true]:border-primary"
-                                                                                  ),
-                                                                                label: "w-full",
-                                                                            }}
-                                                                            disabled={
-                                                                                selectedSale && // Ensure selectedSale exists before using its properties
-                                                                                quantities[id.pd_id] === undefined &&
-                                                                                Object.values(quantities).reduce((acc, qty) => acc + qty, 0) >= selectedSale.qty_per_unit
-                                                                            }
-                                                                            checked={selectedPdIds.includes(id.pd_id)}
-                                                                            onChange={() => handleCheckboxChange(id.pd_id)}
-                                                                        >
-                                                                            <div className="w-full flex justify-between gap-2">
-                                                                                <User
-                                                                                    avatarProps={{ size: "md", src: id.picture }}
-                                                                                    description={id.pdc_name}
-                                                                                    name={id.pd_name || 'No Name Available'}
-                                                                                />
-                                                                                <div className="flex flex-col items-end gap-1">
-                                                                                    {selectedPdIds.includes(id.pd_id) && (
-                                                                                        <>
-                                                                                            <div className="flex items-center mt-2">
-                                                                                                <button
-                                                                                                    onClick={() => decrementQuantitymix(id.pd_id)}
-                                                                                                    className="btn btn-square bg-[#D9CAA7] btn-xs"
-                                                                                                    disabled={quantities[id.pd_id] <= 1}
+                                                            {Mix.length > 0 ? (
+                                                                Mix.map(id => (
+                                                                    <Checkbox
+                                                                        aria-label={id.pd_name}
+                                                                        classNames={{
+                                                                            base: cn(
+                                                                                "inline-flex max-w-md w-full bg-content1 m-0",
+                                                                                "hover:bg-content2 items-center justify-start",
+                                                                                "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                "data-[selected=true]:border-primary"
+                                                                            ),
+                                                                            label: "w-full",
+                                                                        }}
+                                                                        disabled={
+                                                                            selectedSale && // Ensure selectedSale exists before using its properties
+                                                                            quantities[id.pd_id] === undefined &&
+                                                                            Object.values(quantities).reduce((acc, qty) => acc + qty, 0) >= selectedSale.qty_per_unit
+                                                                        }
+                                                                        checked={selectedPdIds.includes(id.pd_id)}
+                                                                        onChange={() => handleCheckboxChange(id.pd_id)}
+                                                                    >
+                                                                        <div className="w-full flex justify-between gap-2">
+                                                                            <User
+                                                                                avatarProps={{ size: "md", src: id.picture }}
+                                                                                description={id.pdc_name}
+                                                                                name={id.pd_name || 'No Name Available'}
+                                                                            />
+                                                                            <div className="flex flex-col items-end gap-1">
+                                                                                {selectedPdIds.includes(id.pd_id) && (
+                                                                                    <>
+                                                                                        <div className="flex items-center mt-2">
+                                                                                            <button
+                                                                                                onClick={() => decrementQuantitymix(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={quantities[id.pd_id] <= 1}
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
                                                                                                 >
-                                                                                                    <svg
-                                                                                                        className="text-[#73664B]"
-                                                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                                                        width="1em"
-                                                                                                        height="1em"
-                                                                                                        viewBox="0 0 256 256"
-                                                                                                    >
-                                                                                                        <path
-                                                                                                            fill="currentColor"
-                                                                                                            d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
-                                                                                                        />
-                                                                                                    </svg>
-                                                                                                </button>
-                                                                                                <span className="w-4 text-center mx-2">{quantities[id.pd_id] || 1}</span>
-                                                                                                <button
-                                                                                                    onClick={() => incrementQuantitymix(id.pd_id)}
-                                                                                                    className="btn btn-square bg-[#D9CAA7] btn-xs"
-                                                                                                    disabled={
-                                                                                                        selectedSale && // Ensure selectedSale exists before using qty_per_unit
-                                                                                                        (quantities[id.pd_id] || 1) >= selectedSale.qty_per_unit
-                                                                                                    }
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                            <span className="w-4 text-center mx-2">{quantities[id.pd_id] || 1}</span>
+                                                                                            <button
+                                                                                                onClick={() => incrementQuantitymix(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={
+                                                                                                    selectedSale && // Ensure selectedSale exists before using qty_per_unit
+                                                                                                    (quantities[id.pd_id] || 1) >= selectedSale.qty_per_unit
+                                                                                                }
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
                                                                                                 >
-                                                                                                    <svg
-                                                                                                        className="text-[#73664B]"
-                                                                                                        xmlns="http://www.w3.org/2000/svg"
-                                                                                                        width="1em"
-                                                                                                        height="1em"
-                                                                                                        viewBox="0 0 256 256"
-                                                                                                    >
-                                                                                                        <path
-                                                                                                            fill="currentColor"
-                                                                                                            d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
-                                                                                                        />
-                                                                                                    </svg>
-                                                                                                </button>
-                                                                                            </div>
-                                                                                        </>
-                                                                                    )}
-                                                                                </div>
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </>
+                                                                                )}
                                                                             </div>
-                                                                        </Checkbox>
-                                                                    ))
-                                                                ) : (
-                                                                    <p>ไม่มีรายการฟรี</p>
-                                                                )}
+                                                                        </div>
+                                                                    </Checkbox>
+                                                                ))
+                                                            ) : (
+                                                                <p>ไม่มีรายการฟรี</p>
+                                                            )}
                                                         </div>
 
                                                         <div>

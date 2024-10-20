@@ -212,6 +212,56 @@ function Detailproduction() {
         //         setMessage(responseData.message || 'Error occurred');
         //     }
         // }
+        //มี เสีย เกิน
+        // if (detail.pdo_status === '2') {
+        //     const idpdo = `${id}`;
+        //     const pdoStatus = isChecked3 ? 3 : 5;
+
+        //     const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
+
+        //     // Create array of pdod_ids with broken and over values from inputValues
+        //     const pdodDetailList = checkedIds.map(id => ({
+        //         pdod_id: Number(id),
+        //         broken: inputValues[id]?.broken || 0, // Default value for broken
+        //         over: inputValues[id]?.over || 0 ,   // Default value for over
+        //         pdod_stock: detail.qty+inputValues[id]?.over || 0 -inputValues[id]?.broken || 0,
+
+        //     }));
+
+        //     const requestBody = {
+        //         pdod_ids: pdodDetailList, // Array of objects with pdod_id, broken, and over
+        //         pdo_id: idpdo, // Add the pdo_id
+        //         pdo_status: pdoStatus
+        //     };
+
+        //     console.log("console.log(requestBody);", requestBody);
+        //     router.push('/manufacture/listorder');
+
+        //     if (checkedIds.length === 0) {
+        //         setMessage('No items selected');
+        //         return;
+        //     }
+
+        //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
+        //         method: 'PATCH',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //         },
+        //         body: JSON.stringify(requestBody),
+        //     });
+
+        //     const responseData = await response.json();
+        //     console.log(requestBody);
+
+        //     if (responseData.status === 200) {
+        //         setMessage('Data update successfully');
+        //     } else {
+        //         setMessage(responseData.message || 'Error occurred');
+        //     }
+        // }
+        //เพิ่ม stock
+        console.log(",detail.qty", detail)
+        console.log(",detail.qty", detail);
 
         if (detail.pdo_status === '2') {
             const idpdo = `${id}`;
@@ -220,11 +270,32 @@ function Detailproduction() {
             const checkedIds = Object.keys(checkedItems).filter(key => checkedItems[key]);
 
             // Create array of pdod_ids with broken and over values from inputValues
-            const pdodDetailList = checkedIds.map(id => ({
-                pdod_id: Number(id),
-                broken: inputValues[id]?.broken || 0, // Default value for broken
-                over: inputValues[id]?.over || 0    // Default value for over
-            }));
+            const pdodDetailList = checkedIds.map(id => {
+                // Find the matching pdod_id in detail
+                const matchingDetail = detail.pdodetail.find(item => item.pdod_id === Number(id));
+
+                // Use matchingDetail.qty for the current pdod_id
+                const qty = matchingDetail ? matchingDetail.qty : 0;
+
+                const broken = inputValues[id]?.broken || 0; // Default value for broken
+                const over = inputValues[id]?.over || 0; // Default value for over
+                const pdod_stock = (qty + over) - broken; // Calculate pdod_stock correctly
+
+                console.log(pdod_stock, "pdod_stock");
+
+                return {
+                    pdod_id: Number(id),
+                    broken: broken,
+                    over: over,
+                    pdod_stock: pdod_stock
+                };
+            });
+
+            // Ensure there are checked items before proceeding
+            if (checkedIds.length === 0) {
+                setMessage('No items selected');
+                return;
+            }
 
             const requestBody = {
                 pdod_ids: pdodDetailList, // Array of objects with pdod_id, broken, and over
@@ -233,13 +304,8 @@ function Detailproduction() {
             };
 
             console.log("console.log(requestBody);", requestBody);
-            router.push('/manufacture/listorder');
 
-            if (checkedIds.length === 0) {
-                setMessage('No items selected');
-                return;
-            }
-
+            // Sending request
             try {
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/production/updatestatusdetail`, {
                     method: 'PATCH',
@@ -249,25 +315,24 @@ function Detailproduction() {
                     body: JSON.stringify(requestBody),
                 });
 
-                console.log("Request Body:", requestBody);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
+                // Parse response
                 const responseData = await response.json();
-                console.log("Response Data:", responseData);
 
-                if (response.status === 200) {
+                if (response.ok) { // Check if the response status is 200-299
                     setMessage('Data updated successfully');
                 } else {
                     setMessage(responseData.message || 'Error occurred');
                 }
             } catch (error) {
-                console.error("Fetch error:", error);
-                setMessage(`Error: ${error.message}`);
+                console.error('Error:', error);
+                setMessage('An error occurred while updating the data');
             }
+
+            // Navigate to another route
+            router.push('/manufacture/listorder');
         }
+
+
 
     };
 
@@ -373,6 +438,12 @@ function Detailproduction() {
                                                 <td scope="col" className="px-6 py-3">จำนวนผลิตเกิน</td>
                                             </>
                                         )}
+                                        {(detail.pdodetail[0]?.status == '5' || detail.pdodetail[0]?.status == '3') && (
+                                            <>
+                                                <td scope="col" className="px-6 py-3">ผลิตจริง</td>
+                                            </>
+                                        )}
+
                                         <td scope="col" className="px-6 py-3">การผลิต</td>
                                     </tr>
                                 </thead>
@@ -424,6 +495,9 @@ function Detailproduction() {
                                                         />
                                                     )}
                                                 </td>
+                                            )}
+                                            {(pdodetail.status == '3' || pdodetail.status == '5') && (
+                                                <td className="px-6 py-1 h-10">{pdodetail.pdod_stock}</td>
                                             )}
 
                                             {/* Status display */}

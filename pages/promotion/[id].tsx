@@ -147,16 +147,17 @@ const AddPromotion: React.FC = () => {
         });
         return Array.from(unique.values());
     };
-
+console.log("id",id)
+        // console.log('staff',staff)
     return (
         <div className='h-screen'>
             <button className='my-3 mx-5'>
-                <Link href="/promotion/discountall" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
+                <Link href="/promotion/freeall" className="text-sm w-full flex justify-center items-center text-[#F2B461] hover:text-[#D9CAA7]">
                     <ChevronLeftIcon className="h-5 w-5 text-[#F2B461] hover:text-[#D9CAA7]" />
-                    โปรโมชันส่วนลด
+                    โปรโมชันของแถม
                 </Link>
             </button>
-            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>เพิ่มโปรโมชั่นส่วนลด</p>
+            <p className='my-1 mx-6 font-semibold text-[#C5B182] border-b border-[#C5B182] py-2'>รายละเอียดโปรโมชั่นของแถม</p>
             {staff ? (
                 <div className="mt-5">
                     <div className="w-1/2">
@@ -260,13 +261,16 @@ const AddPromotion: React.FC = () => {
                     </Link>
 
                     <div className="w-full flex justify-start">
-                        <Link href={`/promotion/editfree/`}>
+
+                    <Link href={`/promotion/editfree/${id}`}>
                             <Button type="button" className="ml-2 text-white bg-[#F2B461] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2">
-                                แก้ไขใบสั่งผลิต
+                                แก้ไขโปรโมชันของแถม
                             </Button>
                         </Link>
 
                     </div>
+                                    
+
                 </div>
             </div>
         </div >

@@ -342,7 +342,7 @@
 //     // calculate
 
 //     const [isOpenPop, setIsOpenPop] = React.useState(false);
-    
+
 //     const conversionFactors = {
 //         "กรัม": 1,
 //         "กิโลกรัม": 1000,
@@ -379,17 +379,17 @@
 
 //     // const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
 
-    
+
 //     function convert(value, fromUnit, toUnit) {
 //         if (!(fromUnit in conversionFactors) || !(toUnit in conversionFactors)) {
 //             throw new Error('Conversion factor for the provided units is not defined.');
 //         }
-    
+
 //         const fromFactor = conversionFactors[fromUnit];
 //         const toFactor = conversionFactors[toUnit];
 //         return value * (fromFactor / toFactor);
 //     }
-    
+
 //     // ที่เก็บค่ากรอกเข้ามาเพื่อเพิ่มวัตถุดิบ
 //     const [ingredientsFood, setIngredientsFood] = useState({
 //         ind_id: "",
@@ -1025,16 +1025,24 @@
 
 import React, { Fragment, useEffect, useState, ChangeEvent } from "react";
 import Link from "next/link";
-import { ChevronLeftIcon, MagnifyingGlassIcon, PlusIcon, PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { Tabs, Tab, Chip, Select, SelectItem, Spinner, Modal, ModalContent, ModalHeader, ModalBody, useDisclosure } from "@nextui-org/react";
+import {
+    ChevronLeftIcon,
+    MagnifyingGlassIcon,
+    PlusIcon,
+    PencilSquareIcon,
+    TrashIcon
+} from "@heroicons/react/24/outline";
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import Datepicker from "react-tailwindcss-datepicker";
 import { useRouter } from "next/router";
-import { CheckboxGroup, Checkbox, Input, colors, Button, Popover, PopoverTrigger, PopoverContent, SelectItem, Select } from "@nextui-org/react";
+import { CheckboxGroup, Checkbox, Input, colors, Button, Popover, PopoverTrigger, PopoverContent } from "@nextui-org/react";
 import Head from 'next/head'
+import { IoCalculator } from "react-icons/io5";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { IoCalculator } from "react-icons/io5";
+
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -1046,6 +1054,7 @@ function Add() {
     const [addedIngredients, setAddedIngredients] = useState([]);
     const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
     const [isOpen, setIsOpen] = useState(false);
+
     const MySwal = withReactContent(Swal);
     const Toast = MySwal.mixin({
         toast: true,
@@ -1054,12 +1063,11 @@ function Add() {
         timer: 3000,
         timerProgressBar: true,
         didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-          router.push('/ingredients/using/list');
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            router.push('/ingredients/using/list');
         }
-      });
-
+    });
     const handleCheckboxChange = () => {
         setIsChecked(!isChecked); // Toggle checkbox status
     };
@@ -1202,9 +1210,7 @@ function Add() {
     //     setSelectedPdoIdName(value);
 
     // };
-    const filteredUnitOptions = Array.isArray(unitOptions) 
-    ? unitOptions.filter(unit => [3].includes(Number(unit.pdo_status)))
-    : [];
+    const filteredUnitOptions = unitOptions.filter(unit => [3].includes(Number(unit.pdo_status)));
 
     const handleSubmit2 = async () => {
         const ingredientLotDetail = addedIngredients.map((ingredient) => ({
@@ -1241,13 +1247,13 @@ function Add() {
                 Toast.fire({
                     icon: "success",
                     title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้สำเร็จ</p>
-                  });
+                });
             } else {
                 setMessage(responseData.message || 'Error occurred');
                 Toast.fire({
                     icon: "error",
                     title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้ไม่สำเร็จ</p>
-                  });
+                });
             }
         } catch (error) {
             setMessage('Error occurred while submitting data');
@@ -1389,7 +1395,7 @@ function Add() {
     // calculate
 
     const [isOpenPop, setIsOpenPop] = React.useState(false);
-    
+
     const conversionFactors = {
         "กรัม": 1,
         "กิโลกรัม": 1000,
@@ -1426,17 +1432,17 @@ function Add() {
 
     // const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
 
-    
+
     function convert(value, fromUnit, toUnit) {
         if (!(fromUnit in conversionFactors) || !(toUnit in conversionFactors)) {
             throw new Error('Conversion factor for the provided units is not defined.');
         }
-    
+
         const fromFactor = conversionFactors[fromUnit];
         const toFactor = conversionFactors[toUnit];
         return value * (fromFactor / toFactor);
     }
-    
+
     // ที่เก็บค่ากรอกเข้ามาเพื่อเพิ่มวัตถุดิบ
     const [ingredientsFood, setIngredientsFood] = useState({
         ind_id: "",
@@ -1464,12 +1470,12 @@ function Add() {
         })
         )
         console.log(ingredientsOptions.find(unit => unit.ind_id == ingredientsFood.ind_id)?.un_ind_name)
-        console.log(name,'name')
+        console.log(name, 'name')
 
         if (name == "convert_before") {
             const convertedValue = convert(value, convertData.convert_before_type, ingredientsOptions.find(unit => unit.ind_id == ingredientsFood.ind_id)?.un_ind_name);
             setResult(convertedValue.toString());
-            console.log(convertedValue.toString(),'convertedValue.toString()')
+            console.log(convertedValue.toString(), 'convertedValue.toString()')
         } else {
             const convertedValue = convert(convertData.convert_before, value, ingredientsOptions.find(unit => unit.ind_id == ingredientsFood.ind_id)?.un_ind_name);
             setResult(convertedValue.toString());
@@ -1577,22 +1583,16 @@ function Add() {
                                     value={selectedId}
                                     onChange={(e) => setSelectedId(e.target.value)}
                                 >
-                                    {filteredUnitOptions.length > 0 ? (
-                                        filteredUnitOptions
-                                            .sort((a, b) => Number(b.pdo_id) - Number(a.pdo_id))
-                                            .map((unit) => (
-                                                <option key={unit.pdo_id} value={unit.pdo_id}>
-                                                    {unit.pdo_id_name}
-                                                </option>
-                                            ))
-                                    ) : (
-                                        <option disabled value="">
-                                            ไม่มีใบสั่งผลิตที่ใช้ได้
-                                        </option>
-                                    )}
+                                    {filteredUnitOptions
+                                        .sort((a, b) => Number(b.pdo_id) - Number(a.pdo_id))
+                                        .map((unit) => (
+                                            <option key={unit.pdo_id} value={unit.pdo_id}>
+                                                {unit.pdo_id_name}
+                                            </option>
+                                        ))}
                                 </select>
-                            </div>
 
+                            </div>
                         </div>
                         <p className="mt-4 mb-2  text-[#73664B] border-b-1 border-b-[#C5B182]">รายละเอียดวัตถุดิบที่ใช้</p>
 
@@ -1844,95 +1844,95 @@ function Add() {
                                         id="qtyusedgrum"
                                         className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                                     /> */}
-                                     <Input
-                                            isRequired
-                                            type="number"
-                                            label="ปริมาณ"
-                                            size="sm"
-                                            width="100%"
-                                            className=" bg-fourth text-primary"
-                                            color="primary"
-                                            name="qtyusedgrum"
-                                            onChange={handleIngredientsFood}
-                                            value={ingredientsFood.qtyusedgrum == null ? "" : ingredientsFood.qtyusedgrum}
-                                        />
+                                    <Input
+                                        isRequired
+                                        type="number"
+                                        label="ปริมาณ"
+                                        size="sm"
+                                        width="100%"
+                                        className=" bg-fourth text-primary"
+                                        color="primary"
+                                        name="qtyusedgrum"
+                                        onChange={handleIngredientsFood}
+                                        value={ingredientsFood.qtyusedgrum == null ? "" : ingredientsFood.qtyusedgrum}
+                                    />
                                 </div>
 
                                 {/* เครื่องแปลงหน่วย */}
                                 <Popover placement="bottom" isOpen={isOpenPop} onOpenChange={(open) => setIsOpenPop(open)} showArrow offset={10} style={{ fontFamily: 'kanit' }} backdrop="opaque">
-                                            <PopoverTrigger>
-                                                <Button isIconOnly className="ml-2" variant="light" isDisabled={ingredientsFood.ind_id === "" ? true : false}>
-                                                    <IoCalculator className="text-2xl" />
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-[340px]">
-                                                {(titleProps) => (
-                                                    <div className="px-1 py-2 w-full">
-                                                        <p className="text-small font-bold text-foreground" {...titleProps}>
-                                                            เครื่องแปลงหน่วย
-                                                        </p>
-                                                        <div className="mt-2 flex w-full">
-                                                            <Input onChange={handleConvert} size="sm" name="convert_before" label="กรุณากรอกค่า" type="number" className=" bg-fourth text-primary" color="primary" />
-                                                            <Select
-                                                                label="หน่วยแปลง"
-                                                                color="primary"
-                                                                className="max-w-md bg-fourth text-primary ml-2"
-                                                                size="sm"
-                                                                value={convertData.convert_before_type}
-                                                                name="convert_before_type"
-                                                                onChange={handleConvert}
-                                                                defaultSelectedKeys={["ช้อนชา"]}
-                                                            >
-                                                                {UnitDetail.map((item) => (
-                                                                    <SelectItem key={item.name} value={item.name}>{item.name}</SelectItem>
-                                                                ))}
-                                                            </Select>
-                                                        </div>
+                                    <PopoverTrigger>
+                                        <Button isIconOnly className="ml-2" variant="light" isDisabled={ingredientsFood.ind_id === "" ? true : false}>
+                                            <IoCalculator className="text-2xl" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-[340px]">
+                                        {(titleProps) => (
+                                            <div className="px-1 py-2 w-full">
+                                                <p className="text-small font-bold text-foreground" {...titleProps}>
+                                                    เครื่องแปลงหน่วย
+                                                </p>
+                                                <div className="mt-2 flex w-full">
+                                                    <Input onChange={handleConvert} size="sm" name="convert_before" label="กรุณากรอกค่า" type="number" className=" bg-fourth text-primary" color="primary" />
+                                                    <Select
+                                                        label="หน่วยแปลง"
+                                                        color="primary"
+                                                        className="max-w-md bg-fourth text-primary ml-2"
+                                                        size="sm"
+                                                        value={convertData.convert_before_type}
+                                                        name="convert_before_type"
+                                                        onChange={handleConvert}
+                                                        defaultSelectedKeys={["ช้อนชา"]}
+                                                    >
+                                                        {UnitDetail.map((item) => (
+                                                            <SelectItem key={item.name} value={item.name}>{item.name}</SelectItem>
+                                                        ))}
+                                                    </Select>
+                                                </div>
 
-                                                        <div className="mt-2 flex w-full">
-                                                            <Input value={result !== null ? result : "0"} onValueChange={setResult} name="convert_after" size="sm" label="ค่าที่แปลงแล้ว" readOnly type="number" className=" bg-fourth text-primary" color="primary" />
-                                                            <Select
-                                                                label="หน่วยแปลง"
-                                                                color="primary"
-                                                                name="convert_after_type"
-                                                                className="max-w-md bg-fourth text-primary ml-2"
-                                                                size="sm"
-                                                                isDisabled
-                                                                selectedKeys={ingredientsFood.ind_id ? [ingredientsOptions.find(unit => unit.ind_id == ingredientsFood.ind_id)?.un_ind_name] : []}
-                                                            // onChange={handleConvert}
-                                                            >
-                                                                {UnitDetail.map(type => (
-                                                                    <SelectItem key={type.name} value={type.name}>
-                                                                        {type.name}
-                                                                    </SelectItem>
-                                                                ))}
-                                                            </Select>
-                                                        </div>
-                                                        <div className="flex justify-end mt-3">
-                                                            <Button className="bg-[#C5B182] text-white mr-2" onPress={() => setIsOpenPop(false)}>
-                                                                ปิด
-                                                            </Button>
-                                                            <Button className="text-white bg-[#736648]" onClick={() => handleConvertAfter()}>
-                                                                แทนที่
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </PopoverContent>
-                                        </Popover>
+                                                <div className="mt-2 flex w-full">
+                                                    <Input value={result !== null ? result : "0"} onValueChange={setResult} name="convert_after" size="sm" label="ค่าที่แปลงแล้ว" readOnly type="number" className=" bg-fourth text-primary" color="primary" />
+                                                    <Select
+                                                        label="หน่วยแปลง"
+                                                        color="primary"
+                                                        name="convert_after_type"
+                                                        className="max-w-md bg-fourth text-primary ml-2"
+                                                        size="sm"
+                                                        isDisabled
+                                                        selectedKeys={ingredientsFood.ind_id ? [ingredientsOptions.find(unit => unit.ind_id == ingredientsFood.ind_id)?.un_ind_name] : []}
+                                                    // onChange={handleConvert}
+                                                    >
+                                                        {UnitDetail.map(type => (
+                                                            <SelectItem key={type.name} value={type.name}>
+                                                                {type.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </Select>
+                                                </div>
+                                                <div className="flex justify-end mt-3">
+                                                    <Button className="bg-[#C5B182] text-white mr-2" onPress={() => setIsOpenPop(false)}>
+                                                        ปิด
+                                                    </Button>
+                                                    <Button className="text-white bg-[#736648]" onClick={() => handleConvertAfter()}>
+                                                        แทนที่
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </PopoverContent>
+                                </Popover>
 
                                 <Select
-                                        isRequired
-                                        label="หน่วย"
-                                        name="un_id"
-                                        size="sm"
-                                        color="primary"
-                                        className=" bg-fourth text-primary col-span-2"
-                                        isDisabled
-                                        selectedKeys={ingredientsFood.ind_id ? [ingredientsFood.un_id] : []}
-                                    >
-                                        <SelectItem key={ingredientsFood.un_id}>{ingredientsOptions.find(ingreds => ingreds.ind_id == ingredientsFood.ind_id)?.un_ind_name}</SelectItem>
-                                    </Select>
+                                    isRequired
+                                    label="หน่วย"
+                                    name="un_id"
+                                    size="sm"
+                                    color="primary"
+                                    className=" bg-fourth text-primary col-span-2"
+                                    isDisabled
+                                    selectedKeys={ingredientsFood.ind_id ? [ingredientsFood.un_id] : []}
+                                >
+                                    <SelectItem key={ingredientsFood.un_id}>{ingredientsOptions.find(ingreds => ingreds.ind_id == ingredientsFood.ind_id)?.un_ind_name}</SelectItem>
+                                </Select>
 
                                 <div className="scale-75 w-full my-2 flex justify-end">
                                     <Button

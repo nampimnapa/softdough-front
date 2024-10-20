@@ -52,10 +52,27 @@ function Notifications() {
                 <div className="p-4 mx-7">
                     {notifications.length > 0 ? (
                         notifications.map((notification) => (
-                            <div key={notification.id} className="flex justify-between items-center p-4 mb-2 bg-white shadow rounded-md">
+                            <div key={notification.noti_id} className="flex justify-between items-center p-4 mb-2 bg-white shadow rounded-md">
                                 <div>
-                                    <p className="text-[#73664B] font-medium">{notification.ind_name} ใกล้หมดสต็อก</p>
+
+                                    <p className="text-[#73664B] font-medium">
+                                    {notification.ind_id != null ? (
+                                  notification.qty < notification.qtyminimum ? (
+                                    `ถึงจุดต่ำกว่าขั้นต่ำ ${notification.ind_name} ปริมาณ ${notification.qty}/${notification.qtyminimum}`
+                                  ) : (
+                                    `ถึงปริมาณขั้นต่ำ ${notification.ind_name} ปริมาณ ${notification.qty}/${notification.qtyminimum}`
+                                  )
+                                ) : notification.pdod_id != null ? (
+                                  `${notification.podde_pdname} ผลิตในวันที่ ${notification.pcreated_at} กำลังจะหมดอายุในวันที่ ${notification.dateexp}`
+                                ) : notification.indlde_id != null ? (
+                                    `${notification.nameindlot} ล็อต ${notification.indl_id_name} กำลังจะหมดอายุในวันที่ ${notification.indlexp}` 
+                                ) : (
+                                  "ไม่พบข้อมูลการแจ้งเตือน"
+                                )}
+                                        
+                                        </p>
                                     <p className="text-xs text-gray-500">วันที่ {notification.formatted_created_at}</p>
+                                
                                 </div>
                                 <p className="text-xs text-gray-400">{notification.timeAgo}</p>
                             </div>
