@@ -352,17 +352,7 @@ function Pos() {
         return freeItems.map(item => item.smfree_id);
     };
 
-    // const isRadioDisabled = (sm_id) => {
-    //     if (!selectedSale) {
-    //         return true; // If no sale is selected, disable all radios
-    //     }
-
-    //     const freeItemIds = getFreeItemNames(selectedSale.sm_id); // Get free item IDs for the currently selected sale
-
-    //     // Disable if the current sm_id is NOT in the list of free item IDs
-    //     return !freeItemIds.includes(sm_id);
-    // };
-
+   
     const [isOpenmix, setIsOpenmix] = useState(false);
     const closeModalmix = () => {
         setIsOpenmix(false);
