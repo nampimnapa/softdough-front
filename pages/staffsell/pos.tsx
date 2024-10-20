@@ -352,7 +352,6 @@ function Pos() {
         return freeItems.map(item => item.smfree_id);
     };
 
-   
     const [isOpenmix, setIsOpenmix] = useState(false);
     const closeModalmix = () => {
         setIsOpenmix(false);
