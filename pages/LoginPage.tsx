@@ -59,7 +59,7 @@ const LoginPage = () => {
 
       switch (true) {
         case data.message.includes('admin'):
-          router.push('/dashboard/dashboard');
+          router.push('/expenses/add');
           break;
         case data.message.includes('production'):
           router.push('/staffpro/addusedind');
@@ -69,6 +69,7 @@ const LoginPage = () => {
           break;
         default:
           console.warn('Unknown user type');
+          // อาจจะ redirect ไปยังหน้า default หรือแสดงข้อความแจ้งเตือน
       }
 
     } catch (error) {
