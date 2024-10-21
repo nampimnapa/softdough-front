@@ -121,10 +121,11 @@ const Sidebar = ({ children, className }) => {
   // }, []);
 
   useEffect(() => {
-    const socket = io('http://api:8080', {
+    const socket = io('https://api.softdough.co', {
       path: '/socket.io',
       transports: ['websocket'],
       secure: true,
+      withCredentials: true,
       upgrade: true
     });
   
