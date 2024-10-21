@@ -181,31 +181,27 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
 }
 
-interface Staff {
-    ep_id: number;
-    ep_date: string;
-    ept_name: string;
-    ep_note: string;
-    ep_sum_formatted: string;
+interface CirculatingMoney {
+    cm_id: number;
+    change: number;
+    deposit: number;
+    scrap: number;
+    note: string;
+    status: string;
     st_name: string;
-}
-
-interface Ingredients {
-    ept_id: string;
-    ept_name: string;
+    created_at: string;
+    updated_at: string;
 }
 
 function StaffIndex() {
-    const [staff, setStaff] = useState<Staff[]>([]);
+    const [circulatingMoney, setCirculatingMoney] = useState<CirculatingMoney[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
     const [error, setError] = useState<string | null>(null);
-    const [ingredientsOptions, setIngredientsOptions] = useState<Ingredients[]>([]);
-    const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/readall`, {
-            credentials: 'include' // Ensure cookies are sent with the request
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/current`, {
+            credentials: 'include'
         })
             .then(response => {
                 if (!response.ok) {
@@ -214,15 +210,11 @@ function StaffIndex() {
                 return response.json();
             })
             .then(data => {
-                setStaff(data);
+                const dataArray = Array.isArray(data) ? data : [data];
+                setCirculatingMoney(dataArray);
                 setLoading(false);
 
-                // Extract unique ingredient options from the staff data
-                const uniqueIngredients: Ingredients[] = Array.from(new Set(data.map((item: Staff) => item.ept_name))).map(name => ({
-                    ept_id: name as string,
-                    ept_name: name as string
-                }));
-                setIngredientsOptions(uniqueIngredients);
+                setLoading(false);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -231,13 +223,15 @@ function StaffIndex() {
             });
     }, []);
 
-    const getSelectedNames = () => {
-        return Array.from(selectedKeys).join(", ");
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('th-TH', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
     };
 
-    const filteredStaff = staff.filter(staffItem =>
-        selectedKeys.size === 0 || selectedKeys.has(staffItem.ept_name)
-    );
 
     return (
         <div className="h-screen bg-white">
@@ -261,65 +255,37 @@ function StaffIndex() {
                     <span className="sr-only">Search</span>
                 </button>
             </form>
-
-            {/* <div className="flex w-full max-w-xs flex-col gap-2">
-                <div className="flex items-center gap-2">
-                    <Select
-                        selectionMode="multiple"
-                        placeholder="Select an ingredient"
-                        selectedKeys={selectedKeys}
-                        className="max-w-xs custom-select"
-                        onSelectionChange={(keys) => {
-                            const stringKeys = new Set(Array.from(keys).map(String));
-                            setSelectedKeys(stringKeys);
-                        }}
-                    >
-                        {ingredientsOptions.map((ingredient) => (
-                            <SelectItem key={ingredient.ept_id} value={ingredient.ept_id}>
-                                {ingredient.ept_name}
-                            </SelectItem>
-                        ))}
-                    </Select>
-
-                    <div className="text-small text-default-500">
-                        Selected: {getSelectedNames()}
-                    </div>
-                </div>
-            </div> */}
-            
-
-
             <div className="mt-2 p-4">
                 <div className="relative overflow-x-auto">
-                    
+
                     {!loading && !error && (
                         <table className="w-full text-sm text-center text-gray-500">
                             <thead>
                                 <tr className="text-white font-normal bg-[#908362]">
                                     <td scope="col" className="px-6 py-3">วัน/เดือน/ปี</td>
-                                    <td scope="col" className="px-6 py-3">ยอดเงินฝาก</td>
-                                    <td scope="col" className="px-6 py-3">รายละเอียด</td>
-                                    <td scope="col" className="px-6 py-3">จำนวนเงิน</td>
+                                    <td scope="col" className="px-6 py-3">เงินทอนตั้งต้น</td>
+                                    <td scope="col" className="px-6 py-3">ยอดเงินเข้าธนาคาร</td>
+                                    <td scope="col" className="px-6 py-3">เงินสดที่ไม่เข้าธนาคาร</td>
                                     <td scope="col" className="px-6 py-3">พนักงาน</td>
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredStaff.map((staffItem, idx) => (
-                                    <tr key={staffItem.ep_id} className={classNames(idx % 2 === 0 ? 'bg-[#F5F1E8]' : 'bg-white', 'border-b h-10', 'text-[#73664B]')}>
+                                {circulatingMoney.map((item, index) => (
+                                    <tr key={item.cm_id} className={classNames(index % 2 === 0 ? 'bg-[#F5F1E8]' : 'bg-white', 'border-b h-10', 'text-[#73664B]')}>
                                         <td scope="row" className="px-6 py-1">
-                                            {/* {staffItem.ep_date} */}
+                                            {formatDate(item.created_at)} </td>
+                                        <td className="px-6 py-1">
+                                            {item.change}
                                         </td>
                                         <td className="px-6 py-1">
-                                            {/* {staffItem.ept_name} */}
+                                            {item.deposit}
                                         </td>
                                         <td className="px-6 py-1">
-                                            {/* {staffItem.ep_note} */}
+                                            {item.scrap}
+
                                         </td>
                                         <td className="px-6 py-1">
-                                            {/* {staffItem.ep_sum_formatted} */}
-                                        </td>
-                                        <td className="px-6 py-1">
-                                            {/* {staffItem.st_name} */}
+                                            {item.st_name}
                                         </td>
                                     </tr>
                                 ))}
@@ -328,12 +294,12 @@ function StaffIndex() {
                     )}
                     {loading && <p className="text-center text-sm text-[#73664B] py-3">Loading...</p>}
                     {error && <p className="text-center text-sm py-3 text-red-500">{error}</p>}
-                    {!loading && !error && filteredStaff.length === 0 && (
+                    {!loading && !error && circulatingMoney.length === 0 &&  (
                         <p className="text-center text-sm text-[#73664B] py-3">ไม่มีรายการจ่าย</p>
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 

@@ -582,7 +582,7 @@ const Sidebar = ({ children, className }) => {
 
       <div className="flex flex-col w-screen bg-red">
         {/* nav ส่วนบน */}
-        <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1 border-l-0 border-t-0 border-r-0">
+        <nav className="bg-white border-gray-200  w-full border border-b-[#C5B182] border-b-1 border-l-0 border-t-0 border-r-0">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto lg:p-4 md:p-0 ">
 
             {/* web name */}
