@@ -121,13 +121,13 @@ const Sidebar = ({ children, className }) => {
   // }, []);
 
   useEffect(() => {
-    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      path: '/socket.io',
+    const socket = io('https://api.softdough.co', {
+      path: '/socket.io',  // Ensure this matches the Nginx config
       transports: ['websocket'],
-      upgrade: false,
-      forceNew: true,
-      query: { userId: localStorage.getItem('userId') },
-    });
+      secure: true,        // Use WebSocket over SSL
+      upgrade: true
+  });
+  
   
     socket.on('connect', () => {
       console.log('Socket connected:', socket.id);
