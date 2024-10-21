@@ -121,7 +121,7 @@ const Sidebar = ({ children, className }) => {
   // }, []);
 
   useEffect(() => {
-    const socket = io('https://api.softdough.co', {
+    const socket = io('wss://api.softdough.co', {
       path: '/socket.io',  // Ensure this matches the Nginx config
       transports: ['websocket'],
       secure: true,        // Use WebSocket over SSL
