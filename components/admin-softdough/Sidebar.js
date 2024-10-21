@@ -96,10 +96,8 @@ const Sidebar = ({ children, className }) => {
   const [Notifications, setNotifications] = useState(false);
 
   useEffect(() => {
-    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      path: '/socket.io',  // เพิ่มบรรทัดนี้
-      transports: ['websocket'],  // เพิ่มบรรทัดนี้
-      query: { userId: localStorage.getItem('userId') },
+    const socket = io(`http://147.50.230.32:5555`, {
+      query: { userId: localStorage.getItem('userId') }, // ส่ง userId
     });
 
     socket.on('connect', () => {
