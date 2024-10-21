@@ -352,9 +352,16 @@ function Ingreincome() {
     };
 
     // Filter based on created_at
-    const filteredInd = ind.filter(indItem =>
-        indItem.created_at && indItem.created_at.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // const filteredInd = ind.filter(indItem =>
+    //     indItem.created_at && indItem.created_at.toLowerCase().includes(searchTerm.toLowerCase()) 
+    // );
+
+    //กัน null
+    const filteredInd = ind && ind.length > 0
+        ? ind.filter(indItem =>
+            indItem.created_at && indItem.created_at.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        : [];
 
     useEffect(() => {
         setLoading(true);
