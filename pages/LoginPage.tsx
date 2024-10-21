@@ -59,7 +59,7 @@ const LoginPage = () => {
 
       switch (true) {
         case data.message.includes('admin'):
-          router.push('/expenses/add');
+          router.push('/dashboard/dashboard');
           break;
         case data.message.includes('production'):
           router.push('/staffpro/addusedind');

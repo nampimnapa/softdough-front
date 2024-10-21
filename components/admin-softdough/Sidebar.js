@@ -96,7 +96,7 @@ const Sidebar = ({ children, className }) => {
   const [Notifications, setNotifications] = useState(false);
 
   useEffect(() => {
-    const socket = io('http://localhost:8080', {
+    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
       query: { userId: localStorage.getItem('userId') }, // ส่ง userId
     });
 
@@ -246,6 +246,31 @@ const Sidebar = ({ children, className }) => {
 
   //respon
   // const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login/logout`, {
+        method: 'GET',
+        credentials: 'include',  // เพื่อส่ง cookies หรือ session ไปพร้อมกับ request
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to logout');
+      }
+
+      const data = await response.json();
+      console.log('Logout successful:', data);
+
+      // เคลียร์ข้อมูลที่เก็บไว้ใน localStorage หรือ state ของแอป
+      localStorage.removeItem('userId');
+
+      // เปลี่ยนเส้นทางไปหน้า LoginPage
+      window.location.href = '/LoginPage';
+    } catch (error) {
+      console.error('Error during logout:', error.message);
+    }
+  };
+
 
   return (
     // nav ส่วนบน
@@ -407,8 +432,15 @@ const Sidebar = ({ children, className }) => {
               href="/logout"
               title="ออกจากระบบ"
               startIcon={<ArrowRightOnRectangleIcon className="h-5 w-5 inherit" />}
-              handleActive={handleActive}
+              // handleActive={handleActive}
+              handleActive={handleLogout}  // ใช้ handleLogout ที่เราเพิ่มไว้
             />
+            {/* <MenuLink
+              isActive={isActive === "ออกจากระบบ"}
+              title="ออกจากระบบ"
+              startIcon={<ArrowRightOnRectangleIcon className="h-5 w-5 inherit" />}
+              handleActive={handleLogout}  // ใช้ handleLogout ที่เราเพิ่มไว้
+            /> */}
 
           </div>
         </div>
@@ -572,11 +604,19 @@ const Sidebar = ({ children, className }) => {
           {/* ออกจากระบบ */}
           <MenuLink
             isActive={isActive === "ออกจากระบบ"}
-            href="/logout"
+            href="/Logout"
             title="ออกจากระบบ"
             startIcon={<ArrowRightOnRectangleIcon className="h-5 w-5 inherit" />}
-            handleActive={handleActive}
+            // handleActive={handleActive}
+            handleActive={handleLogout}  // ใช้ handleLogout ที่เราเพิ่มไว้
           />
+          {/* <MenuLink
+            isActive={isActive === "ออกจากระบบ"}
+            title="ออกจากระบบ"
+            startIcon={<ArrowRightOnRectangleIcon className="h-5 w-5 inherit" />}
+            handleActive={handleLogout}  // ใช้ handleLogout ที่เราเพิ่มไว้
+          /> */}
+
         </div>
       </nav>
 
