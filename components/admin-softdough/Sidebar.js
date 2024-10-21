@@ -121,7 +121,7 @@ const Sidebar = ({ children, className }) => {
   // }, []);
 
   useEffect(() => {
-    const socket = io('https://api.softdough.co', {
+    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
       path: '/socket.io',
       transports: ['websocket'],
       secure: true,
