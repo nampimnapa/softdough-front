@@ -397,7 +397,7 @@ const AddPromotion: React.FC = () => {
                         </div>
 
                     </div>
-                    <p className="mb-3 text-sm font-medium text-[#73664B] text-sm ">
+                    <p className="mb-3 text-sm font-medium text-[#73664B]">
                         เลือกสินค้าที่ต้องซื้อใหม่
                     </p>
 
@@ -485,7 +485,7 @@ const AddPromotion: React.FC = () => {
                             )}
                         </div>
                     </div>
-                    <p className="mb-3 text-sm font-medium text-[#73664B] text-sm ">
+                    <p className="mb-3 text-sm font-medium text-[#73664B]">
                         เลือกของแถมใหม่
                     </p>
                     <div className="flex flex-row">

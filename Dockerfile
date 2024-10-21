@@ -1,10 +1,12 @@
-FROM node:latest
+FROM node:20.9.0-bookworm
 
 WORKDIR /app
 
-COPY . .
+COPY package*.json ./
 
 RUN npm ci
+
+COPY . .
 
 RUN npm run build
 
