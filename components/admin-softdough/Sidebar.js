@@ -96,7 +96,7 @@ const Sidebar = ({ children, className }) => {
   const [Notifications, setNotifications] = useState(false);
 
   useEffect(() => {
-    const socket = io(`http://147.50.230.32:5555`, {
+    const socket = io(`http://172.21.0.2:8080`, {
       query: { userId: localStorage.getItem('userId') }, // ส่ง userId
     });
 

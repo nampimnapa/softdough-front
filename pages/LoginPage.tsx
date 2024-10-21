@@ -59,6 +59,7 @@ const LoginPage = () => {
 
       switch (true) {
         case data.message.includes('admin'):
+          console.log(data.message)
           router.push('/dashboard/dashboard');
           break;
         case data.message.includes('production'):
