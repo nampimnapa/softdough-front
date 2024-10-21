@@ -466,7 +466,7 @@ function StaffIndex() {
 
             <div className="">
                 <Tab.Group>
-                    <Tab.List className="flex space-x-5  bg-white border-b border-b-1 border-b-[#E3D8BF] mx-5">
+                    <Tab.List className="flex space-x-5  bg-white border-b border-b-[#E3D8BF] mx-5">
                         {departs.map((depart) => (
                             <Tab
                                 key={depart}
@@ -474,7 +474,7 @@ function StaffIndex() {
                                     classNames(
                                         'w-sreen py-2.5 text-sm focus:outline-none',
                                         selected
-                                            ? 'bg-white  text-[#73664B] border-b border-b-3 border-b-[#73664B] font-medium '
+                                            ? 'bg-white  text-[#73664B] border-b border-b-[#73664B] font-medium '
                                             : 'text-[#73664B] hover:bg-white/[0.12] hover:text-[#D9CAA7]'
                                     )
                                 }

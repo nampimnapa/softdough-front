@@ -61,14 +61,14 @@ const Sidebar = ({ children, className }) => {
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "สต๊อกสินค้า"}
-                        href="#"
+                        href="/staffsell/stock/list"
                         title="สต๊อกสินค้า"
                         startIcon={<CubeIcon className="h-5 w-5 inherit " />}
                         handleActive={handleActive} />
                     <MenuLink
                         isActive={isActive === "เพิ่มเงินเข้าธนาคาร"}
                         href="/staffsell/bank/add"
-                        title="เพิ่มเงินเข้าธนาคาร"
+                        title="รอบการขาย"
                         startIcon={<WalletIcon class="h-5 w-5 inherit" />}
                         handleActive={handleActive} />
                     <MenuLink

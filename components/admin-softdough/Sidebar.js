@@ -95,26 +95,56 @@ const Sidebar = ({ children, className }) => {
   const [hasNotifications, setHasNotifications] = useState(false);
   const [Notifications, setNotifications] = useState(false);
 
-  useEffect(() => {
-    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      query: { userId: localStorage.getItem('userId') }, // ส่ง userId
-    });
+  // useEffect(() => {
+  //   const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+  //     query: { userId: localStorage.getItem('userId') }, // ส่ง userId
+  //   });
 
+  //   socket.on('connect', () => {
+  //     console.log('Socket connected:', socket.id);
+  //     socket.emit('registerUser', localStorage.getItem('userId')); // ลงทะเบียนผู้ใช้
+  //   });
+
+  //   setHasNotifications(false);
+  //   socket.on('newNotification', (notification) => {
+  //     console.log('Received notification:', notification);
+  //     // setNotifications((prevNotifications) => [...prevNotifications, notification]);
+  //     setHasNotifications(true);
+  //   });
+
+  //   fetchUnreadNotifications();
+  //   console.log('Received notification:');
+
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const socket = io('wss://api.softdough.co', {
+      path: '/socket.io',  // Ensure this matches the Nginx config
+      transports: ['websocket'],
+      secure: true,        // Use WebSocket over SSL
+      upgrade: true
+  });
+  
+  
     socket.on('connect', () => {
       console.log('Socket connected:', socket.id);
-      socket.emit('registerUser', localStorage.getItem('userId')); // ลงทะเบียนผู้ใช้
+      socket.emit('registerUser', localStorage.getItem('userId'));
     });
-
-    setHasNotifications(false);
+  
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+  
     socket.on('newNotification', (notification) => {
       console.log('Received notification:', notification);
-      // setNotifications((prevNotifications) => [...prevNotifications, notification]);
       setHasNotifications(true);
     });
-
+  
     fetchUnreadNotifications();
-
-
+  
     return () => {
       socket.disconnect();
     };
@@ -622,7 +652,7 @@ const Sidebar = ({ children, className }) => {
 
       <div className="flex flex-col w-screen bg-red">
         {/* nav ส่วนบน */}
-        <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1 border-l-0 border-t-0 border-r-0">
+        <nav className="bg-white border-gray-200  w-full border border-b-[#C5B182] border-b-1 border-l-0 border-t-0 border-r-0">
           <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto lg:p-4 md:p-0 ">
 
             {/* web name */}
