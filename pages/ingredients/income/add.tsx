@@ -123,7 +123,7 @@ function Add() {
             body: JSON.stringify(requestData),
         });
         const responseData = await response.json();
-        console.log(responseData)
+        console.log("addddddd",responseData)
         if (responseData.message === 'Ingredient lot added successfully') {
             Toast.fire({
                 icon: "success",
@@ -161,8 +161,6 @@ function Add() {
                         <select id="ingredients"
                             className="bg-[#E3D8BF] w-full block  rounded-md border py-1 text-[#73664B] shadow-sm  sm:text-sm sm:leading-6">
                             {Array.isArray(ingredientsOptions) && ingredientsOptions
-                                .sort((a, b) => a.ind_name.localeCompare(b.ind_name, 'th')) // Sorting by Thai alphabet
-
                                 .map((ind: Ingredients) => (
                                     <option key={ind.ind_id} value={ind.ind_name}>
                                         {ind.ind_name}
