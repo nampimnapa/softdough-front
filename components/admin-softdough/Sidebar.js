@@ -121,12 +121,12 @@ const Sidebar = ({ children, className }) => {
   // }, []);
 
   useEffect(() => {
-    const socket = io('wss://api.softdough.co', {
-      path: '/socket.io',  // Ensure this matches the Nginx config
+    const socket = io('http://api:8080', {
+      path: '/socket.io',
       transports: ['websocket'],
-      secure: true,        // Use WebSocket over SSL
+      secure: true,
       upgrade: true
-  });
+    });
   
   
     socket.on('connect', () => {

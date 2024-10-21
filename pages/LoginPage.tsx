@@ -4,6 +4,7 @@ import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import { Input } from "@nextui-org/react";
 import Logo from "../../public/images/diff.jpeg";
+import Head from 'next/head'
 
 const kanit = Kanit({
   subsets: ["thai", "latin"],
@@ -82,6 +83,9 @@ const LoginPage = () => {
 
   return (
     <div className={kanit.className}>
+      <Head>
+        <title>Login - Softdough</title>
+      </Head>
       <div className="hero min-h-screen max-w-screen bg-base-200 bg-cover bg-center relative" style={{ backgroundImage: `url('/images/diff.jpeg')`, opacity: 0.9 }}>
         <div className="hero-overlay bg-opacity-50"></div>
         <div className='card shrink-0 w-full max-w-sm shadow-2xl bg-base-100  animate-fade animate-once animate-ease-linear'>
