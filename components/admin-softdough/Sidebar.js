@@ -299,9 +299,9 @@ const Sidebar = ({ children, className }) => {
     } catch (error) {
       console.error('Error during logout:', error.message);
     }
-  };
+  }; 
 
-
+ 
   return (
     // nav ส่วนบน
     <div className={`flex flex-row items-start overflow-x-hidden ${className} `}>
