@@ -95,26 +95,56 @@ const Sidebar = ({ children, className }) => {
   const [hasNotifications, setHasNotifications] = useState(false);
   const [Notifications, setNotifications] = useState(false);
 
-  useEffect(() => {
-    const socket = io(`http://172.21.0.2:8080`, {
-      query: { userId: localStorage.getItem('userId') }, // ส่ง userId
-    });
+  // useEffect(() => {
+  //   const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+  //     query: { userId: localStorage.getItem('userId') }, // ส่ง userId
+  //   });
 
+  //   socket.on('connect', () => {
+  //     console.log('Socket connected:', socket.id);
+  //     socket.emit('registerUser', localStorage.getItem('userId')); // ลงทะเบียนผู้ใช้
+  //   });
+
+  //   setHasNotifications(false);
+  //   socket.on('newNotification', (notification) => {
+  //     console.log('Received notification:', notification);
+  //     // setNotifications((prevNotifications) => [...prevNotifications, notification]);
+  //     setHasNotifications(true);
+  //   });
+
+  //   fetchUnreadNotifications();
+  //   console.log('Received notification:');
+
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+      path: '/socket.io',
+      transports: ['websocket'],
+      upgrade: false,
+      forceNew: true,
+      query: { userId: localStorage.getItem('userId') },
+    });
+  
     socket.on('connect', () => {
       console.log('Socket connected:', socket.id);
-      socket.emit('registerUser', localStorage.getItem('userId')); // ลงทะเบียนผู้ใช้
+      socket.emit('registerUser', localStorage.getItem('userId'));
     });
-
-    setHasNotifications(false);
+  
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+  
     socket.on('newNotification', (notification) => {
       console.log('Received notification:', notification);
-      // setNotifications((prevNotifications) => [...prevNotifications, notification]);
       setHasNotifications(true);
     });
-
+  
     fetchUnreadNotifications();
-
-
+  
     return () => {
       socket.disconnect();
     };
