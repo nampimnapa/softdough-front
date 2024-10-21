@@ -69,7 +69,6 @@ const LoginPage = () => {
           break;
         default:
           console.warn('Unknown user type');
-          // อาจจะ redirect ไปยังหน้า default หรือแสดงข้อความแจ้งเตือน
       }
 
     } catch (error) {
