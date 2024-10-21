@@ -97,7 +97,9 @@ const Sidebar = ({ children, className }) => {
 
   useEffect(() => {
     const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      query: { userId: localStorage.getItem('userId') }, // ส่ง userId
+      path: '/socket.io',  // เพิ่มบรรทัดนี้
+      transports: ['websocket'],  // เพิ่มบรรทัดนี้
+      query: { userId: localStorage.getItem('userId') },
     });
 
     socket.on('connect', () => {
