@@ -707,7 +707,7 @@ function Pos() {
             od_status: 1, //1ปกติ 0ยกเลิก
             od_net: netTotal,
             od_discounttotal: discountTotal, //ส่วนลด
-            note: "",
+            note: "", //
 
             sh_id: addressData.sh_id, //ที่อยู่
             odt_id: selectedDeliveryOption, //ประเภทรายการขาย
