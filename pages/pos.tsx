@@ -11,7 +11,7 @@ import { CheckIcon } from '@heroicons/react/solid'
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 // import generatePDF from "../components/puppeteer/generatepdf";
-
+import { getSession } from '../utils/session';
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
     PencilSquareIcon,
@@ -75,6 +75,7 @@ function Pos() {
     const [price, setPrice] = useState([]);
     const [addressData, setAddressData] = useState(null);
     const [Mix, setMix] = useState([]);
+    const [sessionData, setSessionData] = useState(null);
 
 
     const closeModal = () => {
@@ -202,6 +203,8 @@ function Pos() {
         setTodayDate(today);
     }, []);
     useEffect(() => {
+        const session = getSession();
+        setSessionData(session)
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm`)
             .then(response => response.json())
             .then(data => {
@@ -707,7 +710,7 @@ function Pos() {
             sh_id: addressData.sh_id, //ที่อยู่
             odt_id: selectedDeliveryOption, //ประเภทรายการขาย
             dc_id: selectedPromotion?.dc_id || null,
-            // user_id: "",
+            user_id: sessionData.sd_id,
             selectedItems,
             freeItems: allItems.filter(item => item.isFreeItem)
         };
