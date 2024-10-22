@@ -108,6 +108,7 @@ const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
           console.log('User ID saved in localStorage:', data.st_id);
           setSession({
             st_id: data.st_id,
+            st_type: data.st_type,
         });
 
           // เพิ่ม session storage สำหรับข้อมูลเพิ่มเติม

@@ -4,6 +4,7 @@ import router from "next/router";
 import { Dialog, Transition } from '@headlessui/react';
 import { Kanit } from "next/font/google";
 import { Checkbox } from "@nextui-org/react";
+import { getSession } from '../../utils/session';
 
 const kanit = Kanit({
     subsets: ["thai", "latin"],
@@ -58,6 +59,8 @@ function Add() {
         // ตัวแปรอื่น ๆ ที่เกี่ยวข้อง
     }
 
+    const [sessionData, setSessionData] = useState(null);
+
     useEffect(() => {
         // Fetch unit data from the server and set the options
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/readtype`)
@@ -68,6 +71,11 @@ function Add() {
             .catch(error => {
                 console.error('Error fetching unit data:', error);
             });
+
+            if(getSession()?.st_id){
+                console.log("session", getSession())
+                setSessionData(getSession())
+                    }
     }, []); // Run only once on component mount
 
     // modal
@@ -143,6 +151,11 @@ function Add() {
     const saveData = async () => {
         try {
             console.log("Sending data:", valueForm); // ตรวจสอบข้อมูลที่ส่ง
+            const formData = {
+                valueForm,
+                st_id: sessionData.st_id,
+                st_type: sessionData.st_type
+            }
 
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/expenses/add`, {
                 method: 'POST',
@@ -150,7 +163,7 @@ function Add() {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify(valueForm),
+                body: JSON.stringify(formData),
             });
 
             console.log("Response status:", response.status); // ตรวจสอบสถานะของคำตอบ
@@ -186,7 +199,7 @@ function Add() {
     };
 
 
-
+    console.log("Sending data:", valueForm);
     return (
         <div className='h-screen'>
             <p className='text-[#F2B461] font-medium m-4' >เพิ่มรายการจ่าย</p>

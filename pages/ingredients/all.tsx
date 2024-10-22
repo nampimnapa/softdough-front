@@ -164,10 +164,10 @@ console.log(matchingMini,'matchingMini')
                                                 หน่วยที่ซื้อ
                                             </td>
                                             <td scope="col" className="px-6 py-3">
-                                                ขั้นต่ำ
+                                                จุดขั้นต่ำ
                                             </td>
                                             <td scope="col" className="px-6 py-3">
-                                                ขั้นต่ำคำนวณจากการใช้งาน
+                                                จุดขั้นต่ำคำนวณ
                                             </td>
                                             <td scope="col" className="px-6 py-3">
                                                 สถานะ

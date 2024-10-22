@@ -58,13 +58,13 @@
 //                     </div>
 
 //                 </form>
-//                 <div className="mr-4 scale-90 flex items-center">
-//                     <Link href={`./add`}>
-//                         <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
-//                             <PlusIcon className="h-5 w-5 text-white mr-2" />
-//                             เพิ่ม
-//                         </button></Link>
-//                 </div>
+                // <div className="mr-4 scale-90 flex items-center">
+                //     <Link href={`./add`}>
+                //         <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
+                //             <PlusIcon className="h-5 w-5 text-white mr-2" />
+                //             เพิ่ม
+                //         </button></Link>
+                // </div>
 //             </div> */}
 //             <div className="relative overflow-x-auto mx-5 mt-5">
 //                 <table className="w-full text-sm text-center text-gray-500 overflow-x-auto">
@@ -146,7 +146,7 @@
 // export default List
 import React, { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon ,PlusIcon} from "@heroicons/react/24/outline";
 import { Tabs, Tab, Button } from "@nextui-org/react";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -205,9 +205,16 @@ function Approve() {
                     </div>
 
                 </form>
-
+                <div className="mr-4 scale-90 flex items-center">
+                    <Link href={`./add`}>
+                        <button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border  hover:bg-[#5E523C] flex ">
+                            <PlusIcon className="h-5 w-5 text-white mr-2" />
+                            เพิ่ม
+                        </button></Link>
+                </div>
 
             </div>
+            
 
             <div className="w-full">
                 <div className="flex w-full flex-col">
