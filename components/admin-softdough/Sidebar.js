@@ -121,12 +121,17 @@ const Sidebar = ({ children, className }) => {
   // }, []);
 
   useEffect(() => {
-    const socket = io('wss://api.softdough.co', {
-      path: '/socket.io',  // Ensure this matches the Nginx config
+    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+      path: '/socket.io',
       transports: ['websocket'],
-      secure: true,        // Use WebSocket over SSL
-      upgrade: true
-  });
+      upgrade: false,
+      forceNew: true,
+      withCredentials: true,
+      query: { userId: localStorage.getItem('userId') },
+      auth: {
+        token: localStorage.getItem('userId')
+    }
+    });
   
   
     socket.on('connect', () => {
@@ -283,23 +288,19 @@ const Sidebar = ({ children, className }) => {
         method: 'GET',
         credentials: 'include',  // เพื่อส่ง cookies หรือ session ไปพร้อมกับ request
       });
-
       if (!response.ok) {
         throw new Error('Failed to logout');
       }
-
       const data = await response.json();
       console.log('Logout successful:', data);
-
       // เคลียร์ข้อมูลที่เก็บไว้ใน localStorage หรือ state ของแอป
       localStorage.removeItem('userId');
-
       // เปลี่ยนเส้นทางไปหน้า LoginPage
       window.location.href = '/LoginPage';
     } catch (error) {
       console.error('Error during logout:', error.message);
     }
-  }; 
+  };
 
  
   return (
