@@ -20,7 +20,7 @@ import {
 
 } from "@heroicons/react/24/outline";
 import { Icon } from '@iconify/react';
-
+import { clearSession } from '../../utils/session';
 // วัตถุดิบ
 const ingredientDropdown = [
   { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/income/all" },
@@ -293,6 +293,7 @@ const Sidebar = ({ children, className }) => {
       }
       const data = await response.json();
       console.log('Logout successful:', data);
+      clearSession()
       // เคลียร์ข้อมูลที่เก็บไว้ใน localStorage หรือ state ของแอป
       localStorage.removeItem('userId');
       // เปลี่ยนเส้นทางไปหน้า LoginPage

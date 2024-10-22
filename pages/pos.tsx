@@ -709,7 +709,7 @@ function Pos() {
             sh_id: addressData.sh_id, //ที่อยู่
             odt_id: selectedDeliveryOption, //ประเภทรายการขาย
             dc_id: selectedPromotion?.dc_id || null,
-            user_id: getSession().st_id,
+            user_id: sessionData || 1,
             selectedItems,
             freeItems: allItems.filter(item => item.isFreeItem)
         };
@@ -969,7 +969,12 @@ function Pos() {
         "mixItems": []
     }
 
+    if(getSession()?.st_id){
 console.log("session", getSession().st_id)
+setSessionData(getSession().st_id)
+    }
+
+// console.log("session", getSession().st_id)
 
     return (
         <div className={`${kanit.className} max-h-[calc(100vh-50px)]`}>
