@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { Input } from "@nextui-org/react";
 import Logo from "../../public/images/diff.jpeg";
 import Head from 'next/head'
+import { setSession } from '../utils/session';
 
 const kanit = Kanit({
   subsets: ["thai", "latin"],
@@ -105,6 +106,9 @@ const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
       if (data.st_id) {
           localStorage.setItem('userId', data.st_id.toString());
           console.log('User ID saved in localStorage:', data.st_id);
+          setSession({
+            st_id: data.st_id,
+        });
 
           // เพิ่ม session storage สำหรับข้อมูลเพิ่มเติม
           sessionStorage.setItem('userType', data.message);

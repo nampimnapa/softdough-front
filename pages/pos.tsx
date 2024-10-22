@@ -11,7 +11,7 @@ import { CheckIcon } from '@heroicons/react/solid'
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
 // import generatePDF from "../components/puppeteer/generatepdf";
-
+import { getSession } from '../utils/session';
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
     PencilSquareIcon,
@@ -75,6 +75,7 @@ function Pos() {
     const [price, setPrice] = useState([]);
     const [addressData, setAddressData] = useState(null);
     const [Mix, setMix] = useState([]);
+    const [sessionData, setSessionData] = useState(null);
 
 
     const closeModal = () => {
@@ -202,6 +203,10 @@ function Pos() {
         setTodayDate(today);
     }, []);
     useEffect(() => {
+        if(getSession()?.st_id){
+            console.log("session", getSession().st_id)
+            setSessionData(getSession().st_id)
+                }
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm`)
             .then(response => response.json())
             .then(data => {
@@ -702,12 +707,12 @@ function Pos() {
             od_status: 1, //1ปกติ 0ยกเลิก
             od_net: netTotal,
             od_discounttotal: discountTotal, //ส่วนลด
-            note: "",
+            note: "", //
 
             sh_id: addressData.sh_id, //ที่อยู่
             odt_id: selectedDeliveryOption, //ประเภทรายการขาย
             dc_id: selectedPromotion?.dc_id || null,
-            // user_id: "",
+            user_id: sessionData || 1,
             selectedItems,
             freeItems: allItems.filter(item => item.isFreeItem)
         };
@@ -718,6 +723,7 @@ function Pos() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                 },
                 credentials: 'include',
                 body: JSON.stringify(dataOrder),
@@ -967,6 +973,8 @@ function Pos() {
     }
 
 
+
+// console.log("session", getSession().st_id)
 
     return (
         <div className={`${kanit.className} max-h-[calc(100vh-50px)]`}>
