@@ -203,7 +203,10 @@ function Pos() {
         setTodayDate(today);
     }, []);
     useEffect(() => {
-        setSessionData(getSession())
+        if(getSession()?.st_id){
+            console.log("session", getSession().st_id)
+            setSessionData(getSession().st_id)
+                }
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm`)
             .then(response => response.json())
             .then(data => {
@@ -969,10 +972,7 @@ function Pos() {
         "mixItems": []
     }
 
-    if(getSession()?.st_id){
-console.log("session", getSession().st_id)
-setSessionData(getSession().st_id)
-    }
+
 
 // console.log("session", getSession().st_id)
 
