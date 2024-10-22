@@ -114,11 +114,11 @@ const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
 
       // ตรวจสอบว่ามี cookie หรือไม่
       const isLoggedInCookie = document.cookie.includes('isLoggedIn=true');
-      console.log('Login cookie status:', isLoggedInCookie);
+      console.log('Login cookie status:', document.cookie);
 
-      if (!isLoggedInCookie) {
-          throw new Error('Failed to set login cookie');
-      }
+      // if (!isLoggedInCookie) {
+      //     throw new Error('Failed to set login cookie');
+      // }
 
       // Redirect based on user type
       const userType = data.message?.toLowerCase() || '';
