@@ -126,7 +126,11 @@ const Sidebar = ({ children, className }) => {
       transports: ['websocket'],
       upgrade: false,
       forceNew: true,
+      withCredentials: true,
       query: { userId: localStorage.getItem('userId') },
+      auth: {
+        token: localStorage.getItem('userId')
+    }
     });
   
   
