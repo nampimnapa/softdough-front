@@ -701,10 +701,10 @@ function Recipeall() {
                                                 </div>
                                                 <div className="card-actions flex justify-between">
                                                     <div className="flex items-center">
-                                                        <p className="text-sm text-[#DACB46]">ขั้นต่ำใหม่</p>
+                                                        {/* <p className="text-sm text-[#DACB46]">ขั้นต่ำใหม่</p>
                                                         <button>
                                                             <Icon icon="system-uicons:reset" className="mx-1 text-sm text-[#DACB46]" />
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                     <button className="badge badge-outline" onClick={() => handleRead(recipe.pd_id)}>
                                                         สูตรอาหาร

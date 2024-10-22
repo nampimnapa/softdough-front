@@ -54,10 +54,10 @@ function Stock() {
                     </div>
                 </form>
                 <div className="mr-4 scale-90 flex items-center">
-                    <Button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border hover:bg-[#5E523C] flex">
+                    {/* <Button className="px-3 p-2 text-sm rounded-full text-white bg-[#73664B] border hover:bg-[#5E523C] flex">
                         <PlusIcon className="h-5 w-5 text-white " />
                         เพิ่มสินค้าที่ขายไม่ได้
-                    </Button>
+                    </Button> */}
                 </div>
             </div>
 

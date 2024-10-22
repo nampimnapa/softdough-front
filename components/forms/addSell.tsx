@@ -337,7 +337,7 @@ export default function AddSell({
   };
 
   const submitData = async (dataToSend) => {
-    // console.error("Submit", dataToSend);
+    console.error("Submit", dataToSend);
     setIsLoading(true);
     setSubmitRequested(true);
 
