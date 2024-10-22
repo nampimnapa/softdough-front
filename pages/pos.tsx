@@ -203,8 +203,7 @@ function Pos() {
         setTodayDate(today);
     }, []);
     useEffect(() => {
-        const session = getSession();
-        setSessionData(session)
+        setSessionData(getSession())
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm`)
             .then(response => response.json())
             .then(data => {
@@ -970,7 +969,7 @@ function Pos() {
         "mixItems": []
     }
 
-
+console.log("session", sessionData?.sd_id)
 
     return (
         <div className={`${kanit.className} max-h-[calc(100vh-50px)]`}>
