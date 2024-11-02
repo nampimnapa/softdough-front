@@ -41,7 +41,7 @@ const Column = ({ startDate, endDate }) => {
                             }
                         }
                     },
-                    colors: ['#73664B', '#C5B182', '#E3D8BF', '#F5F1E8', '#F2B461'],
+                    colors: ['#4B3A2B', '#7A6A52', '#D1B687', '#8F7352', '#E8872F', '#3B3028'],
                     plotOptions: {
                         bar: {
                             columnWidth: '45%',
@@ -52,12 +52,13 @@ const Column = ({ startDate, endDate }) => {
                         enabled: true,  // Enable data labels
                         formatter: function (val, { dataPointIndex }) {
                             const price = chartData[dataPointIndex].totalprice;
-                            return `${price} บาท`;  // Show totalprice on top of the bar
+                            return `${price.toFixed(2)}`;  // Show totalprice on top of the bar
                         },
                         offsetY: 10,  // Position the label just above the bar
                         style: {
                             fontSize: '12px',
-                            colors: ['#000'],  // Set the label color
+                            // colors: ['#000'],  // Set the label color
+                            colors: ['#FFFFFF'], // เปลี่ยนสีฟอนต์เป็นสีขาว
                         },
                     },
                     legend: {

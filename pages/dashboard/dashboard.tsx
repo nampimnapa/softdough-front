@@ -161,8 +161,8 @@ const Home = () => {
         className="border rounded p-1 text-sm md:text-base"
       />
     </div>
-    <Column startDate={startDate1} endDate={endDate1} />
     <OrderChart startDate={startDate1} endDate={endDate1} />
+    <Column startDate={startDate1} endDate={endDate1} />
     {/* <p className="font-medium mb-2">ยอดขายสินค้าตามประเภทรายการขาย</p> */}
     {/* <SalesComparisonChart startDate={startDate1} endDate={endDate1} /> */}
   </div>
