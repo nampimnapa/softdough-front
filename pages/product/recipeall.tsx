@@ -65,14 +65,14 @@ function Recipeall() {
         timer: 3000,
         timerProgressBar: true,
         didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-          getRecipe();
-          setButtonStatus(false);
-          onClose();
-          onCloseEdit();
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            getRecipe();
+            setButtonStatus(false);
+            onClose();
+            onCloseEdit();
         }
-      });
+    });
 
 
     // สูตรการคำนวณ //
@@ -438,13 +438,13 @@ function Recipeall() {
             Toast.fire({
                 icon: "success",
                 title: <p style={{ fontFamily: 'kanit' }}>เพิ่มสูตรอาหารสำเร็จ</p>
-              });
+            });
         } else {
             console.log(responseData.message || 'Error occurred');
             Toast.fire({
                 icon: "error",
                 title: <p style={{ fontFamily: 'kanit' }}>เพิ่มสูตรอาหารไม่สำเร็จ</p>
-              });
+            });
         }
     }
 
@@ -590,13 +590,13 @@ function Recipeall() {
             Toast.fire({
                 icon: "success",
                 title: <p style={{ fontFamily: 'kanit' }}>แก้ไขสูตรอาหารสำเร็จ</p>
-              });
+            });
         } else {
             console.log(responseData.message || 'Error occurred');
             Toast.fire({
                 icon: "error",
                 title: <p style={{ fontFamily: 'kanit' }}>แก้ไขสูตรอาหารไม่สำเร็จ</p>
-              });
+            });
         }
     }
 
@@ -621,10 +621,10 @@ function Recipeall() {
 
     }
 
-        // ค้นหา
-        const filteredRecipe = Recipe.filter((rec) =>
-            rec.pd_name?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    // ค้นหา
+    const filteredRecipe = Recipe.filter((rec) =>
+        rec.pd_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     // console.log("editProduct: ", editProduct)
     // console.log("convert", convertData)
@@ -894,6 +894,22 @@ function Recipeall() {
                                             value={ingredientsFood.ingredients_qty == null ? "" : ingredientsFood.ingredients_qty}
                                         />
 
+
+
+                                    </div>
+                                    <Select
+                                        isRequired
+                                        label="หน่วย"
+                                        name="un_id"
+                                        size="sm"
+                                        color="primary"
+                                        className=" bg-fourth text-primary col-span-2"
+                                        isDisabled
+                                        selectedKeys={ingredientsFood.ind_id ? [ingredientsFood.un_id] : []}
+                                    >
+                                        <SelectItem key={ingredientsFood.un_id}>{ingredientsOptions.find(ingreds => ingreds.ind_id == ingredientsFood.ind_id)?.un_ind_name}</SelectItem>
+                                    </Select>
+
                                         <Popover placement="bottom" isOpen={isOpenPop} onOpenChange={(open) => setIsOpenPop(open)} showArrow offset={10} style={{ fontFamily: 'kanit' }} backdrop="opaque">
                                             <PopoverTrigger>
                                                 <Button isIconOnly className="ml-2" variant="light" isDisabled={ingredientsFood.ind_id === "" ? true : false}>
@@ -955,25 +971,11 @@ function Recipeall() {
                                                 )}
                                             </PopoverContent>
                                         </Popover>
-
+                                        <Button className="text-white bg-[#F2B461]" size="md" onClick={handleSubmitIngredient} isDisabled={ingredientsFood.ind_id == '' || ingredientsFood.ingredients_qty == null || ingredientsFood.ingredients_qty == 0 ? true : false}>
+                                            เพิ่มวัตถุดิบ
+                                        </Button>
                                     </div>
-                                    <Select
-                                        isRequired
-                                        label="หน่วย"
-                                        name="un_id"
-                                        size="sm"
-                                        color="primary"
-                                        className=" bg-fourth text-primary col-span-2"
-                                        isDisabled
-                                        selectedKeys={ingredientsFood.ind_id ? [ingredientsFood.un_id] : []}
-                                    >
-                                        <SelectItem key={ingredientsFood.un_id}>{ingredientsOptions.find(ingreds => ingreds.ind_id == ingredientsFood.ind_id)?.un_ind_name}</SelectItem>
-                                    </Select>
 
-                                    <Button className="text-white bg-[#F2B461]" size="md" onClick={handleSubmitIngredient} isDisabled={ingredientsFood.ind_id == '' || ingredientsFood.ingredients_qty == null || ingredientsFood.ingredients_qty == 0 ? true : false}>
-                                        เพิ่มวัตถุดิบ
-                                    </Button>
-                                </div>
 
                                 <div className="h-[200px] overflow-x-auto ">
                                     <table className="w-full text-sm text-center text-gray-500">
@@ -1352,10 +1354,10 @@ function Recipeall() {
                             </ModalBody>
                             <ModalFooter>
                                 <Button className="bg-[#C5B182] text-white" onPress={onCloseEdit}>
-                                <p style={{ fontFamily: 'kanit' }}>ปิด</p>
+                                    <p style={{ fontFamily: 'kanit' }}>ปิด</p>
                                 </Button>
                                 <Button className="text-white bg-[#736648]" onClick={() => handleSubmitEdit()} {...buttonStatus ? { isDisabled: true } : { isDisabled: false }}>
-                                {buttonStatus ? (<><Spinner size="sm" className={`text-white`} color="default" /> <p style={{ fontFamily: 'kanit' }}>กำลังบันทึก</p></>) : <p style={{ fontFamily: 'kanit' }}>บันทึก</p>}
+                                    {buttonStatus ? (<><Spinner size="sm" className={`text-white`} color="default" /> <p style={{ fontFamily: 'kanit' }}>กำลังบันทึก</p></>) : <p style={{ fontFamily: 'kanit' }}>บันทึก</p>}
                                 </Button>
                             </ModalFooter>
                         </>

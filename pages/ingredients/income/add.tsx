@@ -123,7 +123,7 @@ function Add() {
             body: JSON.stringify(requestData),
         });
         const responseData = await response.json();
-        console.log("addddddd",responseData)
+        console.log("addddddd", responseData)
         if (responseData.message === 'Ingredient lot added successfully') {
             Toast.fire({
                 icon: "success",
@@ -171,12 +171,21 @@ function Add() {
                     <div className="flex items-center justify-center mr-5">
                         <p className="text-sm  text-[#73664B] flex justify-center items-center w-full">จำนวน : </p>
                         <input
+                            required
                             min="1"
                             // onChange={handleCancelClick}
                             type="number"
                             name="count"
                             id="count"
                             className="px-3 bg-[#FFFFDD] w-full block rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                            onKeyDown={(e) => {
+                                // ป้องกันการกดปุ่ม - และ + และ 0 เมื่อไม่มีตัวเลขอื่นนำอยู่
+                                if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                            maxLength={7}
+                            step="1"
                         />
                     </div>
                     <div className="text-sm  py-2 text-[#73664B] flex  col-span-2 justify-center items-center">
@@ -191,6 +200,7 @@ function Add() {
                     <div className="flex items-center justify-center">
                         <p className="text-sm  py-2 text-[#73664B] flex justify-center items-center mr-3">ราคา : </p>
                         <input
+                            required
                             min="1"
                             // onChange={handleCancelClick}
                             type="number"
@@ -198,6 +208,13 @@ function Add() {
                             name="price"
                             id="price"
                             className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                            onKeyDown={(e) => {
+                                // ป้องกันการกดปุ่ม - และ + และ 0 เมื่อไม่มีตัวเลขอื่นนำอยู่
+                                if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                            maxLength={7}
                         />
                     </div>
                     <div className="scale-75 w-full my-2 flex justify-end">
@@ -329,7 +346,7 @@ function Add() {
                     onClick={openModal}
                     disabled={addedIngredients.length == 0}
                     type="button"
-                    className= {`ml-2 mx-auto mr-5 text-white bg-[#73664B] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ${addedIngredients.length !== 0 ? 'bg-[#73664B]' : 'bg-gray-400 cursor-not-allowed'}`}
+                    className={`ml-2 mx-auto mr-5 text-white bg-[#73664B] focus:outline-none focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ${addedIngredients.length !== 0 ? 'bg-[#73664B]' : 'bg-gray-400 cursor-not-allowed'}`}
                 >
                     บันทึก
                 </button>

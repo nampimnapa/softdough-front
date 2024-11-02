@@ -363,6 +363,13 @@ function Index() {
                                     name="price"
                                     id="price"
                                     className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                                    onKeyDown={(e) => {
+                                        // ป้องกันการกดปุ่ม - และ + และ 0 เมื่อไม่มีตัวเลขอื่นนำอยู่
+                                        if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    maxLength={7}
                                 />
                             </div>
                             <div className="scale-75 w-full my-2 flex justify-end">
