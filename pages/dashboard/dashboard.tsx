@@ -57,6 +57,8 @@ import Donut from '../../components/dashboard/donut.js';
 import CostChart from '../../components/dashboard/cost.js'; // Add your CostChart component
 import OrderChart from '../../components/dashboard/sellall.js'; // Add your CostChart component
 import SalesComparisonChart from '../../components/dashboard/typeorder.js';
+import Column from '../../components/dashboard/column.js';
+
 
 import { format } from 'date-fns';
 
@@ -159,16 +161,16 @@ const Home = () => {
         className="border rounded p-1 text-sm md:text-base"
       />
     </div>
-
     <OrderChart startDate={startDate1} endDate={endDate1} />
-
-    <p className="font-medium mb-2">ยอดขายสินค้าตามประเภทรายการขาย</p>
-    <SalesComparisonChart startDate={startDate1} endDate={endDate1} />
+    <Column startDate={startDate1} endDate={endDate1} />
+    {/* <p className="font-medium mb-2">ยอดขายสินค้าตามประเภทรายการขาย</p> */}
+    {/* <SalesComparisonChart startDate={startDate1} endDate={endDate1} /> */}
   </div>
 
 
 
           <div className="grid grid-cols-1 gap-1 m-4">
+          
 
           </div>
         </div>
@@ -180,5 +182,4 @@ const Home = () => {
 };
 
 export default Home;
-
 
