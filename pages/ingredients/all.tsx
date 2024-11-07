@@ -57,40 +57,40 @@ function All() {
         //     });
 
         const fetchIngredientData = async () => {
-        try {
-            const [ingredientRes, lotDetailRes, ingredientMiniRes] = await Promise.all([
-                fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`).then(res => res.json()),
-                fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlotdetail`).then(res => res.json()),
-                fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/ingredientmini`).then(res => res.json())
-            ]);
+            try {
+                const [ingredientRes, lotDetailRes, ingredientMiniRes] = await Promise.all([
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/read`).then(res => res.json()),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/readlotdetail`).then(res => res.json()),
+                    fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/ingredientmini`).then(res => res.json())
+                ]);
 
-            // Combine the ingredient data with ingredientmini data
-            const mergedData = ingredientRes.map(ingredient => {
-                // Find matching data from ingredientmini based on ind_id
-                const matchingMini = ingredientMiniRes.find(mini => mini.indId === ingredient.ind_id);
-console.log(matchingMini,'matchingMini')
-                // If matchingMini is found, add MinimumqtyStock to ingredient object
-                if (matchingMini) {
-                    return {
-                        ...ingredient,
-                        MinimumqtyStock: matchingMini.MinimumqtyStock  // Add MinimumqtyStock to the ingredient data
-                    };
-                }
+                // Combine the ingredient data with ingredientmini data
+                const mergedData = ingredientRes.map(ingredient => {
+                    // Find matching data from ingredientmini based on ind_id
+                    const matchingMini = ingredientMiniRes.find(mini => mini.indId === ingredient.ind_id);
+                    console.log(matchingMini, 'matchingMini')
+                    // If matchingMini is found, add MinimumqtyStock to ingredient object
+                    if (matchingMini) {
+                        return {
+                            ...ingredient,
+                            MinimumqtyStock: matchingMini.MinimumqtyStock  // Add MinimumqtyStock to the ingredient data
+                        };
+                    }
 
-                // If no match found, return ingredient as it is
-                return ingredient;
-            });
+                    // If no match found, return ingredient as it is
+                    return ingredient;
+                });
 
-            console.log('Merged Data:', mergedData);
-            setIngredientall(mergedData); // Set the merged data
-            setLoading(false);
-        } catch (error) {
-            console.error('Error:', error);
-            setLoading(false);
-        }
-    };
+                console.log('Merged Data:', mergedData);
+                setIngredientall(mergedData); // Set the merged data
+                setLoading(false);
+            } catch (error) {
+                console.error('Error:', error);
+                setLoading(false);
+            }
+        };
 
-    fetchIngredientData();
+        fetchIngredientData();
     }, []);
 
     return (
@@ -157,18 +157,22 @@ console.log(matchingMini,'matchingMini')
                                             <td scope="col" className="px-12 py-3 ">
                                                 รายการ
                                             </td>
-                                            <td scope="col" className="px-6 py-3">
-                                                สต็อก
-                                            </td>
+                                           
                                             <td scope="col" className="px-6 py-3">
                                                 หน่วยที่ซื้อ
                                             </td>
                                             <td scope="col" className="px-6 py-3">
-                                                ขั้นต่ำ
+                                                สต็อก
                                             </td>
                                             <td scope="col" className="px-6 py-3">
-                                                ขั้นต่ำคำนวณจากการใช้งาน
+                                                เศษ
                                             </td>
+                                            <td scope="col" className="px-6 py-3">
+                                                จุดขั้นต่ำ
+                                            </td>
+                                            {/* <td scope="col" className="px-6 py-3">
+                                                จุดขั้นต่ำคำนวณ
+                                            </td> */}
                                             <td scope="col" className="px-6 py-3">
                                                 สถานะ
                                             </td>
@@ -186,18 +190,22 @@ console.log(matchingMini,'matchingMini')
                                                 <td className="px-6 py-1 text-left">
                                                     {ingredients.ind_name}
                                                 </td>
-                                                <td className="px-6 py-1">
-                                                    {ingredients.ind_stock}
-                                                </td>
+                                               
                                                 <td className="px-6 py-1">
                                                     {ingredients.un_purchased_name}
                                                 </td>
                                                 <td className="px-6 py-1">
+                                                    {ingredients.ind_stock}
+                                                </td>
+                                                <td className="px-6 py-1">
+                                                    {ingredients.remainder_stock}
+                                                </td>
+                                                <td className="px-6 py-1">
                                                     {ingredients.qtyminimum}
                                                 </td>
-                                                 <td className="px-6 py-1">
+                                                {/* <td className="px-6 py-1">
                                                     {ingredients.MinimumqtyStock}
-                                                </td>
+                                                </td> */}
                                                 <td className={`px-6 py-1 
                                                     ${ingredients.status === '2' ? 'text-green-500'
                                                         : ingredients.status === '1' ? 'text-red-500'
@@ -241,6 +249,9 @@ console.log(matchingMini,'matchingMini')
                                                     สต็อก
                                                 </td>
                                                 <td scope="col" className="px-6 py-3">
+                                                    เศษ
+                                                </td>
+                                                <td scope="col" className="px-6 py-3">
                                                     วันหมดอายุ
                                                 </td>
 
@@ -258,10 +269,11 @@ console.log(matchingMini,'matchingMini')
                                                     </td>
                                                     <td className="px-6 py-1">{ingredients.stock_quantity}
                                                     </td>
-
+                                                    
+                                                    <td className="px-6 py-1">{ingredients.scrap}
+                                                    </td>
                                                     <td className="px-6 py-1">{ingredients.date_exp}
                                                     </td>
-
                                                     <td className="px-6 py-4 flex items-center justify-center  ">
                                                         <button type="submit" >
                                                             <Link href='#' className="w-full flex justify-center items-center">

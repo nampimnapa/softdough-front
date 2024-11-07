@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { Input } from "@nextui-org/react";
 import Logo from "../../public/images/diff.jpeg";
 import Head from 'next/head'
+import { setSession } from '../utils/session';
 
 const kanit = Kanit({
   subsets: ["thai", "latin"],
@@ -16,6 +17,8 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState<string>('');
+const [isLoading, setIsLoading] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -28,58 +31,136 @@ const LoginPage = () => {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+  const makeAPICall = async (endpoint: string, options: RequestInit = {}) => {
+    const baseURL = process.env.NEXT_PUBLIC_API_URL;
+    const defaultOptions: RequestInit = {
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    };
+
     try {
+        const response = await fetch(`${baseURL}${endpoint}`, {
+            ...defaultOptions,
+            ...options,
+            headers: {
+                ...defaultOptions.headers,
+                ...options.headers,
+            },
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Network response was not ok');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API call failed:', error);
+        throw error;
+    }
+};
+
+const handleLogin = async (e: React.FormEvent<HTMLButtonElement>) => {
+  e.preventDefault();
+  try {
       const formData = { username, password };
 
       console.log('Form data:', formData);
 
+      // เพิ่ม timeout สำหรับ fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include',
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+          },
+          body: JSON.stringify(formData),
+          credentials: 'include',
+          signal: controller.signal,
+          mode: 'cors', // เพิ่ม mode cors
       });
 
+      clearTimeout(timeoutId);
+
+      // ตรวจสอบ cookies จาก response
+      const cookies = response.headers.get('set-cookie');
+      console.log('Received cookies:', cookies);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'ไม่สามารถเข้าสู่ระบบได้');
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'ไม่สามารถเข้าสู่ระบบได้');
       }
 
       const data = await response.json();
       console.log('Login response:', data);
 
+      // Set cookie ด้วย js-cookie หรือวิธีอื่น
+      document.cookie = `isLoggedIn=true; path=/; secure; samesite=none`;
+
       if (data.st_id) {
-        localStorage.setItem('userId', data.st_id.toString());
-        console.log('User ID saved in localStorage:', data.st_id);
+          localStorage.setItem('userId', data.st_id.toString());
+          console.log('User ID saved in localStorage:', data.st_id);
+          setSession({
+            st_id: data.st_id,
+            st_type: data.st_type,
+        });
+
+          // เพิ่ม session storage สำหรับข้อมูลเพิ่มเติม
+          sessionStorage.setItem('userType', data.message);
       } else {
-        console.warn('User ID not found in response');
+          console.warn('User ID not found in response');
       }
 
-      switch (true) {
-        case data.message.includes('admin'):
-          console.log(data.message)
-          router.push('/dashboard/dashboard');
-          break;
-        case data.message.includes('production'):
-          router.push('/staffpro/addusedind');
-          break;
-        case data.message.includes('order'):
-          router.push('/staffsell/test');
-          break;
-        default:
-          console.warn('Unknown user type');
-        // อาจจะ redirect ไปยังหน้า default หรือแสดงข้อความแจ้งเตือน
+      // ตรวจสอบว่ามี cookie หรือไม่
+      const isLoggedInCookie = document.cookie.includes('isLoggedIn=true');
+      console.log('Login cookie status:', document.cookie);
+
+      // if (!isLoggedInCookie) {
+      //     throw new Error('Failed to set login cookie');
+      // }
+
+      // Redirect based on user type
+      const userType = data.message?.toLowerCase() || '';
+      const redirectMap = {
+          admin: '/dashboard/dashboard',
+          production: '/staffpro/addusedind',
+          order: '/staffsell/test'
+      };
+
+      const redirectPath = Object.entries(redirectMap).find(([key]) => 
+          userType.includes(key)
+      )?.[1];
+
+      if (redirectPath) {
+          await router.push(redirectPath);
+      } else {
+          console.warn('Unknown user type:', userType);
+          // แสดง UI error หรือ redirect ไปหน้า default
       }
 
-    } catch (error) {
-      console.error('เกิดข้อผิดพลาดในการเข้าสู่ระบบ:', error.message);
-      // แสดงข้อความผิดพลาดให้ผู้ใช้เห็น (เช่น ใช้ state เพื่อแสดงข้อความใน UI)
-    }
-  };
+  } catch (error) {
+      console.error('Login error:', error);
+
+      let errorMessage = 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ';
+      
+      if (error.name === 'AbortError') {
+          errorMessage = 'การเชื่อมต่อใช้เวลานานเกินไป กรุณาลองใหม่อีกครั้ง';
+      } else if (error instanceof TypeError && error.message.includes('network')) {
+          errorMessage = 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต';
+      } else if (error.message) {
+          errorMessage = error.message;
+      }
+
+      // แสดง error message ใน UI (ใช้ state หรือ UI component)
+      setErrorMessage(errorMessage); // สมมติว่ามี state สำหรับ error message
+  }
+};
 
   return (
     <div className={kanit.className}>
@@ -127,7 +208,7 @@ const LoginPage = () => {
               </label>
             </div>
             <div className="form-control mt-6">
-              <button className="btn bg-[#73664B] text-white" onClick={handleLogin}>เข้าสู่ระบบ</button>
+              <button className="btn bg-[#73664B] text-white" onClick={handleLogin}>{isLoading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}</button>
             </div>
           </form>
         </div>

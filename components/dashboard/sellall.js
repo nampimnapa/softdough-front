@@ -102,16 +102,19 @@ const OrderChart = ({ startDate, endDate }) => {
                 //     },
                 // };      
 
+                const barWidth = orderCategories.length < 5 ? 50 : undefined; // แท่งแคบลงถ้าข้อมูลน้อย
+
                 const chartOptions = {
                     chart: {
                         type: 'bar',
-                        height: 350, // ขนาดปกติ
+                        height: 350,
                         stacked: true,
                     },
                     plotOptions: {
                         bar: {
                             horizontal: false,
                             borderRadius: 10,
+                            columnWidth: orderCategories.length < 5 ? '20%' : '50%', // ตั้งค่าให้แท่งแคบลงเมื่อข้อมูลน้อย
                             dataLabels: {
                                 total: {
                                     enabled: true,
@@ -134,7 +137,7 @@ const OrderChart = ({ startDate, endDate }) => {
                             colors: ['#FFFFFF'],
                         },
                     },
-                    colors: ['#73664B', '#C5B182', '#E3D8BF', '#F5F1E8', '#F2B461'],
+                    colors: ['#4B3A2B', '#7A6A52', '#D1B687', '#8F7352', '#E8872F', '#3B3028'],
                     xaxis: {
                         categories: orderCategories,
                         labels: {
@@ -165,72 +168,72 @@ const OrderChart = ({ startDate, endDate }) => {
                             colors: '#73664B',
                         },
                     },
-                    // Responsive settings
                     responsive: [
                         {
-                            breakpoint: 1024, // เมื่อหน้าจอเล็กกว่า 1024px
+                            breakpoint: 1024,
                             options: {
                                 chart: {
-                                    height: 300, // ลดความสูง
+                                    height: 300,
                                 },
                                 plotOptions: {
                                     bar: {
-                                        borderRadius: 5, // ลดมุมโค้ง
+                                        borderRadius: 5,
                                     },
                                 },
                                 dataLabels: {
                                     style: {
-                                        fontSize: '10px', // ลดขนาดฟอนต์
+                                        fontSize: '10px',
                                     },
                                 },
                                 xaxis: {
                                     labels: {
                                         style: {
-                                            fontSize: '10px', // ลดขนาดฟอนต์ในแกน x
+                                            fontSize: '10px',
                                         },
                                     },
                                 },
                                 yaxis: {
                                     labels: {
                                         style: {
-                                            fontSize: '10px', // ลดขนาดฟอนต์ในแกน y
+                                            fontSize: '10px',
                                         },
                                     },
                                 },
                                 legend: {
-                                    position: 'bottom', // ย้าย legend ไว้ด้านล่าง
+                                    position: 'bottom',
                                 },
                             },
                         },
                         {
-                            breakpoint: 768, // เมื่อหน้าจอเล็กกว่า 768px
+                            breakpoint: 768,
                             options: {
                                 chart: {
-                                    height: 250, // ลดความสูงอีก
+                                    height: 250,
                                 },
                                 dataLabels: {
                                     style: {
-                                        fontSize: '8px', // ลดขนาดฟอนต์มากขึ้น
+                                        fontSize: '8px',
                                     },
                                 },
                                 xaxis: {
                                     labels: {
                                         style: {
-                                            fontSize: '8px', // ลดขนาดฟอนต์ในแกน x
+                                            fontSize: '8px',
                                         },
                                     },
                                 },
                                 yaxis: {
                                     labels: {
                                         style: {
-                                            fontSize: '8px', // ลดขนาดฟอนต์ในแกน y
+                                            fontSize: '8px',
                                         },
                                     },
                                 },
                             },
                         },
                     ],
-                };
+                };                
+                
                 
 
                 setOptions(chartOptions);

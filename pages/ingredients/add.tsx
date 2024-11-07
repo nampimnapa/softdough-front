@@ -27,11 +27,11 @@ function Add() {
         timer: 3000,
         timerProgressBar: true,
         didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-          router.push('/ingredients/all');
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            router.push('/ingredients/all');
         }
-      });
+    });
 
     const closeModal = () => {
         setIsOpen(false);
@@ -102,13 +102,13 @@ function Add() {
             Toast.fire({
                 icon: "success",
                 title: <p style={{ fontFamily: 'kanit' }}>เพิ่มข้อมูลวัตถุดิบสำเร็จ</p>
-              });
+            });
         } else {
             setMessage(responseData.message || 'Error occurred');
             Toast.fire({
                 icon: "error",
                 title: <p style={{ fontFamily: 'kanit' }}>เพิ่มข้อมูลวัตถุดิบไม่สำเร็จ</p>
-              });
+            });
         }
 
         // Reset the form after submission
@@ -150,7 +150,7 @@ function Add() {
                     <div className="mt-2 col-span-2">
                         <input
                             placeholder="จำนวน"
-                            min="0"
+                            min="1"
                             value={formData.qtyminimum}
                             onChange={handleInputChange}
                             type="number"
@@ -159,6 +159,14 @@ function Add() {
                             autoComplete="family-name"
                             // placeholder='ชื่อผู้ใช้งาน'
                             className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                            onKeyDown={(e) => {
+                                // ป้องกันการกดปุ่ม - และ + และ 0 เมื่อไม่มีตัวเลขอื่นนำอยู่
+                                if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                            step="1"
+                            maxLength={7}
                         />
                     </div>
                 </div>
@@ -173,6 +181,7 @@ function Add() {
                             onChange={handleInputChange}>
                             <option value="">เลือกหน่วยวัตถุดิบที่ซื้อ </option>
                             {Array.isArray(unitOptions) && unitOptions
+                                .sort((a, b) => a.un_name.localeCompare(b.un_name, 'th')) // Sorting by Thai alphabet
                                 .map((unit: UnitType) => (
                                     <option key={unit.un_id} value={unit.un_id}>
                                         {unit.un_name}
@@ -187,7 +196,7 @@ function Add() {
                     <div className="mt-2 col-span-2">
                         <input
                             placeholder="ปริมาณต่อหน่วย"
-                            min="0"
+                            min="1"
                             type="number"
                             name="qty_per_unit"
                             value={formData.qty_per_unit}
@@ -195,7 +204,15 @@ function Add() {
                             id="min"
                             autoComplete="family-name"
                             className="px-3 bg-[#FFFFDD] block w-full rounded-t-md border border-b-[#C5B182] py-1.5 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]    sm:text-sm sm:leading-6 focus:outline-none"
+                            onKeyDown={(e) => {
+                                // ป้องกันการกดปุ่ม - และ + และ 0 เมื่อไม่มีตัวเลขอื่นนำอยู่
+                                if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                    e.preventDefault();
+                                }
+                            }}
+                            maxLength={7}
                         />
+
                     </div>
                 </div>
                 <div className="grid grid-cols-3 items-center ">
@@ -295,7 +312,7 @@ function Add() {
                         )
                         }
                     </>
-                    <button onClick={openModal} disabled = {statusButton} type="button" className={`ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ${statusButton ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#73664B]'}`}>บันทึก</button>
+                    <button onClick={openModal} disabled={statusButton} type="button" className={`ml-2 text-white bg-[#73664B] focus:outline-none  focus:ring-4 focus:ring-gray-200 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2 ${statusButton ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#73664B]'}`}>บันทึก</button>
                 </div >
             </div >
         </div >

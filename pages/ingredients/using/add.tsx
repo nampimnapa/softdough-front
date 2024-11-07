@@ -1144,10 +1144,12 @@ function Add() {
         scrap: number;
     }
     const [selectedId, setSelectedId] = useState<string>('');
+
     const [detailData, setDetailData] = useState<DetailData[]>([]);
     const [unitOptions, setUnitOptions] = useState<UnitType[]>([]);
     const { id } = router.query;
 
+    // const [selectedId, setSelectedId] = useState(unitOptions.length > 0 ? unitOptions[0].pdo_id : '');
 
     useEffect(() => {
         // Fetch unit data from the server and set the options
@@ -1210,6 +1212,7 @@ function Add() {
     //     setSelectedPdoIdName(value);
 
     // };
+
     const filteredUnitOptions = unitOptions.filter(unit => [3].includes(Number(unit.pdo_status)));
 
     const handleSubmit2 = async () => {
@@ -1334,13 +1337,13 @@ function Add() {
                 Toast.fire({
                     icon: "success",
                     title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้สำเร็จ</p>
-                  });
+                });
             } else {
                 setMessage(responseData.message || 'Error occurred');
                 Toast.fire({
                     icon: "error",
                     title: <p style={{ fontFamily: 'kanit' }}>เพิ่มวัตถุดิบที่ใช้ไม่สำเร็จ</p>
-                  });
+                });
             }
         } catch (error) {
             setMessage('Error occurred while submitting data');
@@ -1488,10 +1491,10 @@ function Add() {
     const handleConvertAfter = () => {
         setIngredientsFood(prevState => ({
             ...prevState,
-            "qtyusedgrum": parseFloat(result)
+            "qtyusedgrum": parseFloat(parseFloat(result).toFixed(2)) // ใช้ parseFloat 2 ครั้งเพื่อแน่ใจว่าเป็น number
         }));
-        setIsOpenPop(false)
-    }
+        setIsOpenPop(false);
+    };
 
     // ล้างค่าในเครื่องแปลง
     const handleConvertCencel = () => {
@@ -1530,7 +1533,10 @@ function Add() {
             }));
         }
     }
-
+    const ensureFloat = (value) => {
+        const parsed = parseFloat(value);
+        return isNaN(parsed) ? 0 : parsed.toFixed(2);
+    };
     return (
         <div>
             <Head>
@@ -1584,13 +1590,13 @@ function Add() {
                                     onChange={(e) => setSelectedId(e.target.value)}
                                 >
                                     {filteredUnitOptions
-                                        .sort((a, b) => Number(b.pdo_id) - Number(a.pdo_id))
                                         .map((unit) => (
                                             <option key={unit.pdo_id} value={unit.pdo_id}>
                                                 {unit.pdo_id_name}
                                             </option>
                                         ))}
                                 </select>
+
 
                             </div>
                         </div>
@@ -1641,11 +1647,12 @@ function Add() {
                                                 <td scope="col" className="flex-1 text-center">
                                                     {isEditing ? (
                                                         <input
-                                                            type="number"
+                                                            type="text"
                                                             value={detail.qty_used_sum}
                                                             defaultValue={detail.qty_used_sum}
                                                             onChange={(e) => handleInputChange(index, 'qty_used_sum', e.target.value)}
                                                             className="bg-white border border-gray-300 rounded p-1"
+
                                                         />
                                                     ) : (
                                                         detail.qty_used_sum
@@ -1654,10 +1661,18 @@ function Add() {
                                                 <td scope="col" className="flex-1 text-center">
                                                     {isEditing ? (
                                                         <input
-                                                            type="number"
+                                                            type="text"
                                                             defaultValue={detail.scrap}
                                                             onChange={(e) => handleInputChange(index, 'scrap', e.target.value)}
                                                             className="bg-white border border-gray-300 rounded p-1"
+                                                            onKeyDown={(e) => {
+                                                                // ป้องกันการกดปุ่ม - + e และ 0 เมื่อเป็นตัวแรก
+                                                                if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                                                    e.preventDefault();
+                                                                }
+                                                            }}
+                                                            min="1"
+                                                            step="1"
                                                         />
                                                     ) : (
                                                         detail.scrap
@@ -1845,8 +1860,16 @@ function Add() {
                                         className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
                                     /> */}
                                     <Input
+                                        onKeyDown={(e) => {
+                                            // ป้องกันการกดปุ่ม - + e และ 0 เมื่อเป็นตัวแรก
+                                            if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        min="1"
+                                        step="1"
                                         isRequired
-                                        type="number"
+                                        type="float"
                                         label="ปริมาณ"
                                         size="sm"
                                         width="100%"
@@ -1960,7 +1983,11 @@ function Add() {
                                                     <td scope="col" className="flex-1 text-center">{addedIngredient.ind_name}</td>
                                                     {/* <td scope="col" className="flex-1 text-center">{addedIngredient.qty_used_sum}</td>
                                                     <td scope="col" className="flex-1 text-center">{addedIngredient.scrap}</td> */}
-                                                    <td scope="col" className="flex-1 text-center">{addedIngredient.qtyusedgrum}</td>
+                                                    <td scope="col" className="flex-1 text-center">
+                                                        {addedIngredient?.qtyusedgrum != null
+                                                            ? Number(addedIngredient.qtyusedgrum).toFixed(2)
+                                                            : "0.00"
+                                                        }</td>
 
                                                     <td scope="col" className="flex-1 text-center">
                                                         <div className="flex items-center justify-center">

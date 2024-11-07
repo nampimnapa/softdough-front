@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.1.1",
     "@nextui-org/react": "^2.2.9",
     "apexcharts": "^3.52.0",
+    "cookie": "^1.0.1",
     "date-fns": "^3.6.0",
     "flowbite": "^2.2.1",
     "flowbite-datepicker": "^1.2.6",

@@ -33,11 +33,11 @@ function Index() {
         timer: 3000,
         timerProgressBar: true,
         didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-          router.push('/ingredients/income/all');
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+            router.push('/ingredients/income/all');
         }
-      });
+    });
 
     const [Ind, setInd] = useState({
         ind_name: '',
@@ -165,33 +165,101 @@ function Index() {
         fetchData();
     }, [id]);
 
+    // const handleEditWork = async () => {
+    //     setIsOpen(false);
+    //     setIsOpen(false);
+    //     // console.log("handleEditWork", dataForm);
+    //     // const updatedIngrelot = [...ingrelot];
+
+    //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/editData/${id}`, {
+    //         method: 'PATCH',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({ "dataaToEdit": additionalIngredients, "status": (isChecked ? 2 : 1) }), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
+    //     });
+    //     const responseData = await response.json();
+
+    //     if (responseData.message === 'Data updated successfully') {
+    //         Toast.fire({
+    //             icon: "success",
+    //             title: <p style={{ fontFamily: 'kanit' }}>แก้ไขข้อมูลวัตถุดิบเข้าร้านสำเร็จ</p>
+    //         });
+    //     } else {
+    //         setMessage(responseData.message || 'Error occurred');
+    //         Toast.fire({
+    //             icon: "error",
+    //             title: "เกิดข้อผิดพลาดในการแก้ไขข้อมูล"
+    //         });
+    //     }
+    //     setIsModified(true);
+    // };
+    const [initialStatus, setInitialStatus] = useState(false);
+    useEffect(() => {
+        if (id) {
+            fetchOrderDetails(id);
+        }
+    }, [id]);
+    const fetchOrderDetails = async (orderId) => {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/ingredientLotDetails/${orderId}`);
+            const data = await response.json();
+            setIngredientsde(data.data);
+            setAdditionalIngredients(data.data);
+            setInitialStatus(data.status === 2);
+            setIsChecked(data.status === 2);
+        } catch (error) {
+            console.error('Error fetching ingredient details:', error);
+        }
+    };
     const handleEditWork = async () => {
         setIsOpen(false);
-        setIsOpen(false);
-        // console.log("handleEditWork", dataForm);
-        // const updatedIngrelot = [...ingrelot];
+        const dataToSend = {
+            dataaToEdit: additionalIngredients,
+            status: isChecked ? 2 : 1
+        };
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/editData/${id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ "dataaToEdit": additionalIngredients, "status": (isChecked ? 2 : 1) }), // ส่งข้อมูลที่ต้องการอัปเดตไปยังเซิร์ฟเวอร์
-        });
-        const responseData = await response.json();
-        if (responseData.message === 'Data updated successfully') {
-            Toast.fire({
-                icon: "success",
-                title: <p style={{ fontFamily: 'kanit' }}>แก้ไขข้อมูลวัตถุดิบเข้าร้านสำเร็จ</p>
-              });
-        } else {
-            setMessage(responseData.message || 'Error occurred');
+        console.log("Data being sent to API:", dataToSend);
+        console.log("additionalIngredients:", additionalIngredients);
+        console.log("isChecked:", isChecked);
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ingredient/editData/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend),
+            });
+
+            console.log("API Response status:", response.status);
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const responseData = await response.json();
+            console.log("API Response data:", responseData);
+
+            if (responseData.message === 'Data updated successfully') {
+                Toast.fire({
+                    icon: "success",
+                    title: <p style={{ fontFamily: 'kanit' }}>แก้ไขข้อมูลวัตถุดิบเข้าร้านสำเร็จ</p>
+                });
+                setInitialStatus(isChecked);
+                setIsModified(false);
+                // อัพเดต state หรือ refetch ข้อมูลถ้าจำเป็น
+                fetchOrderDetails(id);
+            } else {
+                throw new Error(responseData.message || 'Error occurred');
+            }
+        } catch (error) {
+            console.error('Error updating data:', error);
             Toast.fire({
                 icon: "error",
                 title: "เกิดข้อผิดพลาดในการแก้ไขข้อมูล"
-              });
+            });
         }
-        setIsModified(true);
     };
 
     const handleInputChange = (e) => {
@@ -295,6 +363,13 @@ function Index() {
                                     name="price"
                                     id="price"
                                     className="px-3 bg-[#FFFFDD] block w-1/2 rounded-t-md border border-b-[#C5B182] py-1 text-[#C5B182] shadow-sm  placeholder:text-[#C5B182]  sm:text-sm sm:leading-6 focus:outline-none"
+                                    onKeyDown={(e) => {
+                                        // ป้องกันการกดปุ่ม - และ + และ 0 เมื่อไม่มีตัวเลขอื่นนำอยู่
+                                        if (e.key === '-' || e.key === '+' || e.key === 'e' || (e.key === '0' && !e.currentTarget.value)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    maxLength={7}
                                 />
                             </div>
                             <div className="scale-75 w-full my-2 flex justify-end">

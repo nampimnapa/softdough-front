@@ -20,7 +20,7 @@ import {
 
 } from "@heroicons/react/24/outline";
 import { Icon } from '@iconify/react';
-
+// import { clearSession } from '../../utils/session';
 // วัตถุดิบ
 const ingredientDropdown = [
   { title: "วัตถุดิบเข้าร้าน", href: "/ingredients/income/all" },
@@ -45,8 +45,8 @@ const sellDropdown = [
   { title: "ทำรายการขาย", href: "/pos" },
   { title: "รายการขายทั้งหมด", href: "/sale/all" },
   { title: "สต๊อกสินค้า", href: "/sale/stock" },
-  { title: "สรุปยอดรายการขายรายวัน", href: "/ingredients/instore" },
-  { title: "รออนุมัติ", href: "/ingredients/using" },
+  // { title: "สรุปยอดรายการขายรายวัน", href: "/ingredients/instore" },
+  // { title: "รออนุมัติ", href: "/ingredients/using" },
 ];
 // โปรโมชัน
 const promotionDropdown = [
@@ -124,9 +124,13 @@ const Sidebar = ({ children, className }) => {
     const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
       path: '/socket.io',
       transports: ['websocket'],
-      secure: true,
+      upgrade: false,
+      forceNew: true,
       withCredentials: true,
-      upgrade: true
+      query: { userId: localStorage.getItem('userId') },
+      auth: {
+        token: localStorage.getItem('userId')
+    }
     });
   
   
@@ -284,23 +288,20 @@ const Sidebar = ({ children, className }) => {
         method: 'GET',
         credentials: 'include',  // เพื่อส่ง cookies หรือ session ไปพร้อมกับ request
       });
-
       if (!response.ok) {
         throw new Error('Failed to logout');
       }
-
       const data = await response.json();
       console.log('Logout successful:', data);
-
+      // clearSession()
       // เคลียร์ข้อมูลที่เก็บไว้ใน localStorage หรือ state ของแอป
       localStorage.removeItem('userId');
-
       // เปลี่ยนเส้นทางไปหน้า LoginPage
       window.location.href = '/LoginPage';
     } catch (error) {
       console.error('Error during logout:', error.message);
     }
-  }; 
+  };
 
  
   return (

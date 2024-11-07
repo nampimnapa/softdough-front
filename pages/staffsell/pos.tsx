@@ -1,16 +1,16 @@
-import React, { Fragment, useState, useEffect } from 'react';
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import React, { Fragment, useState, useEffect, ChangeEvent } from 'react';
 import { Kanit } from "next/font/google";
 import { useRouter } from 'next/router';
 import Link from "next/link";
-import { Button, Input, RadioGroup, Radio, Checkbox } from "@nextui-org/react";
+import { Button, Input, RadioGroup, Radio, Checkbox, User, cn, CheckboxGroup, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@nextui-org/react";
 import { Dialog, DialogPanel, DialogTitle, DialogBackdrop, Transition } from '@headlessui/react';
 import { Tabs, Tab, } from "@nextui-org/react";
 import { Spinner, useDisclosure, Image } from "@nextui-org/react";
-import { Card, CardBody, CardFooter } from "@nextui-org/react";
-
-import generatePDF from "../../components/puppeteer/generatepdf";
-
+import { Card, CardBody, CardFooter, Chip } from "@nextui-org/react";
+import { CheckIcon } from '@heroicons/react/solid'
+import { format } from 'date-fns';
+import { th } from 'date-fns/locale';
+// import generatePDF from "../components/puppeteer/generatepdf";
 
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import {
@@ -60,9 +60,13 @@ function Pos() {
     const [typesellmenufix, setTypesellmenufix] = useState([]);
     const [typesellmenumix, setTypesellmenumix] = useState([]);
     const [statusLoading, setStatusLoading] = useState(false);
+    const [statusLoadingSM, setStatusLoadingSM] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [isOpen2, setIsOpen2] = useState(false);
     const [isOpen3, setIsOpen3] = useState(false);
+    const [isOpenEdit, setIsOpenEdit] = useState(false);
+    const [isOpenEditMix, setIsOpenEditMix] = useState(false);
+
 
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedItems, setSelectedItems] = useState([]);
@@ -76,9 +80,11 @@ function Pos() {
     const closeModal = () => {
         setIsOpen(false);
         setSelectedSale(null);
+        setSelectedFreeId(null);
+        setQuantity(1);
     };
     const handleCancel = () => {
-        closeModal(); // ปิด Modal หลังจากที่รีเซ็ตค่าเรียบร้อย
+        setIsOpenEdit(false);
     };
     interface Promotion {
         dc_name: string,
@@ -130,6 +136,25 @@ function Pos() {
 
     }
 
+    interface SelectEdit {
+        sm_id: number;
+        sm_name: string;
+        sm_price: number;
+        status: string;
+        fix: string;
+        picture: string;
+        smt_id: number;
+        smt_name: string;
+        qty_per_unit: number;
+        mixItems: MixItem[];
+    }
+
+    interface MixItem {
+        pd_id: number,
+        pd_name: string,
+        quantity: number
+    }
+
     const [selectedSaleId, setSelectedSaleId] = useState<string | null>(null);
     let selectedDiff = "";
 
@@ -147,14 +172,22 @@ function Pos() {
             const newItem = {
                 ...selectedSale,
                 quantity: quantity,
-                id: selectedFreeId
+                id: selectedFreeId,
+                mixItems: selectedSale.fix === "2" ? selectedPdIds.map(id => {
+                    const item = Mix.find(m => m.pd_id === id);
+                    return {
+                        pd_id: id,
+                        pd_name: item ? item.pd_name : 'Unknown',
+                        quantity: quantities[id] || 1
+                    };
+                }) : []
             };
             setSelectedItems((prevItems) => [...prevItems, newItem]);
-            // console.log("selectedSaleId",selectedFreeId);
-            setSelectedFreeId(null)
+            setSelectedFreeId(null);
             closeModal();
             closeModalmix();
-
+            console.log(selectedPdIds)
+            console.log(quantities)
         }
     };
 
@@ -169,16 +202,6 @@ function Pos() {
         setTodayDate(today);
     }, []);
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm/${id}`)
-            .then(response => response.json())
-            .then(data => {
-                setMix(data);
-                setStatusLoading(true);
-            })
-            .catch(error => {
-                console.error('Error fetching unit data:', error);
-            });
-
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm`)
             .then(response => response.json())
             .then(data => {
@@ -204,7 +227,7 @@ function Pos() {
             .then(response => response.json())
             .then(promo => {
                 setPromotion(promo);
-                setStatusLoading(true);
+                // setStatusLoading(true);
             })
             .catch(error => {
                 console.error('Error fetching unit data:', error);
@@ -213,7 +236,7 @@ function Pos() {
             .then(response => response.json())
             .then(price => {
                 setPrice(price);
-                setStatusLoading(true);
+                // setStatusLoading(true);
             })
             .catch(error => {
                 console.error('Error fetching unit data:', error);
@@ -222,14 +245,14 @@ function Pos() {
             .then(response => response.json())
             .then(promofree => {
                 setSelectedPromotionfree(promofree);
-                setStatusLoading(true);
+                // setStatusLoading(true);
                 // สร้างแผนที่ smfree_id กับชื่อ
                 const idNameMap = new Map<number, string>();
                 promofree.flatMap(promotion => promotion.detail).forEach(item => {
                     idNameMap.set(item.smfree_id, item.smfree_idnamet);
                 });
                 setSmfreeIdNameMap(idNameMap);
-                console.log('smfreeIdNameMap:', idNameMap); // ตรวจสอบค่าของ smfreeIdNameMap
+                // console.log('smfreeIdNameMap:', idNameMap); // ตรวจสอบค่าของ smfreeIdNameMap
 
             })
             .catch(error => {
@@ -237,23 +260,23 @@ function Pos() {
             });
         fetch(`${process.env.NEXT_PUBLIC_API_URL}/setting/address`)
             .then((response) => {
-                console.log('Full response:', response); // Log the full response
+                // console.log('Full response:', response); // Log the full response
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return response.json(); // Parse JSON if the response is okay
             })
             .then((data) => {
-                console.log('Fetched data:', data); // Log the parsed data
+                // console.log('Fetched data:', data); // Log the parsed data
                 if (data && Array.isArray(data) && data.length > 0) {
-                    console.log('Address object:', data[0]); // Log the first object in the array
+                    // console.log('Address object:', data[0]); // Log the first object in the array
                     setAddressData(data[0]); // Set the first object from the array
-                    setStatusLoading(true); // Indicate loading is complete
+                    // setStatusLoading(true); // Indicate loading is complete
                 }
             })
             .catch((error) => {
                 console.error('Error fetching address data:', error);
-                setStatusLoading(false); // Loading failed
+                // setStatusLoading(false); // Loading failed
             });
 
 
@@ -338,61 +361,71 @@ function Pos() {
     //     return freeItems.map(item => item.smfree_id);
     // };
     const getFreeItemNames = (saleId: number) => {
-        if (!selectedPromotionfree) {
+        if (!Array.isArray(selectedPromotionfree)) {
             return [];
         }
 
         // ดึงข้อมูลรายการฟรีที่ตรงกับ saleId
-        const freeItems = selectedPromotionfree.flatMap(promotion =>
-            promotion.detail
-        ).filter(detail => detail.smbuy_id === saleId);
-        // console.log('Free Items:', freeItems); // ตรวจสอบค่าของ freeItems
+        const freeItems = selectedPromotionfree
+            .map(promotion => promotion.detail) // ใช้ map เพื่อดึง detail
+            .flat() // ใช้ flat เพื่อรวม array ที่ซ้อนกัน
+            .filter(detail => detail.smbuy_id === saleId);
 
         // ส่งกลับเป็น smfree_id
         return freeItems.map(item => item.smfree_id);
     };
 
+
+    // const isRadioDisabled = (sm_id) => {
+    //     if (!selectedSale) {
+    //         return true; // If no sale is selected, disable all radios
+    //     }
+
+    //     const freeItemIds = getFreeItemNames(selectedSale.sm_id); // Get free item IDs for the currently selected sale
+
+    //     // Disable if the current sm_id is NOT in the list of free item IDs
+    //     return !freeItemIds.includes(sm_id);
+    // };
+
     const [isOpenmix, setIsOpenmix] = useState(false);
     const closeModalmix = () => {
         setIsOpenmix(false);
+        setIsOpenEditMix(false);
+        setSelectedPdIdEdit([]);
+        setSelectedPdIds([]);
+        setQuantities({});
+        setQuantity(1);
+        setStatusLoadingSM(false)
     };
     const openModal = (sale) => {
         const fixValue = String(sale.fix);
         if (fixValue === "2") {
-            fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm/${sale.sm_id}`)
-                .then(response => response.json())
-                .then(data => {
-                    setMix(data); // Store the fetched data in the state
-                    setStatusLoading(true);
-                })
-                .catch(error => {
-                    console.error('Error fetching unit data:', error);
-                });
-            setIsOpen(false); // Close the regular modal
-
-            // Open a different modal for `fix: "2"`
-            setIsOpenmix(true); // Assuming you have another state for a different modal
+            getSalesMenu(sale)
+            setIsOpen(false);
+            setIsOpenmix(true);
             setSelectedSale(sale);
-            setQuantity(1); // Reset quantity to 1 whenever a new item is selected
-
-            console.log('Opening special modal for fix 2:', sale);
+            setQuantity(1);
         } else {
-            setIsOpenmix(false); // Close the special modal
-
-            // Standard modal for other cases
+            setIsOpenmix(false);
             setIsOpen(true);
+            setQuantity(1);
             setSelectedSale(sale);
-            setQuantity(1); // Reset quantity to 1 whenever a new item is selected
-            console.log('Clicked Sale:', sale);
-
-            const freeItemIds = getFreeItemNames(sale.sm_id);
-            if (freeItemIds.length > 0) {
-                console.log('Free Item IDs:', freeItemIds);
-            } else {
-                console.log('No free items available for this sale.');
-            }
+            setSelectedFreeId(null); // รีเซ็ตค่า selectedFreeId เมื่อเปิด Modal ใหม่
+            getFreeItemNames(sale.sm_id);
         }
     };
+
+    const getSalesMenu = (sale: any) => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/sm/${sale.sm_id}`)
+            .then(response => response.json())
+            .then(data => {
+                setMix(data);
+                setStatusLoadingSM(true);
+            })
+            .catch(error => {
+                console.error('Error fetching unit data:', error);
+            });
+    }
 
     // ฟังก์ชันเปิด modal
     // const openModal = (sale) => {
@@ -406,12 +439,16 @@ function Pos() {
     // };
     const [selectedFreeId, setSelectedFreeId] = useState<string | null>(null);
 
+    const handleFreeIdChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSelectedFreeId(event.target.value);
+    };
+
     // Function to handle changes when a radio button is selected
     const handleFreeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedFreeId(event.target.value); // เข้าถึงค่า string จาก event
     };
 
-    const freeItemIds = getFreeItemNames(selectedSale?.sm_id || 0);
+    var freeItemIds = getFreeItemNames(selectedSale?.sm_id || 0);
 
 
 
@@ -495,12 +532,59 @@ function Pos() {
     const closeModal3 = () => {
         setIsOpen3(false);
     };
-    // Function to format address
-    const formatAddress = (data) => {
-        if (!data) return 'ไม่มีข้อมูลที่อยู่';
-        return `${data.sh_address}, เขต ${data.sh_ampher}, อำเภอ ${data.sh_district}, จังหวัด ${data.sh_province}, รหัสไปรษณีย์ ${data.sh_zipcode}`;
-    };
 
+    const formatAddress = (data) => {
+        if (!data || !thaiAddressData) return 'ไม่มีข้อมูลที่อยู่';
+
+        let provinceName = data.sh_province;
+        let amphureName = data.sh_ampher;
+        let tambonName = data.sh_district;
+
+        // ค้นหาข้อมูลจังหวัด
+        const province = thaiAddressData.find(p =>
+            p.id.toString() === data.sh_province || p.name_th === data.sh_province
+        );
+
+        if (province) {
+            provinceName = province.name_th;
+
+            // ค้นหาข้อมูลอำเภอ
+            const amphure = province.amphure.find(a => {
+                const amphurId = data.sh_ampher.length > 4 ? data.sh_ampher.substring(0, 4) : data.sh_ampher;
+                return a.id.toString() === amphurId || a.name_th === data.sh_ampher;
+            });
+
+            if (amphure) {
+                amphureName = amphure.name_th;
+
+                // ค้นหาข้อมูลตำบล
+                // ถ้า sh_district เป็นรหัสอำเภอ ให้ใช้ตำบลแรกของอำเภอนั้น
+                if (data.sh_district === amphure.id.toString()) {
+                    tambonName = amphure.tambon[0]?.name_th || 'ไม่ระบุตำบล';
+                } else {
+                    const tambon = amphure.tambon.find(t => {
+                        const tambonId = data.sh_district.length > 6 ? data.sh_district.substring(0, 6) : data.sh_district;
+                        return t.id.toString() === tambonId || t.name_th === data.sh_district;
+                    });
+
+                    if (tambon) {
+                        tambonName = tambon.name_th;
+                    } else {
+                        console.log(`ไม่พบข้อมูลตำบลสำหรับ: ${data.sh_district}`);
+                        tambonName = 'ไม่ระบุตำบล';
+                    }
+                }
+            } else {
+                console.log(`ไม่พบข้อมูลอำเภอสำหรับ: ${data.sh_ampher}`);
+                amphureName = 'ไม่ระบุอำเภอ';
+            }
+        } else {
+            console.log(`ไม่พบข้อมูลจังหวัดสำหรับ: ${data.sh_province}`);
+            provinceName = 'ไม่ระบุจังหวัด';
+        }
+
+        return `${data.sh_address}, ตำบล${tambonName}, อำเภอ${amphureName}, จังหวัด${provinceName}, รหัสไปรษณีย์ ${data.sh_zipcode}`;
+    };
     // Debug: Check what data is being fetched
     // console.log('address data:', addressData);
     const [selectedPdIds, setSelectedPdIds] = useState([]);
@@ -511,7 +595,7 @@ function Pos() {
 
     // Functions to increment and decrement quantity
     const incrementQuantitymix = (pd_id: number) => {
-        const currentTotal = Object.values(quantities).reduce((acc, qty) => acc + qty, 0);
+        const currentTotal = getTotalSelectedItems();
         if (currentTotal < selectedSale.qty_per_unit) {
             setQuantities({
                 ...quantities,
@@ -527,8 +611,13 @@ function Pos() {
                 [pd_id]: quantities[pd_id] - 1,
             });
         } else {
-            // If quantity is 1 and decremented, remove from selected IDs
-            handleCheckboxChange(pd_id);
+            // ถ้าจำนวนเหลือ 1 และกดลบ ให้นำรายการออกจากการเลือก
+            const newSelectedPdIds = selectedPdIds.filter(id => id !== pd_id);
+            setSelectedPdIds(newSelectedPdIds);
+
+            // ลบข้อมูลจำนวนของรายการนี้ออก
+            const { [pd_id]: _, ...restQuantities } = quantities;
+            setQuantities(restQuantities);
         }
     };
     // Function to handle checkbox change
@@ -556,15 +645,13 @@ function Pos() {
     useEffect(() => {
         const updateDateTime = () => {
             const now = new Date();
-            const formattedDateTime = now.toLocaleString(); // Customize the format if needed
+            const formattedDateTime = now.toLocaleString();
             setTodayDateTime(formattedDateTime);
         };
 
         updateDateTime();
 
         const intervalId = setInterval(updateDateTime, 1000);
-
-        // Clear the interval on component unmount
         return () => clearInterval(intervalId);
     }, []);
 
@@ -594,6 +681,7 @@ function Pos() {
             second: '2-digit',
             hour12: false // ใช้รูปแบบ 24 ชั่วโมง
         }).replace('T', ' '); // แปลงเป็นฟอร์แมต "YYYY-MM-DD HH:MM:SS"
+
         const allItems = selectedItems.map(product => {
             const isFreeItem = product.id !== null && smfreeIdNameMap.has(parseInt(product.id));
             return {
@@ -601,7 +689,7 @@ function Pos() {
                 quantity: product.quantity,
                 price: isFreeItem ? 0 : product.sm_price,
                 isFreeItem: isFreeItem,
-                smfree_id: isFreeItem ? parseInt(smfreeIdNameMap.get(parseInt(product.id))) : null
+                smfree_id: isFreeItem ? parseInt(product.id) : null // Use the ID directly
             };
         });
         const dataOrder = {
@@ -621,7 +709,7 @@ function Pos() {
             dc_id: selectedPromotion?.dc_id || null,
             // user_id: "",
             selectedItems,
-            allItems
+            freeItems: allItems.filter(item => item.isFreeItem)
         };
         console.log("dataOrder : ", dataOrder)
 
@@ -635,13 +723,12 @@ function Pos() {
                 body: JSON.stringify(dataOrder),
             });
 
-            // const result = await response.json();
+            const result = await response.json();
             if (response.ok) {
                 console.log("Order created successfully");
                 alert("Order created successfully");
-                // Fetch ข้อมูลออร์เดอร์ที่เพิ่งบันทึกจาก DB
-                // const od_id = result.od_id; // สมมติว่าผลลัพธ์คืน od_id กลับมา
-                const fetchOrderResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/latest`, {
+
+                const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/pdf-viewer`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -649,26 +736,42 @@ function Pos() {
                     credentials: 'include',
                 });
 
-                const orderData = await fetchOrderResponse.json();
-                // Call the API route to generate the PDF
-                const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/pos/generate-pdf`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(orderData),
-                });
-
                 if (pdfResponse.ok) {
-                    console.log("PDF generation completed successfully.");
-                    alert("PDF generated successfully!");
-                    const pdfBlob = await pdfResponse.blob(); // รับข้อมูล PDF เป็น Blob
-                    const pdfUrl = URL.createObjectURL(pdfBlob); // สร้าง URL สำหรับ Blob
-                    window.open(pdfUrl, '_blank'); // เปิด PDF ในแท็บใหม่
+                    const pdfBlob = await pdfResponse.blob();
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    window.open(pdfUrl, '_blank');
+                    console.log('PDF Blob:', pdfBlob);
 
                 } else {
-                    console.error("Error generating PDF:", await pdfResponse.json());
+                    const errorData = await pdfResponse.json();
+                    console.error('Error displaying PDF:', errorData.error);
                 }
+                // if (response.ok) {
+                //     console.log("Order created successfully");
+                //     alert("Order created successfully");
+
+
+                //     // ส่ง request ไปที่ /generate-pdf พร้อมข้อมูล order ที่เพิ่งสร้าง
+                //     const pdfResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/generate-pdf`, {
+                //         method: 'POST',
+                //         headers: {
+                //             'Content-Type': 'application/json',
+                //         },
+                //         body: JSON.stringify(dataOrder), // ส่งข้อมูล order เพื่อสร้าง PDF
+                //     });
+
+                //     if (pdfResponse.ok) {
+                //         const pdfBlob = await pdfResponse.blob();
+                //         const pdfUrl = URL.createObjectURL(pdfBlob);
+                //         window.open(pdfUrl, '_blank'); // เปิด PDF ในหน้าต่างใหม่
+                //     } else {
+                //         console.error('Error generating PDF');
+                //     }
+                // } else {
+                //     console.error("Failed to create order");
+                // }
+
+
 
                 closeModal3
                 closeModal2
@@ -688,16 +791,188 @@ function Pos() {
     //         console.error("Failed to open test window");
     //     }
     // };
+    const [thaiAddressData, setThaiAddressData] = useState(null);
+
+    useEffect(() => {
+        setSelectedPdIds([]);
+        setQuantities({});
+        setQuantity(1);
+    }, [selectedSale]);
+
+    // เก็บจำนวนที่เลือก
+    const getTotalSelectedItems = () => {
+        return selectedPdIds.reduce((total, id) => total + (quantities[id] || 1), 0);
+    };
+
+    // Edit selected
+    const [editProduct, setEditProduct] = useState<SelectEdit | null>();
+    const [freeItemIdEdit, setFreeItemIdEdit] = useState(null)
+    const [indexEdit, setIndexEdit] = useState(null)
+    const [selectedPdIdEdit, setSelectedPdIdEdit] = useState([]);
+    const openModalsEdit = (selectedid: any) => {
+        setFreeItemIdEdit(getFreeItemNames(selectedItems[selectedid].sm_id || 0))
+        setEditProduct(selectedItems[selectedid])
+        setQuantityEdit(selectedItems[selectedid].quantity)
+        setSelectedFreeIdEdit(selectedItems[selectedid].id)
+        const pdIds = selectedItems[selectedid].mixItems.map(item => item.pd_id) || [];
+        const QpdIds = selectedItems[selectedid].mixItems.reduce((acc, item) => {
+            acc[item.pd_id] = item.quantity;
+            return acc;
+        }, {});
+        setQuantitiesEdit(QpdIds);
+        setSelectedPdIdEdit(pdIds);
+        setIndexEdit(selectedid);
+        if (selectedItems[selectedid].fix == "1") {
+            setIsOpenEdit(true);
+        } else if (selectedItems[selectedid].fix == "2" && pdIds) {
+            // const pdIds = selectedItems[selectedid].mixItems.map(item => item.pd_id);
+            console.log(quantitiesEdit)
+
+            // setSelectedPdIdEdit(pdIds);
+            setIsOpenEditMix(true);
+        }
 
 
+        console.log(selectedItems[selectedid])
+    }
+
+    // จำนวนสินค้าในหน้าแก้ไข
+    const [quantityEdit, setQuantityEdit] = useState(1);
+    const incrementQuantityEdit = () => {
+        setQuantityEdit(prevQuantity => prevQuantity + 1);
+    };
+    const decrementQuantityEdit = () => {
+        setQuantityEdit(prevQuantity => Math.max(prevQuantity - 1, 1));
+    };
+
+    // แก้ไขสินค้าแถม
+    const [selectedFreeIdEdit, setSelectedFreeIdEdit] = useState<string | null>(null);
+    const handleFreeIdChangeEdit = (event: ChangeEvent<HTMLInputElement>) => {
+        setSelectedFreeIdEdit(event.target.value);
+    };
+
+    const updateItemAtIndex = (array, index, newValues) => {
+        return array.map((item, i) =>
+            i === index ? { ...item, ...newValues } : item
+        );
+    };
+
+    // บันทึกการแก้ไข
+    const submitEdit = () => {
+        if (editProduct && indexEdit !== null) {
+            const updatedItems = updateItemAtIndex(selectedItems, indexEdit, {
+                ...editProduct,
+                quantity: quantityEdit,
+                id: selectedFreeIdEdit,
+                mixItems: editProduct.fix === "2" ? selectedPdIdEdit.map(id => {
+                    const item = Mix.find(m => m.pd_id === id);
+                    return {
+                        pd_id: id,
+                        pd_name: item ? item.pd_name : 'Unknown',
+                        quantity: quantitiesEdit[id] || 1
+                    };
+                }) : []
+            });
+            // const newItem = {
+            //     ...editProduct,
+            //     quantity: quantityEdit,
+            //     id: selectedFreeIdEdit,
+            //     mixItems: editProduct.fix === "2" ? selectedPdIdEdit.map(id => {
+            //         const item = Mix.find(m => m.pd_id === id);
+            //         return {
+            //             pd_id: id,
+            //             pd_name: item ? item.pd_name : 'Unknown',
+            //             quantity: quantitiesEdit[id] || 1
+            //         };
+            //     }) : []
+            // };
+            setSelectedItems(updatedItems);
+            setIsOpenEdit(false); // ปิด modal
+            setIsOpenEditMix(false); // ปิด modal
+            // รีเซ็ตค่าต่างๆ
+            setEditProduct(null);
+            setIndexEdit(null);
+            setQuantityEdit(1);
+            setSelectedFreeIdEdit(null);
+
+        }
+    };
+
+    const handleCheckboxChangeEdit = (pd_id: number) => {
+        if (selectedPdIdEdit.includes(pd_id)) {
+            // If already selected, remove it from the list
+            const newSelectedIds = selectedPdIdEdit.filter(id => id !== pd_id);
+            setSelectedPdIdEdit(newSelectedIds);
+
+            // Remove the quantity entry for this pd_id
+            const { [pd_id]: _, ...rest } = quantitiesEdit; // Remove the entry from quantities
+            setQuantitiesEdit(rest);
+        } else {
+            // Check if adding this item would exceed the limit
+            const currentTotal = Object.values(quantitiesEdit).reduce((acc, qty) => acc + qty, 0);
+            if (currentTotal < editProduct.qty_per_unit) {
+                setSelectedPdIdEdit([...selectedPdIdEdit, pd_id]);
+                setQuantitiesEdit({ ...quantitiesEdit, [pd_id]: 1 }); // Initialize with quantity 1
+            }
+        }
+    };
+
+    const [quantitiesEdit, setQuantitiesEdit] = useState<{ [key: number]: number }>({});
+    const getTotalSelectedItemsEdit = () => {
+        return selectedPdIdEdit.reduce((total, id) => total + (quantitiesEdit[id] || 1), 0);
+    };
+
+    // Functions to increment and decrement quantity
+    const incrementQuantitymixEdit = (pd_id: number) => {
+        const currentTotal = getTotalSelectedItemsEdit();
+        if (currentTotal < editProduct.qty_per_unit) {
+            setQuantitiesEdit({
+                ...quantitiesEdit,
+                [pd_id]: (quantitiesEdit[pd_id] || 1) + 1,
+            });
+        }
+    };
+
+    const decrementQuantitymixEdit = (pd_id: number) => {
+        if (quantitiesEdit[pd_id] > 1) {
+            setQuantitiesEdit({
+                ...quantitiesEdit,
+                [pd_id]: quantitiesEdit[pd_id] - 1,
+            });
+        } else {
+            // ถ้าจำนวนเหลือ 1 และกดลบ ให้นำรายการออกจากการเลือก
+            const newSelectedPdIds = selectedPdIds.filter(id => id !== pd_id);
+            setSelectedPdIds(newSelectedPdIds);
+
+            // ลบข้อมูลจำนวนของรายการนี้ออก
+            const { [pd_id]: _, ...restQuantities } = quantitiesEdit;
+            setQuantitiesEdit(restQuantities);
+        }
+    };
+
+    const test =
+    {
+        "sm_id": 5,
+        "sm_name": "ออริจินอล M",
+        "sm_price": 80,
+        "status": "c",
+        "fix": "1",
+        "picture": "images/logo.svg",
+        "smt_id": 1,
+        "smt_name": "กล่อง M",
+        "qty_per_unit": 4,
+        "quantity": 1,
+        "id": "3",
+        "mixItems": []
+    }
 
 
 
     return (
-        <div className={kanit.className}>
-            <div className="flex flex-col  h-screen">
-                {/* nav ส่วนบน
-                <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1">
+        <div className={`${kanit.className} max-h-[calc(100vh-50px)]`}>
+            <div className="flex flex-col ">
+                {/* nav ส่วนบน */}
+                {/* <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full border border-b-[#C5B182] border-b-1">
                     <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
                             <UserCircleIcon className="h-6 w-6 text-[#73664B] justify-end" />
@@ -722,13 +997,13 @@ function Pos() {
                     </div>
                 </nav> */}
 
-                <main className="flex flex-grow bg-white w-full overflow-hidden">
+                <main className="flex flex-grow bg-white">
                     {/* Left Content */}
-                    <div className="flex-grow overflow-y-auto p-4">
+                    <div className="flex-grow overflow-y-auto pl-4 pt-4">
                         {/* Content that can scroll independently */}
                         <div>
                             <p className='text-[#F2B461] font-medium m-1'>ทำรายการขาย</p>
-                            <div className="flex justify-between">
+                            {/* <div className="flex justify-between">
                                 <form className="flex items-center w-full transform scale-75  ">
                                     <div className="relative w-1/2 ">
                                         <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none ">
@@ -744,7 +1019,7 @@ function Pos() {
                                     </button>
                                 </form>
 
-                            </div>
+                            </div> */}
                             <div className="w-full">
                                 <div className="flex w-full flex-col">
                                     <Tabs
@@ -767,10 +1042,10 @@ function Pos() {
                                                 </div>
                                             }
                                         >
-                                            <div className="second-tab-layout mx-1">
+                                            <div className="second-tab-layout mx-1  max-h-[calc(100vh-225px)] overflow-y-auto">
                                                 <div className="relative overflow-x-auto ">
                                                     {statusLoading ? (
-                                                        <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-5 lg:grid-cols-3 2xl:grid-cols-7 gap-4">
                                                             {Sale && Sale.length > 0 ? (
                                                                 Sale.map((sale, index) => (
                                                                     <Card key={index}
@@ -789,7 +1064,7 @@ function Pos() {
                                                                         </CardBody>
                                                                         <CardFooter className="text-small justify-between">
                                                                             <p className='text-[#73664B]'>{sale.sm_name}</p>
-                                                                            <p className="text-[#F2B461]">{getPriceBasedOnDelivery(sale)} บาท</p>
+                                                                            <p className="text-[#F2B461]">{getPriceBasedOnDelivery(sale)}</p>
                                                                         </CardFooter>
                                                                     </Card>
 
@@ -905,161 +1180,114 @@ function Pos() {
                     </div>
 
                     {/* Right Order Panel */}
-                    <div className="relative w-screen max-w-sm h-full overflow-hidden border-l-1">
-                        <div className="pointer-events-auto h-full w-full transform transition duration-500 ease-in-out bg-white shadow-xl">
-                            <div className="flex h-full flex-col overflow-y-scroll">
-                                <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-                                    <div className="flex items-start justify-between">
-                                        <p className="text-lg font-medium text-[#73664B]">คำสั่งซื้อ</p>
-                                    </div>
-                                    <div className="flex items-start justify-between mt-2">
-                                        <p className="font-normal text-[#73664B]">วันที่ : {todayDateTime}</p>
-                                    </div>
-                                    <div className="flex items-start justify-between mt-2 ">
-                                        <select
-                                            id="countries"
-                                            className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
-                                            name="sell"
-                                            onChange={handleDeliveryChange}
-                                        >
-                                            {/* อายฟูฟิกtypeมาเลย แต่ยังไม่ทำกรณีเพิ่ม line2 grab3*/}
-                                            <option value="1">ขายหน้าร้าน</option>
-                                            <option value="2">Line Man</option>
-                                            <option value="3">Grab</option>
-
-                                        </select>
-                                    </div>
-
-                                    <div className="mt-8">
-                                        <div className="flow-root">
-                                            <ul role="list" className="-my-6 divide-y divide-gray-200">
-                                                {selectedItems.map((product, index) => (
-                                                    <li key={index} className="flex py-6">
-                                                        <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                                            <Image
-                                                                alt={product.picture}
-                                                                src={product.picture}
-                                                                className="h-full w-full object-cover object-center"
-                                                            />
-                                                        </div>
-                                                        <div className="ml-4 flex flex-1 flex-col">
-                                                            <div>
-                                                                <div className="flex justify-between text-base font-medium text-gray-900">
-                                                                    <p>
-                                                                        <a href={product.href}>{product.sm_name}</a>
-                                                                    </p>
-                                                                    <p className="ml-4">{product.sm_price * product.quantity} บาท</p>
-                                                                </div>
-
-                                                                <p className="mt-1 text-sm text-gray-500">
-                                                                    {product.id !== null
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
-                                                                        : ''
-                                                                    }
-                                                                    {/* {selectedPdIds.includes(product.pd_id) && (
-                                                                        <p className="mt-1 text-sm text-gray-500">
-                                                                            Selected: {quantities[product.pd_id] || 1} pieces
-                                                                        </p>
-                                                                    )} */}
-                                                                </p>
-                                                            </div>
-                                                            <div className="flex flex-1 items-end justify-between text-sm ">
-                                                                <p className="text-gray-500">จำนวน </p>
-                                                                <div className="flex items-center w-3/5">
-                                                                    <button
-                                                                        onClick={() => handleDecreaseQuantity(product.sm_id)}
-
-                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
-                                                                    >
-                                                                        <svg
-                                                                            className="text-[#73664B]"
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                            width="1em"
-                                                                            height="1em"
-                                                                            viewBox="0 0 256 256"
-                                                                        >
-                                                                            <path
-                                                                                fill="currentColor"
-                                                                                d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-                                                                    <span className="w-4 text-center mx-2">{product.quantity}</span>
-                                                                    <button
-                                                                        onClick={() => handleIncreaseQuantity(product.sm_id)}
-
-                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs">
-                                                                        <svg
-                                                                            className="text-[#73664B]"
-                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                            width="1em"
-                                                                            height="1em"
-                                                                            viewBox="0 0 256 256"
-                                                                        >
-                                                                            <path
-                                                                                fill="currentColor"
-                                                                                d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
-                                                                            />
-                                                                        </svg>
-                                                                    </button>
-                                                                </div>
-                                                                <div className="flex">
-                                                                    <button
-                                                                        type="button"
-                                                                        className="font-medium "
-                                                                        onClick={() => handleRemoveItem(index)}>
-                                                                        <TrashIcon className="h-5 w-5 text-red-500" />
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
+                    <div className="relative w-screen max-w-sm h-[calc(100vh-60px)] overflow-hidden border-l-1">
+                        <div className="pointer-events-auto h-full w-full transform transition duration-500 ease-in-out bg-white shadow-xl flex flex-col">
+                            {/* ส่วนหัว */}
+                            <div className="px-4 py-4 sm:px-6">
+                                <div className="flex items-start justify-between">
+                                    <p className="text-lg font-medium text-[#73664B]">คำสั่งซื้อ</p>
                                 </div>
-
-                                <div className="border-t border-gray-200 px-4 pb-3 sm:px-6">
-                                    <div className="flex items-start justify-between my-3">
-                                        <select
-                                            id="countries"
-                                            className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
-                                            name="sell"
-                                            onChange={handlePromotionChange}
-
-                                        >
-                                            <option value="" >ไม่มีโปรโมชัน</option>
-                                            {Promotion.filter((promotion) => calculateTotalPriceBeforeDiscount(selectedItems) >= promotion.minimum)
-                                                .map((promotion, index) => (
-                                                    <option key={index} value={promotion.dc_name}>
-                                                        {promotion.dc_name}, {promotion.dc_diccountprice}
-                                                    </option>
-                                                ))}
-                                        </select>
-                                    </div>
-                                    <div className="flex justify-between text-sm   text-[#73664B]">
-                                        <p>ยอดรวม</p>
-                                        <p>{calculateTotalPriceBeforeDiscount(selectedItems).toFixed(2)} บาท</p>
-                                    </div>
-                                    <div className="flex justify-between text-sm  text-[#73664B]">
-                                        <p>ส่วนลด</p>
-                                        <p>- {selectedPromotion ? selectedPromotion.dc_diccountprice.toFixed(2) : '0.00'} บาท</p>
-                                    </div>
-                                    <div className="flex justify-between text-base font-medium text-gray-900">
-                                        <p>รวมสุทธิ</p>
-                                        <p>{calculateTotalPrice().toFixed(2)} บาท</p>
-                                    </div>
-                                    <div className="mt-6">
-                                        <Button
-                                            onClick={openModal2}
-                                            href="#"
-                                            className="flex items-center justify-center rounded-md border border-transparent bg-[#73664B] px-6 py-3 text-base font-medium text-white shadow-sm w-full"
-                                        >
-                                            ยืนยัน
-                                        </Button>
-                                    </div>
+                                <div className="mt-2">
+                                    <p className="font-normal text-[#73664B]">วันที่ : {todayDateTime}</p>
                                 </div>
+                                <div className="mt-2">
+                                    <select
+                                        id="countries"
+                                        className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
+                                        name="sell"
+                                        onChange={handleDeliveryChange}
+                                    >
+                                        <option value="1">ขายหน้าร้าน</option>
+                                        <option value="2">Line Man</option>
+                                        <option value="3">Grab</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* ส่วนรายการสินค้า (สามารถสกรอลล์ได้) */}
+                            <div className="flex-1 overflow-y-auto px-4 sm:px-6">
+                                <ul role="list" className="divide-y divide-gray-200">
+                                    {selectedItems.map((product, index) => (
+                                        <li key={index} className="py-6 flex">
+                                            <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 flex justify-center items-center">
+                                                <p className='text-[#F2B461]'>{product.quantity}x</p>
+                                            </div>
+                                            <div className="ml-4 flex flex-1 flex-col">
+                                                <div>
+                                                    <div className="flex justify-between text-base font-medium text-[#73664B]">
+                                                        <h3>{product.sm_name}</h3>
+                                                        <p className="ml-4">{(product.sm_price * product.quantity).toFixed(2)} บาท</p>
+                                                    </div>
+                                                    {product.id && smfreeIdNameMap.get(parseInt(product.id)) && (
+                                                        <p className="mt-1 text-sm font-light ">
+                                                            แถมฟรี: {smfreeIdNameMap.get(parseInt(product.id))}
+                                                        </p>
+                                                    )}
+                                                    {product.mixItems && product.mixItems.length > 0 && (
+                                                        <div className="mt-1 text-sm font-light ">
+                                                            <p>ประกอบด้วย:</p>
+                                                            <ul className="list-disc list-inside pl-2">
+                                                                {product.mixItems.map((item, idx) => (
+                                                                    <li key={idx}>{item.pd_name} x{item.quantity}</li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex items-center justify-between text-sm mt-2">
+                                                    <div className="flex items-center">
+                                                        <p onClick={() => openModalsEdit(index)} className='text-[#F2B461] cursor-pointer'>แก้ไข</p>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveItem(index)}
+                                                        className="text-[#FF6B6B] hover:text-[#FF3E3E]"
+                                                    >
+                                                        <TrashIcon className="h-5 w-5" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+
+                            {/* ส่วนท้าย */}
+                            <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
+                                <div className="mb-4">
+                                    <select
+                                        id="promotion"
+                                        className="bg-[#E3D9C0] block w-full rounded-md py-1.5 text-[#73664B] shadow-sm sm:text-sm sm:leading-6 pl-2"
+                                        name="promotion"
+                                        onChange={handlePromotionChange}
+                                    >
+                                        <option value="">ไม่มีโปรโมชัน</option>
+                                        {Promotion.filter((promotion) => calculateTotalPriceBeforeDiscount(selectedItems) >= promotion.minimum)
+                                            .map((promotion, index) => (
+                                                <option key={index} value={promotion.dc_name}>
+                                                    {promotion.dc_name}, {promotion.dc_diccountprice}
+                                                </option>
+                                            ))}
+                                    </select>
+                                </div>
+                                <div className="flex justify-between text-sm text-[#73664B] mb-2">
+                                    <p>ยอดรวม</p>
+                                    <p>{calculateTotalPriceBeforeDiscount(selectedItems).toFixed(2)} บาท</p>
+                                </div>
+                                <div className="flex justify-between text-sm text-[#73664B] mb-2">
+                                    <p>ส่วนลด</p>
+                                    <p>- {selectedPromotion ? selectedPromotion.dc_diccountprice.toFixed(2) : '0.00'} บาท</p>
+                                </div>
+                                <div className="flex justify-between text-base font-medium text-[#73664B] mb-6">
+                                    <p>รวมสุทธิ</p>
+                                    <p>{calculateTotalPrice().toFixed(2)} บาท</p>
+                                </div>
+                                <Button
+                                    onClick={openModal2}
+                                    className="flex items-center justify-center rounded-md border border-transparent bg-[#73664B] px-6 py-3 text-base font-medium text-white shadow-sm w-full hover:bg-[#5E523C]"
+                                >
+                                    ยืนยัน
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -1109,18 +1337,33 @@ function Pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between" key={index + "select"}>
-
-                                                                <div key={index}>
-                                                                    <p>{product.quantity} {product.sm_name}</p>
-                                                                    <p className="text-sm text-gray-500">{product.id !== null
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
-                                                                        : ''
-                                                                    }</p>
+                                                            <li key={index} className="flex">
+                                                                <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 flex justify-center items-center">
+                                                                    <p className='text-[#F2B461] text-xs'>{product.quantity}x</p>
                                                                 </div>
-                                                                <p className="font-medium">{product.sm_price * product.quantity}</p>
-
-                                                            </div>
+                                                                <div className="ml-4 flex flex-1 flex-col">
+                                                                    <div>
+                                                                        <div className="flex justify-between text-base font-medium">
+                                                                            <h3 className='text-black'>{product.sm_name}</h3>
+                                                                            <p className="ml-4 text-black">{(product.sm_price * product.quantity).toFixed(2)} บาท</p>
+                                                                        </div>
+                                                                        {product.id && smfreeIdNameMap.get(parseInt(product.id)) && (
+                                                                            <p className="mt-1 text-sm font-light ">
+                                                                                x {smfreeIdNameMap.get(parseInt(product.id))}
+                                                                            </p>
+                                                                        )}
+                                                                        {product.mixItems && product.mixItems.length > 0 && (
+                                                                            <div className="mt-1 text-sm font-light ">
+                                                                                <ul className="list-disc list-inside pl-2">
+                                                                                    {product.mixItems.map((item, idx) => (
+                                                                                        <li key={idx}>{item.pd_name} x{item.quantity}</li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </li>
                                                         ))}
 
                                                     </div>
@@ -1268,19 +1511,33 @@ function Pos() {
 
                                                     <div className="space-y-4">
                                                         {selectedItems.map((product, index) => (
-                                                            <div className="flex justify-between" key={index + "selectItem"}>
-
-                                                                <div key={index}>
-                                                                    <p>{product.quantity} {product.sm_name}</p>
-                                                                    <p className="text-sm text-gray-500">{product.id !== null
-                                                                        ? `x ${smfreeIdNameMap.get(parseInt(product.id))}`
-                                                                        : ''
-                                                                    }</p>
-
+                                                            <li key={index} className="flex">
+                                                                <div className="h-8 w-8 flex-shrink-0 overflow-hidden rounded-md border border-gray-200 flex justify-center items-center">
+                                                                    <p className='text-[#F2B461] text-xs'>{product.quantity}x</p>
                                                                 </div>
-                                                                <p className="font-medium">{product.sm_price * product.quantity}</p>
-
-                                                            </div>
+                                                                <div className="ml-4 flex flex-1 flex-col">
+                                                                    <div>
+                                                                        <div className="flex justify-between text-base font-medium">
+                                                                            <h3 className='text-black'>{product.sm_name}</h3>
+                                                                            <p className="ml-4 text-black">{(product.sm_price * product.quantity).toFixed(2)} บาท</p>
+                                                                        </div>
+                                                                        {product.id && smfreeIdNameMap.get(parseInt(product.id)) && (
+                                                                            <p className="mt-1 text-sm font-light ">
+                                                                                x {smfreeIdNameMap.get(parseInt(product.id))}
+                                                                            </p>
+                                                                        )}
+                                                                        {product.mixItems && product.mixItems.length > 0 && (
+                                                                            <div className="mt-1 text-sm font-light ">
+                                                                                <ul className="list-disc list-inside pl-2">
+                                                                                    {product.mixItems.map((item, idx) => (
+                                                                                        <li key={idx}>{item.pd_name} x{item.quantity}</li>
+                                                                                    ))}
+                                                                                </ul>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </li>
                                                         ))}
 
                                                     </div>
@@ -1364,7 +1621,7 @@ function Pos() {
             <div className="w-1/2  mt-10  flex justify-start ">
                 <>
                     {isOpen && (
-                        <Transition appear show={isOpen} as={Fragment} >
+                        <Transition appear show={isOpen} as={Fragment}>
                             <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                 <Transition.Child
                                     as={Fragment}
@@ -1379,6 +1636,150 @@ function Pos() {
                                 </Transition.Child>
 
                                 <div className="fixed inset-0 overflow-y-auto">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center ">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 scale-95"
+                                            enterTo="opacity-100 scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 scale-100"
+                                            leaveTo="opacity-0 scale-95"
+                                        >
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-50 text-left align-middle shadow-xl transition-all">
+                                                <div>
+                                                    {selectedSale && (
+                                                        <Card shadow="sm">
+                                                            <CardBody className="overflow-visible p-0 bg-white">
+                                                                <Image
+                                                                    alt={'/default-image.png'}
+                                                                    shadow="sm"
+                                                                    width={448}
+                                                                    src={selectedSale.picture || '/default-image.png'}  // Fallback if picture is missing
+                                                                    className="object-cover h-[140px] bg-white"
+                                                                />
+                                                            </CardBody>
+                                                        </Card>
+                                                    )}
+
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-lg bg-white pb-3 font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
+                                                    >
+                                                        <p>{selectedSale.sm_name}</p>
+                                                        <p className="text-[#F2B461]">ราคา {selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}฿</p>
+                                                    </Dialog.Title>
+                                                    <div className="px-4 pb-2 pt-2 mt-1 bg-white">
+
+                                                        {freeItemIds.length > 0 && (
+                                                            <>
+                                                                <div>
+                                                                    <p className="text-lg font-medium">
+                                                                        ของแถม
+                                                                    </p>
+                                                                    <p className='text-sm text-[#73664B] font-normal'>จำเป็นต้องระบุ</p>
+                                                                </div>
+
+
+                                                                <RadioGroup
+                                                                    value={selectedFreeId}
+                                                                    onChange={handleFreeIdChange}
+                                                                    className='mt-2'
+                                                                >
+                                                                    {freeItemIds.map(id => (
+                                                                        <Radio
+                                                                            key={id}
+                                                                            value={id.toString()}
+                                                                            classNames={{
+                                                                                base: cn(
+                                                                                    "inline-flex max-w-full w-full bg-content1 m-0",
+                                                                                    "hover:bg-content2 items-center justify-start",
+                                                                                    "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                    "data-[selected=true]:border-primary"
+                                                                                ),
+                                                                            }}
+                                                                        >
+                                                                            {smfreeIdNameMap.get(id) || 'No Name Available'}
+                                                                        </Radio>
+                                                                    ))}
+                                                                </RadioGroup>
+                                                            </>
+                                                        )}
+
+                                                    </div>
+
+                                                    <div className='px-4 pb-4 pt-2 mt-1 bg-white'>
+                                                            <p className="text-lg font-medium">จำนวน</p>
+                                                            <div className="flex items-center justify-center mt-2">
+                                                                <button
+                                                                    onClick={decrementQuantity}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+                                                                    disabled={quantity == 1}
+                                                                >
+                                                                    <svg className="text-[#73664B] w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                                                                        <path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" />
+                                                                    </svg>
+                                                                </button>
+                                                                <span className="w-10 text-center mx-2 text-lg">{quantity}</span>
+                                                                <button
+                                                                    onClick={incrementQuantity}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+                                                                >
+                                                                    <svg className="text-[#73664B] w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                                                                        <path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex p-4 w-full bg-white mt-1">
+
+                                                            <button
+                                                                type="button"
+                                                                className="inline-flex justify-center w-1/2 rounded-md border border-transparent bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={closeModal}
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+                                                            <div className='mx-1'></div>
+                                                            <button
+                                                                type="button"
+                                                                className="inline-flex justify-center w-1/2 rounded-md border border-transparent bg-[#C5B182] px-4 py-2 text-sm font-medium text-white hover:bg-[#A89362] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={handleAddToCart}
+                                                            >
+                                                                เพิ่มลงตะกร้า
+                                                            </button>
+                                                        </div>
+
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                    )}
+                </>
+            </div>
+
+            <div className="w-1/2  mt-10  flex justify-start ">
+                <>
+                    {isOpenmix && (
+                        <Transition appear show={isOpenmix} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className} bg-gray-500`}>
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-black/25" />
+                                </Transition.Child>
+
+                                <div className="fixed inset-0 overflow-y-auto ">
                                     <div className="flex min-h-full items-center justify-center p-4 text-center">
                                         <Transition.Child
                                             as={Fragment}
@@ -1389,112 +1790,189 @@ function Pos() {
                                             leaveFrom="opacity-100 scale-100"
                                             leaveTo="opacity-0 scale-95"
                                         >
-                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                                {/* <Dialog.Title
-                                                    as="h3"
-                                                    className="text-lg font-medium leading-6 text-[73664B]"
-                                                >
-                                                    {selectedSale.sm_name}
-                                                </Dialog.Title> */}
-                                                <div className='flex'>
-                                                    <Card shadow="sm" >
-                                                        <CardBody className="overflow-visible p-0">
-                                                            <Image
-                                                                alt={selectedSale.picture}
-                                                                shadow="sm"
-                                                                radius="lg"
-                                                                width={200}
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-gray-50 text-left align-middle shadow-xl transition-all">
+                                                <div>
+                                                    {selectedSale && (
+                                                        <Card shadow="sm" className='bg-white'>
+                                                            <CardBody className="overflow-visible p-0 bg-white">
+                                                                <Image
+                                                                    alt={'/default-image.png'}
+                                                                    shadow="sm"
+                                                                    width={448}
+                                                                    src={selectedSale.picture || '/default-image.png'}  // Fallback if picture is missing
+                                                                    className="object-cover h-[140px] bg-white"
+                                                                />
+                                                            </CardBody>
+                                                        </Card>
+                                                    )}
 
-                                                                src={selectedSale.picture}
-                                                                className=" object-cover h-[140px]"
-                                                            />
-                                                        </CardBody>
-                                                        <CardFooter className="text-small justify-between">
-                                                            <p className='text-[#73664B]'>{selectedSale.sm_name}</p>
-                                                            <p className=" text-[#F2B461]">{selectedSale.sm_price}</p>
-                                                        </CardFooter>
-                                                    </Card>
-
-
-                                                    <div className="ml-6">
-                                                        <p className="text-lg text-[#73664B] font-medium">
-                                                            ของแถม <span className='text-sm text-[#73664B] font-normal'>เลือกได้ 1 รายการ</span>
-                                                        </p>
-
-                                                        {freeItemIds.length > 0 ? (
-                                                            <RadioGroup value={selectedFreeId} onChange={handleFreeChange}>
-                                                                {freeItemIds.map(id => (
-                                                                    <Radio
-                                                                        key={id}
-                                                                        value={id.toString()}
-                                                                    >
-                                                                        {smfreeIdNameMap.get(id) || 'No Name Available'}
-                                                                    </Radio>
-                                                                ))}
-                                                            </RadioGroup>
-                                                        ) : (
-                                                            <p>ไม่มีรายการฟรี</p>
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-lg bg-white pb-3 font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
+                                                    >
+                                                        <p>{selectedSale.sm_name}</p>
+                                                        <p className="text-[#F2B461]">ราคา {selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}฿</p>
+                                                    </Dialog.Title>
+                                                    <div className='px-4 pb-2 pt-2 mt-1 bg-white'>
+                                                        {selectedSale && (
+                                                            <div className='flex justify-between items-center'>
+                                                                <div>
+                                                                    <p className="text-lg font-medium">
+                                                                        สินค้า
+                                                                    </p>
+                                                                    <p className='text-sm text-[#73664B] font-normal'>กรุณาเลือก {selectedSale.qty_per_unit} รายการ</p>
+                                                                </div>
+                                                                <div>
+                                                                    <Chip size="sm">{getTotalSelectedItems()}/{selectedSale.qty_per_unit}</Chip>
+                                                                </div>
+                                                            </div>
                                                         )}
-                                                        <div>
-                                                            <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
-
-                                                            <button
-                                                                onClick={decrementQuantity}
-
-                                                                className="mt-2 btn btn-square bg-[#D9CAA7] btn-xs "
-                                                            >
-                                                                <svg
-                                                                    className="text-[#73664B]"
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width="1em"
-                                                                    height="1em"
-                                                                    viewBox="0 0 256 256"
-                                                                >
-                                                                    <path
-                                                                        fill="currentColor"
-                                                                        d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
-                                                                    />
-                                                                </svg>
-                                                            </button>
-                                                            <span className="w-4 text-center mx-2">{quantity}</span>
-                                                            <button
-                                                                onClick={incrementQuantity}
-
-                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
-
-                                                            >
-                                                                <svg
-                                                                    className="text-[#73664B]"
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    width="1em"
-                                                                    height="1em"
-                                                                    viewBox="0 0 256 256"
-                                                                >
-                                                                    <path
-                                                                        fill="currentColor"
-                                                                        d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
-                                                                    />
-                                                                </svg>
-                                                            </button></div>
+                                                        <div className="flex flex-col gap-1 w-full max-h-80 overflow-y-auto">
+                                                            {Mix.length > 0 ? (
+                                                                Mix.map(id => (
+                                                                    <Checkbox
+                                                                        key={id.pd_id}
+                                                                        aria-label={id.pd_name}
+                                                                        classNames={{
+                                                                            base: cn(
+                                                                                "inline-flex max-w-md w-full bg-content1 m-0",
+                                                                                "hover:bg-content2 items-center justify-start",
+                                                                                "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                "data-[selected=true]:border-primary"
+                                                                            ),
+                                                                            label: "w-full",
+                                                                        }}
+                                                                        isDisabled={
+                                                                            selectedSale &&
+                                                                            !selectedPdIds.includes(id.pd_id) &&
+                                                                            getTotalSelectedItems() >= selectedSale.qty_per_unit
+                                                                        }
+                                                                        checked={selectedPdIds.includes(id.pd_id)}
+                                                                        onChange={() => handleCheckboxChange(id.pd_id)}
+                                                                    >
+                                                                        <div className="w-full flex justify-between gap-2">
+                                                                            <User
+                                                                                avatarProps={{ size: "md", src: id.picture }}
+                                                                                description={id.pdc_name}
+                                                                                name={id.pd_name || 'No Name Available'}
+                                                                            />
+                                                                            <div className="flex flex-col items-end gap-1">
+                                                                                {selectedPdIds.includes(id.pd_id) && (
+                                                                                    <>
+                                                                                        <div className="flex items-center mt-2">
+                                                                                            <button
+                                                                                                onClick={() => decrementQuantitymix(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={quantities[id.pd_id] <= 1}
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                            <span className="w-4 text-center mx-2">{quantities[id.pd_id] || 1}</span>
+                                                                                            <button
+                                                                                                onClick={() => incrementQuantitymix(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={getTotalSelectedItems() >= selectedSale.qty_per_unit}
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </Checkbox>
+                                                                ))
+                                                            ) : (
+                                                                <p>ไม่มีรายการสินค้า</p>
+                                                            )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                {/*  choose */}
-                                                <div className="flex justify-end mt-5">
-                                                    <div className="inline-flex justify-end">
-                                                        <button
-                                                            type="button"
-                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={closeModal}
-                                                        >
-                                                            ยกเลิก
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={handleAddToCart}
-                                                        ><Link href="#">
-                                                                ยืนยัน
-                                                            </Link></button>
+
+                                                    <div className='px-4 pb-4 pt-2 mt-1 bg-white'>
+                                                            <p className="text-lg font-medium">จำนวน</p>
+
+                                                            <div className='flex items-center justify-center mt-1 w-full'>
+                                                                <button
+                                                                    onClick={decrementQuantity}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+                                                                    disabled={quantity == 1}
+                                                                >
+                                                                    <svg
+                                                                        className="text-[#73664B]"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="1em"
+                                                                        height="1em"
+                                                                        viewBox="0 0 256 256"
+                                                                    >
+                                                                        <path
+                                                                            fill="currentColor"
+                                                                            d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </button>
+                                                                <span className="w-10 text-center mx-2 text-lg">{quantity}</span>
+                                                                <button
+                                                                    onClick={incrementQuantity}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+
+                                                                >
+                                                                    <svg
+                                                                        className="text-[#73664B]"
+                                                                        xmlns="http://www.w3.org/2000/svg"
+                                                                        width="1em"
+                                                                        height="1em"
+                                                                        viewBox="0 0 256 256"
+                                                                    >
+                                                                        <path
+                                                                            fill="currentColor"
+                                                                            d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                    {/*  choose */}
+                                                    <div className="flex justify-end p-4 w-full bg-white mt-1">
+                                                        <div className="inline-flex justify-end w-full">
+                                                            <button
+                                                                type="button"
+                                                                className="bg-gray-200 inline-flex justify-center rounded-md border border-transparent w-1/2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={closeModalmix}
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+                                                            <div className='mx-1'></div>
+                                                            <button
+                                                                type="button"
+                                                                className={`${getTotalSelectedItems() !== selectedSale.qty_per_unit ? ('bg-[#c9c9c9] ') : ('bg-[#C5B182] hover:bg-[#A89362]')} text-white inline-flex justify-center rounded-md border border-transparent w-1/2 px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
+                                                                onClick={handleAddToCart}
+                                                                disabled={getTotalSelectedItems() !== selectedSale.qty_per_unit}
+                                                            >
+                                                                เพิ่มลงตะกร้า</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </Dialog.Panel>
@@ -1510,8 +1988,8 @@ function Pos() {
 
             <div className="w-1/2  mt-10  flex justify-start ">
                 <>
-                    {isOpenmix && (
-                        <Transition appear show={isOpenmix} as={Fragment} >
+                    {isOpenEdit && (
+                        <Transition appear show={isOpenEdit} as={Fragment}>
                             <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
                                 <Transition.Child
                                     as={Fragment}
@@ -1536,118 +2014,276 @@ function Pos() {
                                             leaveFrom="opacity-100 scale-100"
                                             leaveTo="opacity-0 scale-95"
                                         >
-                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                                                {/* <Dialog.Title
-                                                    as="h3"
-                                                    className="text-lg font-medium leading-6 text-[73664B]"
-                                                >
-                                                    {selectedSale.sm_name}
-                                                </Dialog.Title> */}
-                                                <div className='flex'>
-                                                    {selectedSale && (
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                                <div>
+                                                    {editProduct && (
                                                         <Card shadow="sm">
                                                             <CardBody className="overflow-visible p-0">
                                                                 <Image
                                                                     alt={'/default-image.png'}
                                                                     shadow="sm"
-                                                                    radius="lg"
-                                                                    width={200}
-                                                                    src={selectedSale.picture || '/default-image.png'}  // Fallback if picture is missing
+                                                                    width={448}
+                                                                    src={editProduct.picture || '/default-image.png'}  // Fallback if picture is missing
                                                                     className="object-cover h-[140px]"
                                                                 />
                                                             </CardBody>
-                                                            <CardFooter className="text-small justify-between">
-                                                                <p className='text-[#73664B]'>{selectedSale.sm_name || 'No Name Available'}</p> {/* Fallback for name */}
-                                                                <p className="text-[#F2B461]">{selectedSale.sm_price != null ? selectedSale.sm_price : 'N/A'}</p> {/* Fallback for price */}
-                                                            </CardFooter>
                                                         </Card>
                                                     )}
 
-                                                    <div className="ml-6">
-                                                        {selectedSale && (
-                                                            <p className="text-lg text-[#73664B] font-medium">
-                                                                คละ <span className='text-sm text-[#73664B] font-normal'>เลือกได้ {selectedSale.qty_per_unit} รายการ</span>
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-lg font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
+                                                    >
+                                                        <p>{editProduct.sm_name}</p>
+                                                        <p className="text-[#F2B461]">ราคา {editProduct.sm_price != null ? editProduct.sm_price : 'N/A'}฿</p>
+                                                    </Dialog.Title>
+                                                    <div className="p-4">
+                                                        <div>
+                                                            <p className="text-lg font-medium">
+                                                                สินค้า
                                                             </p>
+                                                            <p className='text-sm text-[#73664B] font-normal'>จำเป็นต้องระบุ</p>
+                                                        </div>
+
+                                                        {freeItemIdEdit.length > 0 ? (
+                                                            <RadioGroup
+                                                                value={selectedFreeIdEdit}
+                                                                onChange={handleFreeIdChangeEdit}
+                                                                className='mt-2'
+                                                            >
+                                                                {freeItemIdEdit.map(id => (
+                                                                    <Radio
+                                                                        key={id}
+                                                                        value={id.toString()}
+                                                                        classNames={{
+                                                                            base: cn(
+                                                                                "inline-flex max-w-full w-full bg-content1 m-0",
+                                                                                "hover:bg-content2 items-center justify-start",
+                                                                                "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                "data-[selected=true]:border-primary"
+                                                                            ),
+                                                                        }}
+                                                                    >
+                                                                        {smfreeIdNameMap.get(id) || 'No Name Available'}
+                                                                    </Radio>
+                                                                ))}
+                                                            </RadioGroup>
+                                                        ) : (
+                                                            <p>ไม่มีรายการฟรี</p>
                                                         )}
 
+
+
                                                         <div>
+                                                            <p className="text-lg font-medium mt-2">จำนวน</p>
+                                                            <div className="flex items-center justify-center mt-2">
+                                                                <button
+                                                                    onClick={decrementQuantityEdit}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+                                                                    disabled={quantityEdit == 1}
+                                                                >
+                                                                    <svg className="text-[#73664B] w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                                                                        <path fill="currentColor" d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12" />
+                                                                    </svg>
+                                                                </button>
+                                                                <span className="w-10 text-center mx-2 text-lg">{quantityEdit}</span>
+                                                                <button
+                                                                    onClick={incrementQuantityEdit}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+                                                                >
+                                                                    <svg className="text-[#73664B] w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                                                                        <path fill="currentColor" d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12" />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="mt-4 flex w-full">
+
+                                                            <button
+                                                                type="button"
+                                                                className="inline-flex justify-center w-1/2 rounded-md border border-transparent bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={handleCancel}
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+                                                            <div className='mx-1'></div>
+                                                            <button
+                                                                type="button"
+                                                                className="inline-flex justify-center w-1/2 rounded-md border border-transparent bg-[#C5B182] px-4 py-2 text-sm font-medium text-white hover:bg-[#A89362] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={submitEdit}
+                                                            >
+                                                                อัปเดตตะกร้า
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </Dialog.Panel>
+                                        </Transition.Child>
+                                    </div>
+                                </div>
+                            </Dialog>
+                        </Transition>
+                    )}
+                </>
+            </div>
+
+            <div className="w-1/2  mt-10  flex justify-start ">
+                <>
+                    {isOpenEditMix && (
+                        <Transition appear show={isOpenEditMix} as={Fragment} >
+                            <Dialog as="div" onClose={closeModal} className={`relative z-10 ${kanit.className}`}>
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-300"
+                                    enterFrom="opacity-0"
+                                    enterTo="opacity-100"
+                                    leave="ease-in duration-200"
+                                    leaveFrom="opacity-100"
+                                    leaveTo="opacity-0"
+                                >
+                                    <div className="fixed inset-0 bg-black/25" />
+                                </Transition.Child>
+
+                                <div className="fixed inset-0 overflow-y-auto">
+                                    <div className="flex min-h-full items-center justify-center p-4 text-center">
+                                        <Transition.Child
+                                            as={Fragment}
+                                            enter="ease-out duration-300"
+                                            enterFrom="opacity-0 scale-95"
+                                            enterTo="opacity-100 scale-100"
+                                            leave="ease-in duration-200"
+                                            leaveFrom="opacity-100 scale-100"
+                                            leaveTo="opacity-0 scale-95"
+                                        >
+                                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white text-left align-middle shadow-xl transition-all">
+                                                <div>
+                                                    {editProduct && (
+                                                        <Card shadow="sm">
+                                                            <CardBody className="overflow-visible p-0">
+                                                                <Image
+                                                                    alt={'/default-image.png'}
+                                                                    shadow="sm"
+                                                                    width={448}
+                                                                    src={editProduct.picture || '/default-image.png'}  // Fallback if picture is missing
+                                                                    className="object-cover h-[140px]"
+                                                                />
+                                                            </CardBody>
+                                                        </Card>
+                                                    )}
+
+                                                    <Dialog.Title
+                                                        as="h3"
+                                                        className="text-lg font-medium leading-6 text-[73664B] px-4 pt-4 flex justify-between"
+                                                    >
+                                                        <p>{editProduct.sm_name}</p>
+                                                        <p className="text-[#F2B461]">ราคา {editProduct.sm_price != null ? editProduct.sm_price : 'N/A'}฿</p>
+                                                    </Dialog.Title>
+                                                    <div className='p-4'>
+                                                        {editProduct && (
+                                                            <div className='flex justify-between items-center'>
+                                                                <div>
+                                                                    <p className="text-lg font-medium">
+                                                                        สินค้า
+                                                                    </p>
+                                                                    <p className='text-sm text-[#73664B] font-normal'>กรุณาเลือก {editProduct.qty_per_unit} รายการ</p>
+                                                                </div>
+                                                                <div>
+                                                                    <Chip size="sm">{getTotalSelectedItemsEdit()}/{editProduct.qty_per_unit}</Chip>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        <div className="flex flex-col gap-1 w-full max-h-80 overflow-y-auto">
                                                             {Mix.length > 0 ? (
                                                                 Mix.map(id => (
-                                                                    <div key={id} className="flex items-center space-x-2">
-                                                                        <Checkbox
-                                                                            disabled={
-                                                                                selectedSale && // Ensure selectedSale exists before using its properties
-                                                                                quantities[id.pd_id] === undefined &&
-                                                                                Object.values(quantities).reduce((acc, qty) => acc + qty, 0) >= selectedSale.qty_per_unit
-                                                                            }
-                                                                            size="md"
-                                                                            color="warning"
-                                                                            checked={selectedPdIds.includes(id.pd_id)}
-                                                                            onChange={() => handleCheckboxChange(id.pd_id)}
-                                                                        >
-                                                                            {id.pd_name || 'No Name Available'}
-                                                                        </Checkbox>
-
-                                                                        {/* Quantity controls */}
-                                                                        {selectedPdIds.includes(id.pd_id) && (
-                                                                            <>
-                                                                                <div className="flex items-center mt-2">
-                                                                                    <button
-                                                                                        onClick={() => decrementQuantitymix(id.pd_id)}
-                                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
-                                                                                        disabled={quantities[id.pd_id] <= 1}
-                                                                                    >
-                                                                                        <svg
-                                                                                            className="text-[#73664B]"
-                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                            width="1em"
-                                                                                            height="1em"
-                                                                                            viewBox="0 0 256 256"
-                                                                                        >
-                                                                                            <path
-                                                                                                fill="currentColor"
-                                                                                                d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
-                                                                                            />
-                                                                                        </svg>
-                                                                                    </button>
-                                                                                    <span className="w-4 text-center mx-2">{quantities[id.pd_id] || 1}</span>
-                                                                                    <button
-                                                                                        onClick={() => incrementQuantitymix(id.pd_id)}
-                                                                                        className="btn btn-square bg-[#D9CAA7] btn-xs"
-                                                                                        disabled={
-                                                                                            selectedSale && // Ensure selectedSale exists before using qty_per_unit
-                                                                                            (quantities[id.pd_id] || 1) >= selectedSale.qty_per_unit
-                                                                                        }
-                                                                                    >
-                                                                                        <svg
-                                                                                            className="text-[#73664B]"
-                                                                                            xmlns="http://www.w3.org/2000/svg"
-                                                                                            width="1em"
-                                                                                            height="1em"
-                                                                                            viewBox="0 0 256 256"
-                                                                                        >
-                                                                                            <path
-                                                                                                fill="currentColor"
-                                                                                                d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
-                                                                                            />
-                                                                                        </svg>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </>
-                                                                        )}
-                                                                    </div>
+                                                                    <Checkbox
+                                                                        key={id.pd_id}
+                                                                        aria-label={id.pd_name}
+                                                                        classNames={{
+                                                                            base: cn(
+                                                                                "inline-flex max-w-md w-full bg-content1 m-0",
+                                                                                "hover:bg-content2 items-center justify-start",
+                                                                                "cursor-pointer rounded-lg gap-2 p-2 border-2 border-transparent",
+                                                                                "data-[selected=true]:border-primary"
+                                                                            ),
+                                                                            label: "w-full",
+                                                                        }}
+                                                                        isDisabled={
+                                                                            editProduct &&
+                                                                            !selectedPdIdEdit.includes(id.pd_id) &&
+                                                                            getTotalSelectedItemsEdit() >= editProduct.qty_per_unit
+                                                                        }
+                                                                        checked={selectedPdIdEdit.includes(id.pd_id)}
+                                                                        isSelected={selectedPdIdEdit.includes(id.pd_id)}
+                                                                        onChange={() => handleCheckboxChangeEdit(id.pd_id)}
+                                                                    >
+                                                                        <div className="w-full flex justify-between gap-2">
+                                                                            <User
+                                                                                avatarProps={{ size: "md", src: id.picture }}
+                                                                                description={id.pdc_name}
+                                                                                name={id.pd_name || 'No Name Available'}
+                                                                            />
+                                                                            <div className="flex flex-col items-end gap-1">
+                                                                                {selectedPdIdEdit.includes(id.pd_id) && (
+                                                                                    <>
+                                                                                        <div className="flex items-center mt-2">
+                                                                                            <button
+                                                                                                onClick={() => decrementQuantitymixEdit(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={quantitiesEdit[id.pd_id] <= 1}
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12H40a12 12 0 0 1 0-24h176a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                            <span className="w-4 text-center mx-2">{quantitiesEdit[id.pd_id] || 1}</span>
+                                                                                            <button
+                                                                                                onClick={() => incrementQuantitymixEdit(id.pd_id)}
+                                                                                                className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                                                disabled={getTotalSelectedItemsEdit() >= editProduct.qty_per_unit}
+                                                                                            >
+                                                                                                <svg
+                                                                                                    className="text-[#73664B]"
+                                                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                                                    width="1em"
+                                                                                                    height="1em"
+                                                                                                    viewBox="0 0 256 256"
+                                                                                                >
+                                                                                                    <path
+                                                                                                        fill="currentColor"
+                                                                                                        d="M228 128a12 12 0 0 1-12 12h-76v76a12 12 0 0 1-24 0v-76H40a12 12 0 0 1 0-24h76V40a12 12 0 0 1 24 0v76h76a12 12 0 0 1 12 12"
+                                                                                                    />
+                                                                                                </svg>
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    </>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </Checkbox>
                                                                 ))
                                                             ) : (
-                                                                <p>ไม่มีรายการฟรี</p>
+                                                                <p>ไม่มีรายการสินค้า</p>
                                                             )}
+                                                        </div>
 
-                                                            <div>
-                                                                <p className="text-lg text-[#73664B] font-medium mt-2">จำนวน</p>
+                                                        <div>
+                                                            <p className="text-lg font-medium mt-2">จำนวน</p>
 
+                                                            <div className='flex items-center justify-center mt-2 w-full'>
                                                                 <button
-                                                                    onClick={decrementQuantity}
-
-                                                                    className="mt-2 btn btn-square bg-[#D9CAA7] btn-xs "
+                                                                    onClick={decrementQuantityEdit}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
+                                                                    disabled={quantity == 1}
                                                                 >
                                                                     <svg
                                                                         className="text-[#73664B]"
@@ -1662,11 +2298,10 @@ function Pos() {
                                                                         />
                                                                     </svg>
                                                                 </button>
-                                                                <span className="w-4 text-center mx-2">{quantity}</span>
+                                                                <span className="w-10 text-center mx-2 text-lg">{quantityEdit}</span>
                                                                 <button
-                                                                    onClick={incrementQuantity}
-
-                                                                    className="btn btn-square bg-[#D9CAA7] btn-xs"
+                                                                    onClick={incrementQuantityEdit}
+                                                                    className="btn btn-square bg-[#D9CAA7] btn-sm flex items-center justify-center"
 
                                                                 >
                                                                     <svg
@@ -1685,25 +2320,26 @@ function Pos() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                {/*  choose */}
-                                                <div className="flex justify-end mt-5">
-                                                    <div className="inline-flex justify-end">
-                                                        <button
-                                                            type="button"
-                                                            className="text-[#73664B] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={closeModalmix}
-                                                        >
-                                                            ยกเลิก
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="text-[#C5B182] inline-flex justify-center rounded-md border border-transparent  px-4 py-2 text-sm font-medium  hover:bg-[#FFFFDD] focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                                            onClick={handleAddToCart}
-                                                        ><Link href="#">
-                                                                ยืนยัน
-                                                            </Link></button>
+                                                    {/*  choose */}
+                                                    <div className="flex justify-end p-4 w-full">
+                                                        <div className="inline-flex justify-end w-full">
+                                                            <button
+                                                                type="button"
+                                                                className="bg-gray-200 inline-flex justify-center rounded-md border border-transparent w-1/2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                                                onClick={closeModalmix}
+                                                            >
+                                                                ยกเลิก
+                                                            </button>
+                                                            <div className='mx-1'></div>
+                                                            <button
+                                                                type="button"
+                                                                className={`${getTotalSelectedItemsEdit() !== editProduct.qty_per_unit ? ('bg-[#c9c9c9] ') : ('bg-[#C5B182] hover:bg-[#A89362]')} text-white inline-flex justify-center rounded-md border border-transparent w-1/2 px-4 py-2 text-sm font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
+                                                                onClick={submitEdit}
+                                                                disabled={getTotalSelectedItemsEdit() !== editProduct.qty_per_unit}
+                                                            >
+                                                                เพิ่มลงตะกร้า</button>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </Dialog.Panel>

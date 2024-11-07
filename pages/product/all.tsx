@@ -755,7 +755,7 @@ function All() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1 text-[#F2B461]" style={{ fontFamily: 'kanit' }}>เพิ่มประเภทเมนูสำหรับขาย</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1 text-[#F2B461]" style={{ fontFamily: 'kanit' }}>แก้ไขประเภทเมนูสำหรับขาย</ModalHeader>
                             <ModalBody style={{ fontFamily: 'kanit' }}>
                                 <Input
                                     isRequired
